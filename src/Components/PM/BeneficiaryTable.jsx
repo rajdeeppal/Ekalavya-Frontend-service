@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Button, Collapse, Form, Modal } from 'react-bootstrap';
 import Accordion from 'react-bootstrap/Accordion';
+import * as XLSX from 'xlsx';
 
 const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   const [open, setOpen] = useState({});
@@ -51,9 +52,49 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     setShowConfirmation(false);
   };
 
+  const exportToExcel = () => {
+    const formattedData = [];
+  
+    // Iterate through each beneficiary to format data
+    beneficiaries.forEach((beneficiary) => {
+      beneficiary.components.forEach((component) => {
+        component.activities.forEach((activity) => {
+          activity.tasks.forEach((task, taskIndex) => {
+            formattedData.push({
+              Vertical: taskIndex === 0 && component === beneficiary.components[0] && activity === component.activities[0] ? beneficiary.verticalName : '', // Vertical only on first task of first component/activity
+              'Type of Project': taskIndex === 0 && activity === component.activities[0] ? beneficiary.projectType : '', // Type of Project only on first task of first activity
+              'Name of the Project': taskIndex === 0 && component === beneficiary.components[0] ? beneficiary.projectName : '', // Project Name only on first task of first component
+              Component: taskIndex === 0 ? component.componentName : '', // Component name only on the first task
+              Activity: taskIndex === 0 ? activity.activityName : '', // Activity name only on the first task
+              Tasks: task.taskName,
+              'Type of Unit': task.typeOfUnit,
+              'Unit Rate': task.ratePerUnit,
+              'No. of Units': task.units,
+              'Total Cost Rs.': task.totalCost,
+              'Beneficiary Contribution Rs.': task.beneficiaryContribution,
+              'Grant Amount (Rs.)': task.grantAmount,
+              'Year of Sanction': task.yearOfSanction,
+            });
+          });
+        });
+      });
+    });
+  
+    // Creating the worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Beneficiaries');
+  
+    // Writing the file
+    XLSX.writeFile(workbook, 'Beneficiaries.xlsx');
+  };
+  
   return (
     <div>
       <h3>Beneficiary List</h3>
+      <Button variant="success" onClick={exportToExcel} style={{ marginBottom: '10px' }}>
+        Download Excel
+      </Button>
       <Table bordered hover responsive>
         <thead>
           <tr>

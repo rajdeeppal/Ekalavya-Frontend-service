@@ -4,75 +4,77 @@ import SearchBar from './SearchBar';
 import ProjectForm from './ProjectForm';
 import BeneficiaryForm from './BeneficiaryForm';
 import BeneficiaryTable from './BeneficiaryTable';
+import { getBeneficiary } from '../DataCenter/apiService';
+
 
 const MainApp = () => {
 
   
   const [projects, setProjects] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([
-    {
-        "id": 1,
-        "verticalName": "BT",
-        "components": [
-            {
-                "id": 1,
-                "componentName": "Enterprise",
-                "activities": [
-                    {
-                        "id": 1,
-                        "activityName": "AIB",
-                        "tasks": [
-                            {
-                                "id": 1,
-                                "taskName": "VOICE",
-                                "typeOfUnit":"gm",
-                                "units": "10",
-                                "ratePerUnit": "800",
-                                "totalCost":"234",
-                                "beneficiaryContribution":"12",
-                                "grantAmount":"234",
-                                "yearOfSanction":"2009"
-                            },
-                            {
-                                "id": 3,
-                                "taskName": "CV",
-                                "typeOfUnit":"gm",
-                                "units": "20",
-                                "ratePerUnit": "700",
-                                "totalCost":"234",
-                                "beneficiaryContribution":"12",
-                                "grantAmount":"234",
-                                "yearOfSanction":"2009"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "id": 2,
-                "componentName": "Consumer",
-                "activities": [
-                    {
-                        "id": 2,
-                        "activityName": "OFS",
-                        "tasks": [
-                            {
-                                "id": 2,
-                                "taskName": "Global",
-                                "typeOfUnit":"gm",
-                                "units": "96",
-                                "ratePerUnit": "89",
-                                "totalCost":"234",
-                                "beneficiaryContribution":"12",
-                                "grantAmount":"234",
-                                "yearOfSanction":"2009"
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
+    // {
+    //     "id": 1,
+    //     "verticalName": "BT",
+    //     "components": [
+    //         {
+    //             "id": 1,
+    //             "componentName": "Enterprise",
+    //             "activities": [
+    //                 {
+    //                     "id": 1,
+    //                     "activityName": "AIB",
+    //                     "tasks": [
+    //                         {
+    //                             "id": 1,
+    //                             "taskName": "VOICE",
+    //                             "typeOfUnit":"gm",
+    //                             "units": "10",
+    //                             "ratePerUnit": "800",
+    //                             "totalCost":"234",
+    //                             "beneficiaryContribution":"12",
+    //                             "grantAmount":"234",
+    //                             "yearOfSanction":"2009"
+    //                         },
+    //                         {
+    //                             "id": 3,
+    //                             "taskName": "CV",
+    //                             "typeOfUnit":"gm",
+    //                             "units": "20",
+    //                             "ratePerUnit": "700",
+    //                             "totalCost":"234",
+    //                             "beneficiaryContribution":"12",
+    //                             "grantAmount":"234",
+    //                             "yearOfSanction":"2009"
+    //                         }
+    //                     ]
+    //                 }
+    //             ]
+    //         },
+    //         {
+    //             "id": 2,
+    //             "componentName": "Consumer",
+    //             "activities": [
+    //                 {
+    //                     "id": 2,
+    //                     "activityName": "OFS",
+    //                     "tasks": [
+    //                         {
+    //                             "id": 2,
+    //                             "taskName": "Global",
+    //                             "typeOfUnit":"gm",
+    //                             "units": "96",
+    //                             "ratePerUnit": "89",
+    //                             "totalCost":"234",
+    //                             "beneficiaryContribution":"12",
+    //                             "grantAmount":"234",
+    //                             "yearOfSanction":"2009"
+    //                         }
+    //                     ]
+    //                 }
+    //             ]
+    //         }
+    //     ]
+    // }
 ]);
 
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -89,13 +91,19 @@ const MainApp = () => {
     setShowBeneficiaryModal(false);
   };
 
-  const handleSearch = (criteria) => {
-    // Implement search logic here
+  const handleSearch = async(criteria) => {
+    if (!criteria) return;
+    try {
+      const data = await getBeneficiary(criteria);
+      setBeneficiaries(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
   };
 
   return (
     <Container>
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar handleSearch={handleSearch} />
       <Button variant="primary" onClick={() => setShowProjectModal(true)}>
         Add Project
       </Button>

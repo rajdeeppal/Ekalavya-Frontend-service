@@ -91,7 +91,7 @@ export const saveConfiguration = async (projectConfig) => {
 };
 
 // Save the project **(Riya to use in Add Project)
-export const saveConfiguration = async (projectDto) => {
+export const saveBeneficiaryConfiguration = async (projectDto) => {
     try {
         const response = await axios.post(`${PM_BASE_URL}/project/save`, projectDto);
         return response.data;
@@ -110,5 +110,15 @@ export const updateTask = async (taskId, updatedTask) => {
         });
     } catch (error) {
         console.error("Error updating task:", error);
+    }
+};
+
+export const getBeneficiary = async (projectName) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/${projectName}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching task by ID:', error);
+        throw error;
     }
 };

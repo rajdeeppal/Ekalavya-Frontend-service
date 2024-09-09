@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import ActivityIframe from './ActivityIframe';
-import { getVerticals, getComponents, getActivities, saveConfiguration } from '../DataCenter/apiService';
+import { getVerticals, getComponents, getActivities, getTasks, saveBeneficiaryConfiguration } from '../DataCenter/apiService';
 
 const BeneficiaryForm = ({ projects, addBeneficiary }) => {
   const [beneficiary, setBeneficiary] = useState({
@@ -65,6 +65,19 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
     }
     fetchActivities();
   }, [selectedComponent]);
+
+  useEffect(() => {
+    async function fetchTasks() {
+      if (!selectedActivity) return;
+      try {
+        const data = await getTasks(selectedActivity);
+        setTasks(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching Tasks:', error);
+      }
+    }
+    fetchTasks();
+  }, [selectedActivity]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -143,7 +156,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
     setErrors((prevErrors) => ({ ...prevErrors, selectedTask: '' }));
   };
 
-  const handleAddTask = (task) => {
+  const handleAddTask = async (task) => {
     
     if (!validateForm()) return;
 
@@ -157,7 +170,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
     };
 
     console.log(projectConfig);
-    // await saveConfiguration(projectConfig);
+    await saveBeneficiaryConfiguration(projectConfig);
     setShowIframe(false);
     // setSelectedVertical('');
     // setSelectedComponent('');
