@@ -5,7 +5,16 @@ import * as XLSX from 'xlsx';
 const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
-    
+    const [editMode, setEditMode] = useState({});
+
+    const toggleEditMode = (taskIndex, rowIndex) => {
+        setEditMode((prevEditMode) => ({
+            ...prevEditMode,
+            [`${taskIndex}-${rowIndex}`]: !prevEditMode[`${taskIndex}-${rowIndex}`],
+        }));
+    };
+
+
     const toggleCollapse = (index) => {
         setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
     };
@@ -15,61 +24,89 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
     };
 
     const handleInputChange = (taskIndex, rowIndex, field, value) => {
+        const updatedBeneficiaries = [...beneficiaries];
+
+        const task = updatedBeneficiaries.flatMap(b =>
+            b.components.flatMap(c =>
+                c.activities.flatMap(a =>
+                    a.tasks
+                )
+            )
+        ).find((t, i) => i === taskIndex);
+
+        if (task) {
+            const row = task.additionalRows[rowIndex];
+    
+            row[field] = value;
+    
+            if (row.unitAchievement && task.ratePerUnit) {
+                row.currentCost = row.unitAchievement * task.ratePerUnit;
+            }
+    
+            setBeneficiaries(updatedBeneficiaries); // Update the state
+        }
         setBeneficiaries((prevBeneficiaries) => {
             const updatedBeneficiaries = [...prevBeneficiaries];
-            const task = updatedBeneficiaries.flatMap(b => b.components.flatMap(c => c.activities.flatMap(a => a.tasks))).find((t, i) => i === taskIndex);
-            if (task) {
-                if (!task.additionalRows) {
-                    task.additionalRows = [];
-                }
-                task.additionalRows[rowIndex] = {
-                    ...task.additionalRows[rowIndex],
-                    [field]: value
-                };
-            }
+            const task = updatedBeneficiaries
+                .flatMap(b => b.components.flatMap(c => c.activities.flatMap(a => a.tasks)))
+                .find((t, i) => i === taskIndex);
+
+            task.additionalRows[rowIndex][field] = value;
             return updatedBeneficiaries;
         });
     };
+
+    const handleSaveRow = (taskIndex, rowIndex) => {
+        setEditMode((prevState) => ({
+            ...prevState,
+            [`${taskIndex}-${rowIndex}`]: !prevState[`${taskIndex}-${rowIndex}`],
+        }));
+
+        const task = beneficiaries
+            .flatMap(b => b.components.flatMap(c => c.activities.flatMap(a => a.tasks)))
+            .find((t, i) => i === taskIndex);
+
+        const changedData = task.additionalRows[rowIndex];
+        console.log(changedData);
+        // axios
+        //     .post('/your-endpoint-url', { taskIndex, rowIndex, ...changedData },
+        //         { headers: { 'Content-Type': 'multipart/form-data' } })
+        //     .then((response) => {
+        //         console.log('Data saved successfully:', response.data);
+        //         toggleEditMode(taskIndex, rowIndex); // Exit edit mode after saving
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error saving data:', error);
+        //     });
+    };
+
 
     const addNewRow = (taskIndex) => {
         setBeneficiaries((prevBeneficiaries) => {
             const updatedBeneficiaries = [...prevBeneficiaries];
-            
-            // Find the specific task in the beneficiaries array
+
             const task = updatedBeneficiaries.flatMap(b => b.components.flatMap(c => c.activities.flatMap(a => a.tasks))).find((t, i) => i === taskIndex);
-    
-            // Initialize additionalRows if it does not exist
+
             if (!task.additionalRows) {
                 task.additionalRows = [];
             }
-    
-            // Add a new row only if there are no existing rows or if the last row is complete
-            if (task.additionalRows.length === 0 || (task.additionalRows[task.additionalRows.length - 1] && 
+
+            if (task.additionalRows.length === 0 || (task.additionalRows[task.additionalRows.length - 1] &&
                 (task.additionalRows[task.additionalRows.length - 1].unitAchievement !== '' ||
-                 task.additionalRows[task.additionalRows.length - 1].remainingBalance !== '' ||
-                 task.additionalRows[task.additionalRows.length - 1].duration !== '' ||
-                 task.additionalRows[task.additionalRows.length - 1].payeeName !== '' ||
-                 task.additionalRows[task.additionalRows.length - 1].passbookCopy !== ''))) {
-                 
+                    task.additionalRows[task.additionalRows.length - 1].payeeName !== '' ||
+                    task.additionalRows[task.additionalRows.length - 1].passbookCopy !== ''))) {
+
                 task.additionalRows.push({
                     unitAchievement: '',
-                    remainingBalance: '',
-                    duration: '',
+                    currentCost: '',
                     payeeName: '',
-                    passbookCopy: ''
+                    passbookCopy: '',
+                    otherDocument:''
                 });
             }
-            
             return updatedBeneficiaries;
         });
 
-    
-    };
-    
-
-    const handleSaveRow = (taskIndex, rowIndex) => {
-        // Implement save logic for the specific row if needed
-        console.log(`Saving row ${rowIndex} for task ${taskIndex}`);
     };
 
     const exportToExcel = () => {
@@ -82,8 +119,8 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                         formattedData.push({
                             Vertical:
                                 taskIndex === 0 &&
-                                component === beneficiary.components[0] &&
-                                activity === component.activities[0]
+                                    component === beneficiary.components[0] &&
+                                    activity === component.activities[0]
                                     ? beneficiary.verticalName
                                     : '', // Vertical only on first task of first component/activity
                             'Type of Project':
@@ -138,6 +175,32 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
         XLSX.writeFile(workbook, 'Beneficiaries.xlsx');
     };
 
+    const handleFileChange = (taskIndex, rowIndex, fileType, e) => {
+        const file = e.target.files[0];
+
+        const updatedBeneficiaries = [...beneficiaries];
+        const task = updatedBeneficiaries.flatMap(b =>
+            b.components.flatMap(c =>
+                c.activities.flatMap(a =>
+                    a.tasks
+                )
+            )
+        ).find((t, i) => i === taskIndex);
+
+        if (task && file) {
+            const fileURL = URL.createObjectURL(file);
+            task.additionalRows[rowIndex] = {
+                ...task.additionalRows[rowIndex], 
+                [fileType]: {
+                    file,        
+                    fileURL,
+                }
+            };
+            setBeneficiaries(updatedBeneficiaries);
+        }
+    };
+
+
     return (
         <div>
             <h3>Beneficiary List</h3>
@@ -150,9 +213,9 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                         <th>Project Name</th>
                         <th>Beneficiary Name</th>
                         <th>Father/Husband Name</th>
-                        <th>Village</th>
-                        <th>Mandal</th>
-                        <th>District</th>
+                        <th>villageName</th>
+                        <th>mandalName</th>
+                        <th>districtName</th>
                         <th>State</th>
                         <th>Aadhar</th>
                         <th>Survey No.</th>
@@ -165,10 +228,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                             <tr>
                                 <td>{beneficiary.verticalName}</td>
                                 <td>{beneficiary.beneficiaryName}</td>
-                                <td>{beneficiary.fatherHusbandName}</td>
-                                <td>{beneficiary.village}</td>
-                                <td>{beneficiary.mandal}</td>
-                                <td>{beneficiary.district}</td>
+                                <td>{beneficiary.guardianName}</td>
+                                <td>{beneficiary.villageName}</td>
+                                <td>{beneficiary.mandalName}</td>
+                                <td>{beneficiary.districtName}</td>
                                 <td>{beneficiary.state}</td>
                                 <td>{beneficiary.aadhar}</td>
                                 <td>{beneficiary.surveyNo}</td>
@@ -244,10 +307,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                         <thead>
                                                                                                                             <tr>
                                                                                                                                 <th>Unit Achievement</th>
-                                                                                                                                <th>Remaining Balance</th>
-                                                                                                                                <th>Duration</th>
+                                                                                                                                <th>Current Cost</th>
                                                                                                                                 <th>Payee Name</th>
                                                                                                                                 <th>Passbook Copy</th>
+                                                                                                                                <th>Other Document</th>
                                                                                                                                 <th>Actions</th>
                                                                                                                             </tr>
                                                                                                                         </thead>
@@ -255,48 +318,94 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                             {(task.additionalRows || []).map((row, rowIndex) => (
                                                                                                                                 <tr key={rowIndex}>
                                                                                                                                     <td>
-                                                                                                                                        <Form.Control
-                                                                                                                                            type="text"
-                                                                                                                                            value={row.unitAchievement || ''}
-                                                                                                                                            onChange={(e) => handleInputChange(taskIndex, rowIndex, 'unitAchievement', e.target.value)}
-                                                                                                                                        />
+                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            <Form.Control
+                                                                                                                                                type="text"
+                                                                                                                                                value={row.unitAchievement || ''}
+                                                                                                                                                onChange={(e) => handleInputChange(taskIndex, rowIndex, 'unitAchievement', e.target.value)}
+                                                                                                                                            />
+                                                                                                                                        ) : (
+                                                                                                                                            row.unitAchievement
+                                                                                                                                        )}
                                                                                                                                     </td>
                                                                                                                                     <td>
-                                                                                                                                        <Form.Control
-                                                                                                                                            type="text"
-                                                                                                                                            value={row.remainingBalance || ''}
-                                                                                                                                            onChange={(e) => handleInputChange(taskIndex, rowIndex, 'remainingBalance', e.target.value)}
-                                                                                                                                        />
+                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            <Form.Control
+                                                                                                                                                type="text"
+                                                                                                                                                value={row.currentCost || ''}
+                                                                                                                                                readOnly
+                                                                                                                                            />
+                                                                                                                                        ) : (
+                                                                                                                                            row.currentCost
+                                                                                                                                        )}
                                                                                                                                     </td>
                                                                                                                                     <td>
-                                                                                                                                        <Form.Control
-                                                                                                                                            type="text"
-                                                                                                                                            value={row.duration || ''}
-                                                                                                                                            onChange={(e) => handleInputChange(taskIndex, rowIndex, 'duration', e.target.value)}
-                                                                                                                                        />
+                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            <Form.Control
+                                                                                                                                                type="text"
+                                                                                                                                                value={row.payeeName || ''}
+                                                                                                                                                onChange={(e) => handleInputChange(taskIndex, rowIndex, 'payeeName', e.target.value)}
+                                                                                                                                            />
+                                                                                                                                        ) : (
+                                                                                                                                            row.payeeName
+                                                                                                                                        )}
                                                                                                                                     </td>
                                                                                                                                     <td>
-                                                                                                                                        <Form.Control
-                                                                                                                                            type="text"
-                                                                                                                                            value={row.payeeName || ''}
-                                                                                                                                            onChange={(e) => handleInputChange(taskIndex, rowIndex, 'payeeName', e.target.value)}
-                                                                                                                                        />
+                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            <Form.Control
+                                                                                                                                                type="file"
+                                                                                                                                                accept="image/*"  // Only allow image files
+                                                                                                                                                onChange={(e) => handleFileChange(taskIndex, rowIndex, 'passbookCopy', e)}
+                                                                                                                                            />
+                                                                                                                                        ) : (
+                                                                                                                                            row.passbookCopy ? (
+                                                                                                                                                <a
+                                                                                                                                                    href={row.passbookCopy.fileURL}
+                                                                                                                                                    download={row.passbookCopy.file.name} // Trigger download
+                                                                                                                                                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                                                                                                                                >
+                                                                                                                                                    {row.passbookCopy.file.name}
+                                                                                                                                                </a>
+
+                                                                                                                                            ) : (
+                                                                                                                                                <span>No Image</span> // Placeholder if no image is uploaded
+                                                                                                                                            )
+                                                                                                                                        )}
                                                                                                                                     </td>
                                                                                                                                     <td>
-                                                                                                                                        <Form.Control
-                                                                                                                                            type="text"
-                                                                                                                                            value={row.passbookCopy || ''}
-                                                                                                                                            onChange={(e) => handleInputChange(taskIndex, rowIndex, 'passbookCopy', e.target.value)}
-                                                                                                                                        />
+                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            <Form.Control
+                                                                                                                                                type="file"
+                                                                                                                                                accept=".pdf"
+                                                                                                                                                onChange={(e) => handleFileChange(taskIndex, rowIndex, 'otherDocument', e)}
+                                                                                                                                            />
+                                                                                                                                        ) : (
+                                                                                                                                            row.otherDocument ? (
+                                                                                                                                                <a
+                                                                                                                                                    href={row.otherDocument.fileURL}
+                                                                                                                                                    download={row.otherDocument.file.name}
+                                                                                                                                                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                                                                                                                                >
+                                                                                                                                                    {row.otherDocument.file.name}
+                                                                                                                                                </a>
+
+                                                                                                                                            ) : (
+                                                                                                                                                <span>No File Uploaded</span> 
+                                                                                                                                            )
+                                                                                                                                        )}
                                                                                                                                     </td>
                                                                                                                                     <td>
-                                                                                                                                        <Button
-                                                                                                                                            variant="secondary"
-                                                                                                                                            onClick={() => handleSaveRow(taskIndex, rowIndex)}
-                                                                                                                                        >
-                                                                                                                                            Save
-                                                                                                                                        </Button>
+                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            <Button variant="success" onClick={() => handleSaveRow(taskIndex, rowIndex)}>
+                                                                                                                                                Save
+                                                                                                                                            </Button>
+                                                                                                                                        ) : (
+                                                                                                                                            <Button variant="secondary" onClick={() => toggleEditMode(taskIndex, rowIndex)}>
+                                                                                                                                                Edit
+                                                                                                                                            </Button>
+                                                                                                                                        )}
                                                                                                                                     </td>
+                                                                                                                                    {/* {<pre>{JSON.stringify({ task }, null, 2)}</pre>} */}
                                                                                                                                 </tr>
                                                                                                                             ))}
                                                                                                                         </tbody>

@@ -18,10 +18,25 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setActivity({ ...activity, [name]: value });
-    console.log(activity);
+    const updatedActivity = { ...activity, [name]: value };
+
+    // // Recalculate totalCost if unitRate or noOfUnits changes
+    // if (name === 'unitRate' || name === 'noOfUnits') {
+    //     const unitRate = name === 'unitRate' ? value : updatedActivity.unitRate;
+    //     const noOfUnits = name === 'noOfUnits' ? value : updatedActivity.noOfUnits;
+
+    //     // Calculate totalCost if both unitRate and noOfUnits are defined
+    //     if (unitRate && noOfUnits) {
+    //         updatedActivity.totalCost = parseFloat(unitRate) * parseFloat(noOfUnits);
+    //     }
+    // }
+
+    setActivity(updatedActivity);
+    console.log(updatedActivity);
+
+    // Clear the error for the changed field
     setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
-  };
+};
 
   const validateForm = () => {
     let formErrors = {};

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080/admin'; // Update with your actual API URL
-const PM_BASE_URL = 'http://localhost:8080/user/pm';
+const BASE_URL = 'http://3.111.84.98:8080/admin'; // Update with your actual API URL
+const PM_BASE_URL = 'http://3.111.84.98:8080/user/pm';
 
 // Fetch all Projects created by PM **(Riya to use while add Beneficiary)
 export const getUserProjects = async (userId) => {

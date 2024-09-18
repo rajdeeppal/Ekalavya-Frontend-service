@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Table, Button, Collapse, Form, Modal } from 'react-bootstrap';
-import Accordion from 'react-bootstrap/Accordion';
+import { Button, Table, Collapse, Accordion, AccordionSummary, AccordionDetails, TextField, Modal, Box, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
 
 const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
@@ -91,255 +91,286 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   
   return (
     <div>
-      <h3>Beneficiary List</h3>
-      <Button variant="success" onClick={exportToExcel} style={{ marginBottom: '10px' }}>
-        Download Excel
-      </Button>
-      <Table bordered hover responsive>
-        <thead>
-          <tr>
-            <th>Project Name</th>
-            <th>Beneficiary Name</th>
-            <th>Father/Husband Name</th>
-            <th>Village</th>
-            <th>Mandal</th>
-            <th>District</th>
-            <th>State</th>
-            <th>Aadhar</th>
-            <th>Survey No.</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {beneficiaries.map((beneficiary, beneficiaryIndex) => (
-            <React.Fragment key={beneficiary.id}>
-              <tr>
-                <td>{beneficiary.verticalName}</td>
-                <td>{beneficiary.beneficiaryName}</td>
-                <td>{beneficiary.fatherHusbandName}</td>
-                <td>{beneficiary.village}</td>
-                <td>{beneficiary.mandal}</td>
-                <td>{beneficiary.district}</td>
-                <td>{beneficiary.state}</td>
-                <td>{beneficiary.aadhar}</td>
-                <td>{beneficiary.surveyNo}</td>
-                <td>
-                  <Button
-                    variant="primary"
-                    onClick={() => toggleCollapse(beneficiaryIndex)}
-                    aria-controls={`collapse-${beneficiaryIndex}`}
-                    aria-expanded={open[beneficiaryIndex]}
-                  >
-                    View Components
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan="10" style={{ padding: 0 }}>
-                  <Collapse in={open[beneficiaryIndex]}>
-                    <div id={`collapse-${beneficiaryIndex}`} style={{ padding: '10px' }}>
-                      {beneficiary.components?.map((component, componentIndex) => (
-                        <div key={component.id}>
-                          <Accordion defaultActiveKey="0">
-                            <Accordion.Item eventKey={component.id}>
-                              <Accordion.Header>{component.componentName}</Accordion.Header>
-                              <Accordion.Body>
-                                {component.activities?.map((activity, activityIndex) => (
-                                  <div key={activity.id}>
-                                    <Accordion defaultActiveKey="0">
-                                      <Accordion.Item eventKey={activity.id}>
-                                        <Accordion.Header>{activity.activityName}</Accordion.Header>
-                                        <Accordion.Body>
-                                          <Table striped bordered hover>
-                                            <thead>
-                                              <tr>
-                                                <th>Name of the Work</th>
-                                                <th>Type of Unit</th>
-                                                <th>Unit Rate</th>
-                                                <th>No. of Units</th>
-                                                <th>Total Cost</th>
-                                                <th>Beneficiary Contribution</th>
-                                                <th>Grant Amount</th>
-                                                <th>Year of Sanction</th>
-                                                {showEdit &&
-                                                  <th>Actions</th>}
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {activity.tasks?.map((task, taskIndex) => (
-                                                <tr key={task.id}>
-                                                  {editActivityMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`] ? (
-                                                    <>
-                                                      <td>{task.taskName}</td>
-                                                      <td>{task.typeOfUnit}</td>
-                                                      <td>{task.ratePerUnit}</td>
-                                                      <td>
-                                                        <Form.Control
-                                                          type="text"
-                                                          name="units"
-                                                          value={task.units || ''}
-                                                          onChange={(e) =>
-                                                            handleActivityInputChange(
-                                                              beneficiaryIndex,
-                                                              componentIndex,
-                                                              activityIndex,
-                                                              taskIndex,
-                                                              e
-                                                            )
-                                                          }
-                                                        />
-                                                      </td>
-                                                      <td>
-                                                        <Form.Control
-                                                          type="text"
-                                                          name="totalCost"
-                                                          value={task.totalCost || ''}
-                                                          onChange={(e) =>
-                                                            handleActivityInputChange(
-                                                              beneficiaryIndex,
-                                                              componentIndex,
-                                                              activityIndex,
-                                                              taskIndex,
-                                                              e
-                                                            )
-                                                          }
-                                                        />
-                                                      </td>
-                                                      <td>
-                                                        <Form.Control
-                                                          type="text"
-                                                          name="beneficiaryContribution"
-                                                          value={task.beneficiaryContribution || ''}
-                                                          onChange={(e) =>
-                                                            handleActivityInputChange(
-                                                              beneficiaryIndex,
-                                                              componentIndex,
-                                                              activityIndex,
-                                                              taskIndex,
-                                                              e
-                                                            )
-                                                          }
-                                                        />
-                                                      </td>
-                                                      <td>
-                                                        <Form.Control
-                                                          type="text"
-                                                          name="grantAmount"
-                                                          value={task.grantAmount || ''}
-                                                          onChange={(e) =>
-                                                            handleActivityInputChange(
-                                                              beneficiaryIndex,
-                                                              componentIndex,
-                                                              activityIndex,
-                                                              taskIndex,
-                                                              e
-                                                            )
-                                                          }
-                                                        />
-                                                      </td>
-                                                      <td>
-                                                        <Form.Control
-                                                          type="text"
-                                                          name="yearOfSanction"
-                                                          value={task.yearOfSanction || ''}
-                                                          onChange={(e) =>
-                                                            handleActivityInputChange(
-                                                              beneficiaryIndex,
-                                                              componentIndex,
-                                                              activityIndex,
-                                                              taskIndex,
-                                                              e
-                                                            )
-                                                          }
-                                                        />
-                                                      </td>
-                                                      <td>
-                                                        <Button
-                                                          variant="success"
-                                                          onClick={() =>
-                                                            handleSaveActivity(
-                                                              beneficiaryIndex,
-                                                              componentIndex,
-                                                              activityIndex,
-                                                              taskIndex
-                                                            )
-                                                          }
-                                                        >
-                                                          Save
-                                                        </Button>
-                                                      </td>
-                                                    </>
-                                                  ) : (
-                                                    <>
-                                                      <td>{task.taskName}</td>
-                                                      <td>{task.typeOfUnit}</td>
-                                                      <td>{task.ratePerUnit}</td>
-                                                      <td>{task.units}</td>
-                                                      <td>{task.totalCost}</td>
-                                                      <td>{task.beneficiaryContribution}</td>
-                                                      <td>{task.grantAmount}</td>
-                                                      <td>{task.yearOfSanction}</td>
-                                                      {showEdit && <td>
-                                                        <Button
-                                                          variant="warning"
-                                                          onClick={() =>
-                                                            handleEditActivityClick(
-                                                              beneficiaryIndex,
-                                                              componentIndex,
-                                                              activityIndex,
-                                                              taskIndex
-                                                            )
-                                                          }
-                                                        >
-                                                          Edit
-                                                        </Button>
-                                                      </td>}
-                                                    </>
-                                                  )}
-                                                </tr>
-                                              ))}
-                                            </tbody>
-                                          </Table>
-                                        </Accordion.Body>
-                                      </Accordion.Item>
-                                    </Accordion>
-                                  </div>
-                                ))}
-                              </Accordion.Body>
-                            </Accordion.Item>
-                          </Accordion>
-                        </div>
-                      ))}
-                      <Button
-                        variant="primary"
-                        onClick={() => handleSubmit(beneficiaryIndex)}
-                        style={{ marginTop: '10px' }}
-                      >
-                        Submit
-                      </Button>
-                    </div>
-                  </Collapse>
-                </td>
-              </tr>
-            </React.Fragment>
-          ))}
-        </tbody>
-      </Table>
-      <Modal show={showConfirmation} onHide={handleCloseConfirmation}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Submission</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Do you want to submit the changes?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseConfirmation}>
+    <Typography variant="h4" gutterBottom>Beneficiary List</Typography>
+    <Button
+      variant="contained"
+      color="success"
+      onClick={exportToExcel}
+      sx={{ marginBottom: '10px' }}
+    >
+      Download Excel
+    </Button>
+    <Table sx={{ minWidth: 650 }} aria-label="beneficiary table">
+      <thead>
+        <tr>
+          <th>Project Name</th>
+          <th>Beneficiary Name</th>
+          <th>Father/Husband Name</th>
+          <th>villageName</th>
+          <th>mandalName</th>
+          <th>districtName</th>
+          <th>State</th>
+          <th>Aadhar</th>
+          <th>Survey No.</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {beneficiaries.map((beneficiary, beneficiaryIndex) => (
+          <React.Fragment key={beneficiary.id}>
+            <tr>
+              <td>{beneficiary.verticalName}</td>
+              <td>{beneficiary.beneficiaryName}</td>
+              <td>{beneficiary.guardianName}</td>
+              <td>{beneficiary.villageName}</td>
+              <td>{beneficiary.mandalName}</td>
+              <td>{beneficiary.districtName}</td>
+              <td>{beneficiary.state}</td>
+              <td>{beneficiary.aadhar}</td>
+              <td>{beneficiary.surveyNo}</td>
+              <td>
+                <Button
+                  variant="contained"
+                  onClick={() => toggleCollapse(beneficiaryIndex)}
+                >
+                  View Components
+                </Button>
+              </td>
+            </tr>
+            <tr>
+              <td colSpan="10" style={{ padding: 0 }}>
+                <Collapse in={open[beneficiaryIndex]}>
+                  <Box sx={{ padding: '10px' }}>
+                    {beneficiary.components?.map((component, componentIndex) => (
+                      <div key={component.id}>
+                        <Accordion>
+                          <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls={`component-${componentIndex}-content`}
+                            id={`component-${componentIndex}-header`}
+                          >
+                            <Typography>{component.componentName}</Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            {component.activities?.map((activity, activityIndex) => (
+                              <div key={activity.id}>
+                                <Accordion>
+                                  <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls={`activity-${activityIndex}-content`}
+                                    id={`activity-${activityIndex}-header`}
+                                  >
+                                    <Typography>{activity.activityName}</Typography>
+                                  </AccordionSummary>
+                                  <AccordionDetails>
+                                    <Table aria-label="activity table">
+                                      <thead>
+                                        <tr>
+                                          <th>Name of the Work</th>
+                                          <th>Type of Unit</th>
+                                          <th>Unit Rate</th>
+                                          <th>No. of Units</th>
+                                          <th>Total Cost</th>
+                                          <th>Beneficiary Contribution</th>
+                                          <th>Grant Amount</th>
+                                          <th>Year of Sanction</th>
+                                          {showEdit && <th>Actions</th>}
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {activity.tasks?.map((task, taskIndex) => (
+                                          <tr key={task.id}>
+                                            {editActivityMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`] ? (
+                                              <>
+                                                <td>{task.taskName}</td>
+                                                <td>{task.typeOfUnit}</td>
+                                                <td>{task.ratePerUnit}</td>
+                                                <td>
+                                                  <TextField
+                                                    variant="outlined"
+                                                    size="small"
+                                                    name="units"
+                                                    value={task.units || ''}
+                                                    onChange={(e) =>
+                                                      handleActivityInputChange(
+                                                        beneficiaryIndex,
+                                                        componentIndex,
+                                                        activityIndex,
+                                                        taskIndex,
+                                                        e
+                                                      )
+                                                    }
+                                                  />
+                                                </td>
+                                                <td>
+                                                  <TextField
+                                                    variant="outlined"
+                                                    size="small"
+                                                    name="totalCost"
+                                                    value={task.totalCost || ''}
+                                                    onChange={(e) =>
+                                                      handleActivityInputChange(
+                                                        beneficiaryIndex,
+                                                        componentIndex,
+                                                        activityIndex,
+                                                        taskIndex,
+                                                        e
+                                                      )
+                                                    }
+                                                  />
+                                                </td>
+                                                <td>
+                                                  <TextField
+                                                    variant="outlined"
+                                                    size="small"
+                                                    name="beneficiaryContribution"
+                                                    value={task.beneficiaryContribution || ''}
+                                                    onChange={(e) =>
+                                                      handleActivityInputChange(
+                                                        beneficiaryIndex,
+                                                        componentIndex,
+                                                        activityIndex,
+                                                        taskIndex,
+                                                        e
+                                                      )
+                                                    }
+                                                  />
+                                                </td>
+                                                <td>
+                                                  <TextField
+                                                    variant="outlined"
+                                                    size="small"
+                                                    name="grantAmount"
+                                                    value={task.grantAmount || ''}
+                                                    onChange={(e) =>
+                                                      handleActivityInputChange(
+                                                        beneficiaryIndex,
+                                                        componentIndex,
+                                                        activityIndex,
+                                                        taskIndex,
+                                                        e
+                                                      )
+                                                    }
+                                                  />
+                                                </td>
+                                                <td>
+                                                  <TextField
+                                                    variant="outlined"
+                                                    size="small"
+                                                    name="yearOfSanction"
+                                                    value={task.yearOfSanction || ''}
+                                                    onChange={(e) =>
+                                                      handleActivityInputChange(
+                                                        beneficiaryIndex,
+                                                        componentIndex,
+                                                        activityIndex,
+                                                        taskIndex,
+                                                        e
+                                                      )
+                                                    }
+                                                  />
+                                                </td>
+                                                <td>
+                                                  <Button
+                                                    variant="contained"
+                                                    color="success"
+                                                    onClick={() =>
+                                                      handleSaveActivity(
+                                                        beneficiaryIndex,
+                                                        componentIndex,
+                                                        activityIndex,
+                                                        taskIndex
+                                                      )
+                                                    }
+                                                  >
+                                                    Save
+                                                  </Button>
+                                                </td>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <td>{task.taskName}</td>
+                                                <td>{task.typeOfUnit}</td>
+                                                <td>{task.ratePerUnit}</td>
+                                                <td>{task.units}</td>
+                                                <td>{task.totalCost}</td>
+                                                <td>{task.beneficiaryContribution}</td>
+                                                <td>{task.grantAmount}</td>
+                                                <td>{task.yearOfSanction}</td>
+                                                {showEdit && (
+                                                  <td>
+                                                    <Button
+                                                      variant="contained"
+                                                      color="warning"
+                                                      onClick={() =>
+                                                        handleEditActivityClick(
+                                                          beneficiaryIndex,
+                                                          componentIndex,
+                                                          activityIndex,
+                                                          taskIndex
+                                                        )
+                                                      }
+                                                    >
+                                                      Edit
+                                                    </Button>
+                                                  </td>
+                                                )}
+                                              </>
+                                            )}
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </Table>
+                                  </AccordionDetails>
+                                </Accordion>
+                              </div>
+                            ))}
+                          </AccordionDetails>
+                        </Accordion>
+                      </div>
+                    ))}
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleSubmit(beneficiaryIndex)}
+                      sx={{ marginTop: '10px' }}
+                    >
+                      Submit
+                    </Button>
+                  </Box>
+                </Collapse>
+              </td>
+            </tr>
+          </React.Fragment>
+        ))}
+      </tbody>
+    </Table>
+
+    {/* Modal for confirmation */}
+    <Modal
+      open={showConfirmation}
+      onClose={handleCloseConfirmation}
+      aria-labelledby="confirmation-modal-title"
+      aria-describedby="confirmation-modal-description"
+    >
+      <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4 }}>
+        <Typography id="confirmation-modal-title" variant="h6" component="h2">
+          Confirm Submission
+        </Typography>
+        <Typography id="confirmation-modal-description" sx={{ mt: 2 }}>
+          Do you want to submit the changes?
+        </Typography>
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button variant="contained" color="secondary" onClick={handleCloseConfirmation} sx={{ marginRight: 2 }}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleConfirmSubmit}>
+          <Button variant="contained" color="primary" onClick={handleConfirmSubmit}>
             Yes, Submit
           </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+        </Box>
+      </Box>
+    </Modal>
+  </div>
   );
 };
 

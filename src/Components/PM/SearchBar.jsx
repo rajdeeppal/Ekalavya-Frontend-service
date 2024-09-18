@@ -4,7 +4,7 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 const SearchBar = ({ onSearch }) => {
   const [searchCriteria, setSearchCriteria] = React.useState({
     state: '',
-    district: '',
+    districtName: '',
     projectName: '',
     projectType: '',
     category: '',
@@ -26,7 +26,7 @@ const SearchBar = ({ onSearch }) => {
           <Form.Control type="text" name="state" placeholder="State" onChange={handleChange} />
         </Col>
         <Col md={2}>
-          <Form.Control type="text" name="district" placeholder="District" onChange={handleChange} />
+          <Form.Control type="text" name="districtName" placeholder="districtName" onChange={handleChange} />
         </Col>
         <Col md={2}>
           <Form.Control type="text" name="projectName" placeholder="Project Name" onChange={handleChange} />

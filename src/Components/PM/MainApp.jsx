@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Container, Button, Modal } from 'react-bootstrap';
+import { Container, Button, Modal, Typography, Box, AppBar, Toolbar } from '@mui/material';
 import SearchBar from './SearchBar';
 import ProjectForm from './ProjectForm';
 import BeneficiaryForm from './BeneficiaryForm';
 import BeneficiaryTable from './BeneficiaryTable';
 import { getBeneficiary } from '../DataCenter/apiService';
+import Sidebar from './sidebar/Sidebar';
 
 
 const MainApp = () => {
@@ -102,36 +103,81 @@ const MainApp = () => {
   };
 
   return (
-    <Container>
-      <SearchBar handleSearch={handleSearch} />
-      <Button variant="primary" onClick={() => setShowProjectModal(true)}>
-        Add Project
-      </Button>
-      <Button variant="primary" onClick={() => setShowBeneficiaryModal(true)}>
-        Add Beneficiary
-      </Button>
+    <Box sx={{ display: 'flex' }}>
+      <Sidebar />
+      <Box
+        component="main"
+        sx={{
+          flex: 6,
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
 
-      <Modal show={showProjectModal} onHide={() => setShowProjectModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Project</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ProjectForm addProject={addProject} />
-        </Modal.Body>
-      </Modal>
+        <Box sx={{ mt: "-2%" }}>
+          <SearchBar onSearch={handleSearch} />
+          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            <Button variant="contained" color="primary" onClick={() => setShowProjectModal(true)}>
+              Add Project
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => setShowBeneficiaryModal(true)}>
+              Add Beneficiary
+            </Button>
+          </Box>
+        </Box>
 
-      <Modal show={showBeneficiaryModal} onHide={() => setShowBeneficiaryModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Beneficiary</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <BeneficiaryForm projects={projects} addBeneficiary={addBeneficiary} />
-        </Modal.Body>
-      </Modal>
+        <Modal
+          open={showProjectModal}
+          onClose={() => setShowProjectModal(false)}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+              bgcolor: 'background.paper',
+              borderRadius: 1,
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Typography variant="h6" component="h2" gutterBottom>
+              Add Project
+            </Typography>
+            <ProjectForm addProject={addProject} />
+          </Box>
+        </Modal>
 
-      {/* <pre>{JSON.stringify({ projects, beneficiaries }, null, 2)}</pre> */}
-      <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries}/>
-    </Container>
+        <Modal
+          open={showBeneficiaryModal}
+          onClose={() => setShowBeneficiaryModal(false)}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 600,
+              bgcolor: 'background.paper',
+              borderRadius: 1,
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Typography variant="h6" component="h2" gutterBottom>
+              Add Beneficiary
+            </Typography>
+            <BeneficiaryForm projects={projects} addBeneficiary={addBeneficiary} />
+          </Box>
+        </Modal>
+
+        <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} />
+      </Box>
+    </Box>
   );
 };
 

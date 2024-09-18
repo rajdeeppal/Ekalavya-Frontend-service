@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { TextField, Button, Select, MenuItem, InputLabel, FormControl, Box, Typography } from '@mui/material';
 import { getVerticals, getComponents, getActivities, getTasks, getTaskById, updateTask, saveConfiguration } from '../DataCenter/apiService';
 
 function TaskIframe() {
@@ -55,7 +56,6 @@ function TaskIframe() {
         }
     }, [selectedActivity]);
 
-    // Fetch task details when a task is selected
     useEffect(() => {
         if (selectedTask && selectedTask !== 'other') {
             async function fetchTaskDetails() {
@@ -109,96 +109,145 @@ function TaskIframe() {
     };
 
     return (
-        <div>
-            <h1>Project Configuration</h1>
+        <Box sx={{ p: 2, fontSize: '14px' }}>
+            <Typography variant="h5" sx={{ mb: 3 }}>Project Configuration</Typography>
 
             {/* Vertical dropdown */}
-            <div>
-                <label>Vertical:</label>
-                <select onChange={(e) => setSelectedVertical(e.target.value)} value={selectedVertical}>
-                    <option value="">Select Vertical</option>
-                    {verticals.map(v => <option key={v.id} value={v.verticalName}>{v.verticalName}</option>)}
-                    <option value="other">Other</option>
-                </select>
-            </div>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel id="vertical-select-label">Vertical</InputLabel>
+                <Select
+                    labelId="vertical-select-label"
+                    onChange={(e) => setSelectedVertical(e.target.value)}
+                    value={selectedVertical}
+                    sx={{ fontSize: '14px' }}
+                >
+                    <MenuItem value=""><em>Select Vertical</em></MenuItem>
+                    {verticals.map(v => (
+                        <MenuItem key={v.id} value={v.verticalName}>{v.verticalName}</MenuItem>
+                    ))}
+                    <MenuItem value="other">Other</MenuItem>
+                </Select>
+            </FormControl>
 
             {selectedVertical === 'other' && (
-                <div>
-                    <label>New Vertical Name:</label>
-                    <input type="text" onChange={(e) => setNewVerticalName(e.target.value)} value={newVerticalName} />
-                </div>
+                <TextField
+                    label="New Vertical Name"
+                    fullWidth
+                    value={newVerticalName}
+                    onChange={(e) => setNewVerticalName(e.target.value)}
+                    sx={{ mb: 2, fontSize: '14px' }}
+                />
             )}
 
             {/* Component dropdown */}
             {selectedVertical && (
-                <div>
-                    <label>Component:</label>
-                    <select onChange={(e) => setSelectedComponent(e.target.value)} value={selectedComponent}>
-                        <option value="">Select Component</option>
-                        {components.map(c => <option key={c.id} value={c.componentName}>{c.componentName}</option>)}
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel id="component-select-label">Component</InputLabel>
+                    <Select
+                        labelId="component-select-label"
+                        onChange={(e) => setSelectedComponent(e.target.value)}
+                        value={selectedComponent}
+                        sx={{ fontSize: '14px' }}
+                    >
+                        <MenuItem value=""><em>Select Component</em></MenuItem>
+                        {components.map(c => (
+                            <MenuItem key={c.id} value={c.componentName}>{c.componentName}</MenuItem>
+                        ))}
+                        <MenuItem value="other">Other</MenuItem>
+                    </Select>
+                </FormControl>
             )}
 
             {selectedComponent === 'other' && (
-                <div>
-                    <label>New Component Name:</label>
-                    <input type="text" onChange={(e) => setNewComponentName(e.target.value)} value={newComponentName} />
-                </div>
+                <TextField
+                    label="New Component Name"
+                    fullWidth
+                    value={newComponentName}
+                    onChange={(e) => setNewComponentName(e.target.value)}
+                    sx={{ mb: 2, fontSize: '14px' }}
+                />
             )}
 
             {/* Activity dropdown */}
             {selectedComponent && (
-                <div>
-                    <label>Activity:</label>
-                    <select onChange={(e) => setSelectedActivity(e.target.value)} value={selectedActivity}>
-                        <option value="">Select Activity</option>
-                        {activities.map(a => <option key={a.id} value={a.activityName}>{a.activityName}</option>)}
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel id="activity-select-label">Activity</InputLabel>
+                    <Select
+                        labelId="activity-select-label"
+                        onChange={(e) => setSelectedActivity(e.target.value)}
+                        value={selectedActivity}
+                        sx={{ fontSize: '14px' }}
+                    >
+                        <MenuItem value=""><em>Select Activity</em></MenuItem>
+                        {activities.map(a => (
+                            <MenuItem key={a.id} value={a.activityName}>{a.activityName}</MenuItem>
+                        ))}
+                        <MenuItem value="other">Other</MenuItem>
+                    </Select>
+                </FormControl>
             )}
 
             {selectedActivity === 'other' && (
-                <div>
-                    <label>New Activity Name:</label>
-                    <input type="text" onChange={(e) => setNewActivityName(e.target.value)} value={newActivityName} />
-                </div>
+                <TextField
+                    label="New Activity Name"
+                    fullWidth
+                    value={newActivityName}
+                    onChange={(e) => setNewActivityName(e.target.value)}
+                    sx={{ mb: 2, fontSize: '14px' }}
+                />
             )}
 
             {/* Task dropdown */}
             {selectedActivity && (
-                <div>
-                    <label>Task:</label>
-                    <select onChange={(e) => setSelectedTask(e.target.value)} value={selectedTask}>
-                        <option value="">Select Task</option>
-                        {tasks.map(t => <option key={t.id} value={t.id}>{t.taskName}</option>)}
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel id="task-select-label">Task</InputLabel>
+                    <Select
+                        labelId="task-select-label"
+                        onChange={(e) => setSelectedTask(e.target.value)}
+                        value={selectedTask}
+                        sx={{ fontSize: '14px' }}
+                    >
+                        <MenuItem value=""><em>Select Task</em></MenuItem>
+                        {tasks.map(t => (
+                            <MenuItem key={t.id} value={t.id}>{t.taskName}</MenuItem>
+                        ))}
+                        <MenuItem value="other">Other</MenuItem>
+                    </Select>
+                </FormControl>
             )}
 
             {/* Input fields for Task Name, Units, and Rate per Unit */}
             {(selectedTask === 'other' || selectedTask) && (
                 <>
-                    <div>
-                        <label>Task Name:</label>
-                        <input type="text" onChange={(e) => setTaskName(e.target.value)} value={taskName} disabled={selectedTask !== 'other'} />
-                    </div>
-                    <div>
-                        <label>Units:</label>
-                        <input type="number" onChange={(e) => setUnits(e.target.value)} value={units} />
-                    </div>
-                    <div>
-                        <label>Rate per Unit:</label>
-                        <input type="number" onChange={(e) => setRatePerUnit(e.target.value)} value={ratePerUnit} />
-                    </div>
+                    <TextField
+                        label="Task Name"
+                        fullWidth
+                        value={taskName}
+                        onChange={(e) => setTaskName(e.target.value)}
+                        disabled={selectedTask !== 'other'}
+                        sx={{ mb: 2, fontSize: '14px' }}
+                    />
+                    <TextField
+                        label="Units"
+                        fullWidth
+                        value={units}
+                        onChange={(e) => setUnits(e.target.value)}
+                        sx={{ mb: 2, fontSize: '14px' }}
+                    />
+                    <TextField
+                        label="Rate per Unit"
+                        fullWidth
+                        value={ratePerUnit}
+                        onChange={(e) => setRatePerUnit(e.target.value)}
+                        sx={{ mb: 2, fontSize: '14px' }}
+                    />
                 </>
             )}
 
-            <button onClick={handleSave}>Save Configuration</button>
-        </div>
+            <Button variant="contained" color="primary" onClick={handleSave} sx={{ fontSize: '14px' }}>
+                Save Configuration
+            </Button>
+        </Box>
     );
 }
 
