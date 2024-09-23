@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Button, Stack
+  Paper, Button, Stack, TextField
 } from '@mui/material';
 import axios from 'axios';
 
@@ -11,25 +11,65 @@ const PendingRequests = () => {
 
   // Fetch requests from API
   useEffect(() => {
-    axios.get('http://3.111.84.98:8080/admin/manageRoles')  // Replace with your API endpoint
+    const token = localStorage.getItem('jwtToken');
+    console.log('Inside Pending Requests Component : ', token);
+
+    axios.get('http://3.111.84.98:8080/admin/manageRoles', {
+      headers:{
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
       .then(response => {
         setRequests(response.data);
         console.log(response.data);
       })
       .catch(error => {
-        console.error('Error fetching requests', error);
+        if(error.response && error.response.status === 401){
+          console.error('Token has expired, please login again.');
+          localStorage.removeItem('jwtToken');
+          window.location.href = '/login';  // Redirect to login page
+        } else {
+          console.error('Error fetching requests', error);
+        }
       });
   }, [refresh]);
 
-  // Function to handle approve/reject
-  const handleStatusChange = (requestId, newStatus) => {
-    axios.post(`/api/request/${requestId}/update-status`, { status: newStatus })
+  // Handle status change with approver comments and date
+  const handleStatusChange = (requestId, newStatus, approverComments, approvedDate) => {
+    axios.post(`/api/request/${requestId}/update-status`, { 
+        status: newStatus,
+        approverComments,
+        approvedDate
+      })
       .then(() => {
         setRefresh(!refresh);  // Trigger a re-fetch of data
       })
       .catch(error => {
         console.error('Error updating status', error);
       });
+  };
+
+  // Handle entering edit mode
+  const [editing, setEditing] = useState({});
+
+  const toggleEdit = (requestId) => {
+    setEditing((prev) => ({
+      ...prev,
+      [requestId]: !prev[requestId]
+    }));
+  };
+
+  const handleApproveReject = (request, newStatus) => {
+    handleStatusChange(request.id, newStatus, request.approverComments, request.approvedDate);
+  };
+
+  const handleChange = (requestId, field, value) => {
+    setRequests((prevRequests) =>
+      prevRequests.map((request) =>
+        request.id === requestId ? { ...request, [field]: value } : request
+      )
+    );
   };
 
   return (
@@ -59,25 +99,59 @@ const PendingRequests = () => {
               <TableCell>{request.user.emailId}</TableCell>
               <TableCell>{request.requestedRole}</TableCell>
               <TableCell>{request.status}</TableCell>
-              <TableCell>{request.approverComments}</TableCell>
-              <TableCell>{new Date(request.requestedDate).toLocaleDateString()}</TableCell>
-              <TableCell>{request.approvedDate ? new Date(request.approvedDate).toLocaleDateString() : '-'}</TableCell>
+              
+              <TableCell>
+                {editing[request.id] ? (
+                  <TextField
+                    value={request.approverComments}
+                    onChange={(e) => handleChange(request.id, 'approverComments', e.target.value)}
+                    fullWidth
+                  />
+                ) : (
+                  request.approverComments || '-'
+                )}
+              </TableCell>
+
+              <TableCell>
+                {editing[request.id] ? (
+                  <TextField
+                    type="date"
+                    value={request.approvedDate ? new Date(request.approvedDate).toISOString().split('T')[0] : ''}
+                    onChange={(e) => handleChange(request.id, 'approvedDate', e.target.value)}
+                    fullWidth
+                  />
+                ) : (
+                  request.approvedDate ? new Date(request.approvedDate).toLocaleDateString() : '-'
+                )}
+              </TableCell>
+
               <TableCell>
                 <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleStatusChange(request.id, 'approve')}
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => handleStatusChange(request.id, 'reject')}
-                  >
-                    Reject
-                  </Button>
+                  {editing[request.id] ? (
+                    <>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleApproveReject(request, 'approve')}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleApproveReject(request, 'reject')}
+                      >
+                        Reject
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      onClick={() => toggleEdit(request.id)}
+                    >
+                      Edit
+                    </Button>
+                  )}
                 </Stack>
               </TableCell>
             </TableRow>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { TextField, Button, Grid, Container } from '@mui/material';
 
 const SearchBar = ({ onSearch }) => {
   const [searchCriteria, setSearchCriteria] = React.useState({
@@ -20,27 +20,71 @@ const SearchBar = ({ onSearch }) => {
   };
 
   return (
-    <Container className="mt-4">
-      <Row>
-        <Col md={2}>
-          <Form.Control type="text" name="state" placeholder="State" onChange={handleChange} />
-        </Col>
-        <Col md={2}>
-          <Form.Control type="text" name="districtName" placeholder="districtName" onChange={handleChange} />
-        </Col>
-        <Col md={2}>
-          <Form.Control type="text" name="projectName" placeholder="Project Name" onChange={handleChange} />
-        </Col>
-        <Col md={2}>
-          <Form.Control type="text" name="projectType" placeholder="Project Type" onChange={handleChange} />
-        </Col>
-        <Col md={2}>
-          <Form.Control type="text" name="category" placeholder="Category" onChange={handleChange} />
-        </Col>
-        <Col md={2}>
-          <Button variant="primary" onClick={handleSearch}>Search</Button>
-        </Col>
-      </Row>
+    <Container sx={{ marginTop: 4 }}>
+      <Grid container spacing={3} alignItems="center">
+        <Grid item xs={12} sm={6} md={2}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="State"
+            name="state"
+            onChange={handleChange}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="District Name"
+            name="districtName"
+            onChange={handleChange}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Project Name"
+            name="projectName"
+            onChange={handleChange}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Project Type"
+            name="projectType"
+            onChange={handleChange}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Category"
+            name="category"
+            onChange={handleChange}
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2}>
+          <Button
+            variant="outlined"
+            fullWidth
+            color="primary"
+            className="button"
+            onClick={handleSearch}
+            sx={{ height: '40px' }}  // Adjust height to match input fields
+          >
+            Search
+          </Button>
+        </Grid>
+      </Grid>
     </Container>
   );
 };

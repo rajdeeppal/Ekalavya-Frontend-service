@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Container, TextField, Button, Alert } from '@mui/material';
 
 function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
   const [activity, setActivity] = useState({
@@ -20,20 +20,17 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
     const { name, value } = e.target;
     const updatedActivity = { ...activity, [name]: value };
 
-    // // Recalculate totalCost if unitRate or noOfUnits changes
-    // if (name === 'unitRate' || name === 'noOfUnits') {
-    //     const unitRate = name === 'unitRate' ? value : updatedActivity.unitRate;
-    //     const noOfUnits = name === 'noOfUnits' ? value : updatedActivity.noOfUnits;
+    if (name === 'unitRate' || name === 'noOfUnits') {
+        const unitRate = name === 'unitRate' ? value : updatedActivity.unitRate;
+        const noOfUnits = name === 'noOfUnits' ? value : updatedActivity.noOfUnits;
 
-    //     // Calculate totalCost if both unitRate and noOfUnits are defined
-    //     if (unitRate && noOfUnits) {
-    //         updatedActivity.totalCost = parseFloat(unitRate) * parseFloat(noOfUnits);
-    //     }
-    // }
+        // Calculate totalCost if both unitRate and noOfUnits are defined
+        if (unitRate && noOfUnits) {
+            updatedActivity.totalCost = parseFloat(unitRate) * parseFloat(noOfUnits);
+        }
+    }
 
     setActivity(updatedActivity);
-    console.log(updatedActivity);
-
     // Clear the error for the changed field
     setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
 };
@@ -54,7 +51,6 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
   const handleSave = () => {
     if (!validateForm()) return;
 
-    console.log(activity);
     onSave(activity);
     setActivity({
       task: taskName,
@@ -70,86 +66,142 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
     // setErrors({});
   };
 
-  return (
-    <div className="container mt-5">
-      <Form>
-        <Form.Group>
-          <Form.Label>Task Name</Form.Label>
-          <Form.Control type="text" value={taskName} readOnly />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Name of Work</Form.Label>
-          <Form.Control
-            type="text"
-            name="nameOfWork"
-            value={activity.nameOfWork}
-            onChange={handleChange}
-          />
-          {errors.nameOfWork && <Alert variant="danger">{errors.nameOfWork}</Alert>}
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Type of Unit</Form.Label>
-          <Form.Control type="text" value={typeOfUnit} readOnly />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Unit Rate</Form.Label>
-          <Form.Control type="number" value={unitRate} readOnly />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>No of Units</Form.Label>
-          <Form.Control
-            type="number"
-            name="noOfUnits"
-            value={activity.noOfUnits}
-            onChange={handleChange}
-          />
-          {errors.noOfUnits && <Alert variant="danger">{errors.noOfUnits}</Alert>}
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Total Cost</Form.Label>
-          <Form.Control
-            type="number"
-            name="totalCost"
-            value={activity.totalCost}
-            onChange={handleChange}
-          />
-          {errors.totalCost && <Alert variant="danger">{errors.totalCost}</Alert>}
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Beneficiary Contribution</Form.Label>
-          <Form.Control
-            type="number"
-            name="beneficiaryContribution"
-            value={activity.beneficiaryContribution}
-            onChange={handleChange}
-          />
-          {errors.beneficiaryContribution && <Alert variant="danger">{errors.beneficiaryContribution}</Alert>}
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Grant Amount</Form.Label>
-          <Form.Control
-            type="number"
-            name="grantAmount"
-            value={activity.grantAmount}
-            onChange={handleChange}
-          />
-          {errors.grantAmount && <Alert variant="danger">{errors.grantAmount}</Alert>}
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Year of Sanction</Form.Label>
-          <Form.Control
-            type="number"
-            name="yearOfSanction"
-            value={activity.yearOfSanction}
-            onChange={handleChange}
-          />
-          {errors.yearOfSanction && <Alert variant="danger">{errors.yearOfSanction}</Alert>}
-        </Form.Group>
-        <Button variant="primary" onClick={handleSave}>
+  return  (
+    <Container sx={{ marginTop: 5 }}>
+      <form>
+        <TextField
+          label="Task Name"
+          value={taskName}
+          InputProps={{ readOnly: true }}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+
+        <TextField
+          label="Name of Work"
+          name="nameOfWork"
+          value={activity.nameOfWork}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+        {errors.nameOfWork && (
+          <Alert severity="error" sx={{ marginTop: 1 }}>
+            {errors.nameOfWork}
+          </Alert>
+        )}
+
+        <TextField
+          label="Type of Unit"
+          value={typeOfUnit}
+          InputProps={{ readOnly: true }}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+
+        <TextField
+          label="Unit Rate"
+          type="number"
+          value={unitRate}
+          InputProps={{ readOnly: true }}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+
+        <TextField
+          label="No of Units"
+          name="noOfUnits"
+          type="number"
+          value={activity.noOfUnits}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+        {errors.noOfUnits && (
+          <Alert severity="error" sx={{ marginTop: 1 }}>
+            {errors.noOfUnits}
+          </Alert>
+        )}
+
+        <TextField
+          label="Total Cost"
+          name="totalCost"
+          type="number"
+          value={activity.totalCost}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          readonly
+        />
+        {errors.totalCost && (
+          <Alert severity="error" sx={{ marginTop: 1 }}>
+            {errors.totalCost}
+          </Alert>
+        )}
+
+        <TextField
+          label="Beneficiary Contribution"
+          name="beneficiaryContribution"
+          type="number"
+          value={activity.beneficiaryContribution}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+        {errors.beneficiaryContribution && (
+          <Alert severity="error" sx={{ marginTop: 1 }}>
+            {errors.beneficiaryContribution}
+          </Alert>
+        )}
+
+        <TextField
+          label="Grant Amount"
+          name="grantAmount"
+          type="number"
+          value={activity.grantAmount}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+        {errors.grantAmount && (
+          <Alert severity="error" sx={{ marginTop: 1 }}>
+            {errors.grantAmount}
+          </Alert>
+        )}
+
+        <TextField
+          label="Year of Sanction"
+          name="yearOfSanction"
+          type="number"
+          value={activity.yearOfSanction}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+        {errors.yearOfSanction && (
+          <Alert severity="error" sx={{ marginTop: 1 }}>
+            {errors.yearOfSanction}
+          </Alert>
+        )}
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          sx={{ marginTop: 2 }}
+        >
           Save
         </Button>
-      </Form>
-    </div>
+      </form>
+    </Container>
   );
 }
 

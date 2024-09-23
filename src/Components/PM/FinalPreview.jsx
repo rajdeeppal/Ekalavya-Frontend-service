@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Container, Button, Modal, Typography, Box, AppBar, Toolbar } from '@mui/material';
+import { Box } from '@mui/material';
 import SearchBar from './SearchBar';
 import Sidebar from './sidebar/Sidebar';
 import InprogressTable from './InprogressTable';
 import { getBeneficiary } from '../DataCenter/apiService';
 
-const ProgressIframe = () => {
+const FinalPreview = () => {
     const [beneficiaries, setBeneficiaries] = useState([
         {
             "id": 1,
@@ -106,7 +106,6 @@ const ProgressIframe = () => {
         }
     ]);
     const [showTable, setShowTable] = useState(true);
-
     const handleSearch = async (criteria) => {
         if (!criteria) return;
         try {
@@ -141,4 +140,4 @@ const ProgressIframe = () => {
     )
 }
 
-export default ProgressIframe;
+export default FinalPreview;

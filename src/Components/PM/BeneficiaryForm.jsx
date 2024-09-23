@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
+import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
 import ActivityIframe from './ActivityIframe';
 import { getVerticals, getComponents, getActivities, getTasks, saveBeneficiaryConfiguration } from '../DataCenter/apiService';
 
@@ -10,9 +10,9 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
     villageName: '',
     mandalName: '',
     districtName: '',
-    state: '',
-    aadhar: '',
-    surveyNo: '',
+    stateName: '',
+    aadharNumber: '',
+    surveyNumber: '',
   });
 
   const [verticals, setVerticals] = useState([]);
@@ -97,9 +97,9 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
     if (!beneficiary.villageName) formErrors.villageName = 'villageName is required';
     if (!beneficiary.mandalName) formErrors.mandalName = 'mandalName is required';
     if (!beneficiary.districtName) formErrors.districtName = 'districtName is required';
-    if (!beneficiary.state) formErrors.state = 'State is required';
-    if (!beneficiary.aadhar) formErrors.aadhar = 'Aadhar is required';
-    if (!beneficiary.surveyNo) formErrors.surveyNo = 'Survey number is required';
+    if (!beneficiary.stateName) formErrors.stateName = 'State is required';
+    if (!beneficiary.aadharNumber) formErrors.aadharNumber = 'aadharNumber is required';
+    if (!beneficiary.surveyNumber) formErrors.surveyNumber = 'Survey number is required';
     if (!selectedComponent) formErrors.selectedComponent = 'Component is required';
     if (!selectedActivity) formErrors.selectedActivity = 'Activity is required';
     if (!selectedTask) formErrors.selectedTask = 'Task is required';
@@ -116,9 +116,9 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
       villageName: '',
       mandalName: '',
       districtName: '',
-      state: '',
-      aadhar: '',
-      surveyNo: '',
+      stateName: '',
+      aadharNumber: '',
+      surveyNumber: '',
     });
     setSelectedVertical('');
     setSelectedComponent('');
@@ -159,32 +159,55 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
 
   const handleAddTask = async (task) => {
 
+    setTaskDetails(task);
+
     if (!validateForm()) return;
+    console.log(selectedComponent);
 
     const projectConfig = {
+      // projectName: selectedVertical,
+      // ...beneficiary,
+      // componentName: selectedComponent,
+      // activityName: selectedActivity,
+      // taskName: selectedTask,
+      // ...task,
       projectName: selectedVertical,
-      ...beneficiary,
+      beneficiary: beneficiary.beneficiaryName,
+      guardianName: beneficiary.guardianName,
+      villageName: beneficiary.villageName,
+      mandalName: beneficiary.mandalName,
+      districtName: beneficiary.districtName,
+      stateName: beneficiary.stateName,
+      aadharNumber: parseInt(beneficiary.aadharNumber, 10),
+      surveyNumber: parseInt(beneficiary.surveyNumber, 10),
       componentName: selectedComponent,
       activityName: selectedActivity,
       taskName: selectedTask,
-      ...task,
+      beneficiaryContribution: parseFloat(task.beneficiaryContribution),
+      grantAmount: parseFloat(task.grantAmount),
+      nameOfWork: task.nameOfWork,
+      noOfUnits: parseInt(task.noOfUnits, 10),
+      totalCost: parseFloat(task.totalCost),
+      typeOfUnit: task.typeOfUnit,
+      unitRate: parseFloat(task.unitRate),
+      yearOfSanction: parseInt(task.yearOfSanction, 10),
+      
     };
 
     console.log(projectConfig);
-    await saveBeneficiaryConfiguration(projectConfig);
-    setShowIframe(false);
-    // setSelectedVertical('');
-    // setSelectedComponent('');
-    // setSelectedActivity('');
-    // setSelectedTask('');
-    // setShowActivityDropdown(false);
-    // setShowTaskDropdown(false);
-    // addBeneficiary(beneficiary);
+    try {
+      await saveBeneficiaryConfiguration(projectConfig);
+      alert('Beneficiary and Task saved successfully!');
+      setTaskDetails({});
+    } catch (error) {
+      console.error('Error saving beneficiary and task:', error);
+      alert('Failed to save. Please try again.');
+    }
   };
 
   return (
-    
-        <Box sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
+    <Container sx={{ maxHeight: '80vh', overflowY: 'auto', p: 2 }}>
+        <Box >
           <FormControl fullWidth margin="normal">
             <InputLabel>Project Name</InputLabel>
             <Select
@@ -209,7 +232,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
           <TextField
             fullWidth
             label="Beneficiary Name"
-            name="beneficiary"
+            name="beneficiaryName"
             placeholder="Beneficiary Name"
             onChange={handleChange}
             margin="normal"
@@ -269,7 +292,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
           <TextField
             fullWidth
             label="State"
-            name="state"
+            name="stateName"
             placeholder="State"
             onChange={handleChange}
             margin="normal"
@@ -280,26 +303,26 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
 
           <TextField
             fullWidth
-            label="Aadhar"
-            name="aadhar"
-            placeholder="Aadhar"
+            label="aadharNumber"
+            name="aadharNumber"
+            placeholder="aadharNumber"
             onChange={handleChange}
             margin="normal"
             required
-            error={!!errors.aadhar}
-            helperText={errors.aadhar}
+            error={!!errors.aadharNumber}
+            helperText={errors.aadharNumber}
           />
 
           <TextField
             fullWidth
             label="Survey No."
-            name="surveyNo"
+            name="surveyNumber"
             placeholder="Survey No"
             onChange={handleChange}
             margin="normal"
             required
-            error={!!errors.surveyNo}
-            helperText={errors.surveyNo}
+            error={!!errors.surveyNumber}
+            helperText={errors.surveyNumber}
           />
 
           <FormControl fullWidth margin="normal">
@@ -371,12 +394,12 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
           </Button>
 
         </Box>
-      
+    </Container>  
   );
 };
 
 // {
-//   "aadhar":"qw33",
+//   "aadharNumber":"qw33",
 //   "activityName":"OK",
 //   "beneficiary":"qwe",
 //   "beneficiaryContribution":"324",
@@ -388,7 +411,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
 //   "nameOfWork":"34",
 //   "noOfUnits":"324",
 //   "state":"other",
-//   "surveyNo":"qw",
+//   "surveyNumber":"qw",
 //   "task":"VOICE",
 //   "taskName":"VOICE",
 //   "totalCost":"324",

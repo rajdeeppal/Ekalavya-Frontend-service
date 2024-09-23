@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Container, Button, Modal, Typography, Box, AppBar, Toolbar } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Button, Modal, Typography, Box } from '@mui/material';
 import SearchBar from './SearchBar';
 import ProjectForm from './ProjectForm';
 import BeneficiaryForm from './BeneficiaryForm';
@@ -13,70 +13,83 @@ const MainApp = () => {
   
   const [projects, setProjects] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([
-    // {
-    //     "id": 1,
-    //     "verticalName": "BT",
-    //     "components": [
-    //         {
-    //             "id": 1,
-    //             "componentName": "Enterprise",
-    //             "activities": [
-    //                 {
-    //                     "id": 1,
-    //                     "activityName": "AIB",
-    //                     "tasks": [
-    //                         {
-    //                             "id": 1,
-    //                             "taskName": "VOICE",
-    //                             "typeOfUnit":"gm",
-    //                             "units": "10",
-    //                             "ratePerUnit": "800",
-    //                             "totalCost":"234",
-    //                             "beneficiaryContribution":"12",
-    //                             "grantAmount":"234",
-    //                             "yearOfSanction":"2009"
-    //                         },
-    //                         {
-    //                             "id": 3,
-    //                             "taskName": "CV",
-    //                             "typeOfUnit":"gm",
-    //                             "units": "20",
-    //                             "ratePerUnit": "700",
-    //                             "totalCost":"234",
-    //                             "beneficiaryContribution":"12",
-    //                             "grantAmount":"234",
-    //                             "yearOfSanction":"2009"
-    //                         }
-    //                     ]
-    //                 }
-    //             ]
-    //         },
-    //         {
-    //             "id": 2,
-    //             "componentName": "Consumer",
-    //             "activities": [
-    //                 {
-    //                     "id": 2,
-    //                     "activityName": "OFS",
-    //                     "tasks": [
-    //                         {
-    //                             "id": 2,
-    //                             "taskName": "Global",
-    //                             "typeOfUnit":"gm",
-    //                             "units": "96",
-    //                             "ratePerUnit": "89",
-    //                             "totalCost":"234",
-    //                             "beneficiaryContribution":"12",
-    //                             "grantAmount":"234",
-    //                             "yearOfSanction":"2009"
-    //                         }
-    //                     ]
-    //                 }
-    //             ]
-    //         }
-    //     ]
-    // }
-]);
+    {
+      "id": 1,
+      "verticalName": "BT",
+      "components": [
+        {
+          "id": 1,
+          "componentName": "Enterprise",
+          "activities": [
+            {
+              "id": 1,
+              "activityName": "AIB",
+              "tasks": [
+                {
+                  "id": 1,
+                  "taskName": "VOICE",
+                  "typeOfUnit": "gm",
+                  "units": "10",
+                  "ratePerUnit": "800",
+                  "totalCost": "234",
+                  "beneficiaryContribution": "12",
+                  "grantAmount": "234",
+                  "yearOfSanction": "2009"
+                },
+                {
+                  "id": 3,
+                  "taskName": "CV",
+                  "typeOfUnit": "gm",
+                  "units": "20",
+                  "ratePerUnit": "700",
+                  "totalCost": "234",
+                  "beneficiaryContribution": "12",
+                  "grantAmount": "234",
+                  "yearOfSanction": "2009"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "componentName": "Consumer",
+          "activities": [
+            {
+              "id": 2,
+              "activityName": "OFS",
+              "tasks": [
+                {
+                  "id": 2,
+                  "taskName": "Global",
+                  "typeOfUnit": "gm",
+                  "units": "96",
+                  "ratePerUnit": "89",
+                  "totalCost": "234",
+                  "beneficiaryContribution": "12",
+                  "grantAmount": "234",
+                  "yearOfSanction": "2009"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]);
+  const [showTable, setShowTable] = useState(true);
+
+  // useEffect(() => {
+  //   async function fetchBeneficiary() {
+  //     try {
+  //       const data = await getBeneficiary();
+  //       setBeneficiaries(Array.isArray(data) ? data : []);
+  //     } catch (error) {
+  //       console.error('Error fetching Beneficiary:', error);
+  //     }
+  //   }
+  //   fetchBeneficiary();
+  // }, [])
 
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
@@ -92,11 +105,12 @@ const MainApp = () => {
     setShowBeneficiaryModal(false);
   };
 
-  const handleSearch = async(criteria) => {
+  const handleSearch = async (criteria) => {
     if (!criteria) return;
     try {
       const data = await getBeneficiary(criteria);
       setBeneficiaries(Array.isArray(data) ? data : []);
+      setShowTable(true)
     } catch (error) {
       console.error('Error fetching activities:', error);
     }
@@ -115,9 +129,9 @@ const MainApp = () => {
         }}
       >
 
-        <Box sx={{ mt: "-2%" }}>
+        <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', pb: 3 }}>
           <SearchBar onSearch={handleSearch} />
-          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, mt: 3, ml: 3 }} >
             <Button variant="contained" color="primary" onClick={() => setShowProjectModal(true)}>
               Add Project
             </Button>
@@ -175,7 +189,9 @@ const MainApp = () => {
           </Box>
         </Modal>
 
-        <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} />
+        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
+          <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} />
+        </Box>}
       </Box>
     </Box>
   );

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Table, Collapse, Accordion, AccordionSummary, AccordionDetails, TextField, Modal, Box, Typography } from '@mui/material';
+import { Button, Table, Collapse, TableContainer, Accordion, AccordionSummary, AccordionDetails, TextField, Modal, Box, Typography, TableHead, TableBody, TableCell, TableRow, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
+import Paper from "@mui/material/Paper";
+import DownloadIcon from '@mui/icons-material/Download';
 
 const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   const [open, setOpen] = useState({});
@@ -54,18 +56,17 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
 
   const exportToExcel = () => {
     const formattedData = [];
-  
-    // Iterate through each beneficiary to format data
+
     beneficiaries.forEach((beneficiary) => {
       beneficiary.components.forEach((component) => {
         component.activities.forEach((activity) => {
           activity.tasks.forEach((task, taskIndex) => {
             formattedData.push({
-              Vertical: taskIndex === 0 && component === beneficiary.components[0] && activity === component.activities[0] ? beneficiary.verticalName : '', // Vertical only on first task of first component/activity
-              'Type of Project': taskIndex === 0 && activity === component.activities[0] ? beneficiary.projectType : '', // Type of Project only on first task of first activity
-              'Name of the Project': taskIndex === 0 && component === beneficiary.components[0] ? beneficiary.projectName : '', // Project Name only on first task of first component
-              Component: taskIndex === 0 ? component.componentName : '', // Component name only on the first task
-              Activity: taskIndex === 0 ? activity.activityName : '', // Activity name only on the first task
+              Vertical: taskIndex === 0 && component === beneficiary.components[0] && activity === component.activities[0] ? beneficiary.verticalName : '',
+              'Type of Project': taskIndex === 0 && activity === component.activities[0] ? beneficiary.projectType : '',
+              'Name of the Project': taskIndex === 0 && component === beneficiary.components[0] ? beneficiary.projectName : '',
+              Component: taskIndex === 0 ? component.componentName : '',
+              Activity: taskIndex === 0 ? activity.activityName : '',
               Tasks: task.taskName,
               'Type of Unit': task.typeOfUnit,
               'Unit Rate': task.ratePerUnit,
@@ -79,229 +80,190 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
         });
       });
     });
-  
-    // Creating the worksheet and workbook
+
     const worksheet = XLSX.utils.json_to_sheet(formattedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Beneficiaries');
-  
-    // Writing the file
     XLSX.writeFile(workbook, 'Beneficiaries.xlsx');
   };
-  
+
   return (
-    <div>
-    <Typography variant="h4" gutterBottom>Beneficiary List</Typography>
-    <Button
-      variant="contained"
-      color="success"
-      onClick={exportToExcel}
-      sx={{ marginBottom: '10px' }}
-    >
-      Download Excel
-    </Button>
-    <Table sx={{ minWidth: 650 }} aria-label="beneficiary table">
-      <thead>
-        <tr>
-          <th>Project Name</th>
-          <th>Beneficiary Name</th>
-          <th>Father/Husband Name</th>
-          <th>villageName</th>
-          <th>mandalName</th>
-          <th>districtName</th>
-          <th>State</th>
-          <th>Aadhar</th>
-          <th>Survey No.</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {beneficiaries.map((beneficiary, beneficiaryIndex) => (
-          <React.Fragment key={beneficiary.id}>
-            <tr>
-              <td>{beneficiary.verticalName}</td>
-              <td>{beneficiary.beneficiaryName}</td>
-              <td>{beneficiary.guardianName}</td>
-              <td>{beneficiary.villageName}</td>
-              <td>{beneficiary.mandalName}</td>
-              <td>{beneficiary.districtName}</td>
-              <td>{beneficiary.state}</td>
-              <td>{beneficiary.aadhar}</td>
-              <td>{beneficiary.surveyNo}</td>
-              <td>
-                <Button
-                  variant="contained"
-                  onClick={() => toggleCollapse(beneficiaryIndex)}
-                >
-                  View Components
-                </Button>
-              </td>
-            </tr>
-            <tr>
-              <td colSpan="10" style={{ padding: 0 }}>
-                <Collapse in={open[beneficiaryIndex]}>
-                  <Box sx={{ padding: '10px' }}>
-                    {beneficiary.components?.map((component, componentIndex) => (
-                      <div key={component.id}>
-                        <Accordion>
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls={`component-${componentIndex}-content`}
-                            id={`component-${componentIndex}-header`}
-                          >
-                            <Typography>{component.componentName}</Typography>
-                          </AccordionSummary>
-                          <AccordionDetails>
-                            {component.activities?.map((activity, activityIndex) => (
-                              <div key={activity.id}>
-                                <Accordion>
-                                  <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls={`activity-${activityIndex}-content`}
-                                    id={`activity-${activityIndex}-header`}
-                                  >
+    <div style={{ padding: '20px' }} className='listContainer'>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography variant="h4" gutterBottom style={{ color: '#888' }}>Beneficiary List</Typography>
+
+        <IconButton onClick={exportToExcel}>
+          <DownloadIcon />
+        </IconButton>
+      </div>
+      {/* <Button
+        variant="contained"
+        color="success"
+        onClick={exportToExcel}
+        sx={{ marginBottom: '20px' }}
+      >
+        Download Excel
+      </Button> */}
+      <TableContainer component={Paper} className="table">
+        <Table sx={{ minWidth: 650 }} aria-label="beneficiary table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Project Name</TableCell>
+              <TableCell>Beneficiary Name</TableCell>
+              <TableCell>Father/Husband Name</TableCell>
+              <TableCell>Village</TableCell>
+              <TableCell>Mandal</TableCell>
+              <TableCell>District</TableCell>
+              <TableCell>State</TableCell>
+              <TableCell>Aadhar Number</TableCell>
+              <TableCell>Survey No.</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {beneficiaries.map((beneficiary, beneficiaryIndex) => (
+              <React.Fragment key={beneficiary.id}>
+                <TableRow>
+                  <TableCell>{beneficiary.verticalName}</TableCell>
+                  <TableCell>{beneficiary.beneficiaryName}</TableCell>
+                  <TableCell>{beneficiary.guardianName}</TableCell>
+                  <TableCell>{beneficiary.villageName}</TableCell>
+                  <TableCell>{beneficiary.mandalName}</TableCell>
+                  <TableCell>{beneficiary.districtName}</TableCell>
+                  <TableCell>{beneficiary.stateName}</TableCell>
+                  <TableCell>{beneficiary.aadharNumber}</TableCell>
+                  <TableCell>{beneficiary.surveyNumber}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => toggleCollapse(beneficiaryIndex)}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell colSpan="10" style={{ padding: 0 }}>
+                    <Collapse in={open[beneficiaryIndex]}>
+                      <Box sx={{ padding: '20px' }}>
+                        {beneficiary.components?.map((component, componentIndex) => (
+                          <Accordion key={component.id} >
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                              <Typography>{component.componentName}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              {component.activities?.map((activity, activityIndex) => (
+                                <Accordion key={activity.id} sx={{ marginBottom: '10px' }}>
+                                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                     <Typography>{activity.activityName}</Typography>
                                   </AccordionSummary>
                                   <AccordionDetails>
-                                    <Table aria-label="activity table">
-                                      <thead>
-                                        <tr>
-                                          <th>Name of the Work</th>
-                                          <th>Type of Unit</th>
-                                          <th>Unit Rate</th>
-                                          <th>No. of Units</th>
-                                          <th>Total Cost</th>
-                                          <th>Beneficiary Contribution</th>
-                                          <th>Grant Amount</th>
-                                          <th>Year of Sanction</th>
-                                          {showEdit && <th>Actions</th>}
-                                        </tr>
-                                      </thead>
-                                      <tbody>
+                                    <Table aria-label="activity table" sx={{ borderSpacing: '0 10px' }}>
+                                      <TableHead>
+                                        <TableRow>
+                                          <TableCell>Name of the Work</TableCell>
+                                          <TableCell>Type of Unit</TableCell>
+                                          <TableCell>Unit Rate</TableCell>
+                                          <TableCell>No. of Units</TableCell>
+                                          <TableCell>Total Cost</TableCell>
+                                          <TableCell>Beneficiary Contribution</TableCell>
+                                          <TableCell>Grant Amount</TableCell>
+                                          <TableCell>Year of Sanction</TableCell>
+                                          {showEdit && <TableCell>Actions</TableCell>}
+                                        </TableRow>
+                                      </TableHead>
+                                      <TableBody>
                                         {activity.tasks?.map((task, taskIndex) => (
-                                          <tr key={task.id}>
+                                          <TableRow key={task.id}>
                                             {editActivityMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`] ? (
                                               <>
-                                                <td>{task.taskName}</td>
-                                                <td>{task.typeOfUnit}</td>
-                                                <td>{task.ratePerUnit}</td>
-                                                <td>
+                                                <TableCell>{task.taskName}</TableCell>
+                                                <TableCell>{task.typeOfUnit}</TableCell>
+                                                <TableCell>{task.ratePerUnit}</TableCell>
+                                                <TableCell>
                                                   <TextField
                                                     variant="outlined"
                                                     size="small"
                                                     name="units"
                                                     value={task.units || ''}
                                                     onChange={(e) =>
-                                                      handleActivityInputChange(
-                                                        beneficiaryIndex,
-                                                        componentIndex,
-                                                        activityIndex,
-                                                        taskIndex,
-                                                        e
-                                                      )
+                                                      handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
                                                     }
                                                   />
-                                                </td>
-                                                <td>
+                                                </TableCell>
+                                                <TableCell>
                                                   <TextField
                                                     variant="outlined"
                                                     size="small"
                                                     name="totalCost"
                                                     value={task.totalCost || ''}
                                                     onChange={(e) =>
-                                                      handleActivityInputChange(
-                                                        beneficiaryIndex,
-                                                        componentIndex,
-                                                        activityIndex,
-                                                        taskIndex,
-                                                        e
-                                                      )
+                                                      handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
                                                     }
                                                   />
-                                                </td>
-                                                <td>
+                                                </TableCell>
+                                                <TableCell>
                                                   <TextField
                                                     variant="outlined"
                                                     size="small"
                                                     name="beneficiaryContribution"
                                                     value={task.beneficiaryContribution || ''}
                                                     onChange={(e) =>
-                                                      handleActivityInputChange(
-                                                        beneficiaryIndex,
-                                                        componentIndex,
-                                                        activityIndex,
-                                                        taskIndex,
-                                                        e
-                                                      )
+                                                      handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
                                                     }
                                                   />
-                                                </td>
-                                                <td>
+                                                </TableCell>
+                                                <TableCell>
                                                   <TextField
                                                     variant="outlined"
                                                     size="small"
                                                     name="grantAmount"
                                                     value={task.grantAmount || ''}
                                                     onChange={(e) =>
-                                                      handleActivityInputChange(
-                                                        beneficiaryIndex,
-                                                        componentIndex,
-                                                        activityIndex,
-                                                        taskIndex,
-                                                        e
-                                                      )
+                                                      handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
                                                     }
                                                   />
-                                                </td>
-                                                <td>
+                                                </TableCell>
+                                                <TableCell>
                                                   <TextField
                                                     variant="outlined"
                                                     size="small"
                                                     name="yearOfSanction"
                                                     value={task.yearOfSanction || ''}
                                                     onChange={(e) =>
-                                                      handleActivityInputChange(
-                                                        beneficiaryIndex,
-                                                        componentIndex,
-                                                        activityIndex,
-                                                        taskIndex,
-                                                        e
-                                                      )
+                                                      handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
                                                     }
                                                   />
-                                                </td>
-                                                <td>
+                                                </TableCell>
+                                                <TableCell>
                                                   <Button
                                                     variant="contained"
                                                     color="success"
                                                     onClick={() =>
-                                                      handleSaveActivity(
-                                                        beneficiaryIndex,
-                                                        componentIndex,
-                                                        activityIndex,
-                                                        taskIndex
-                                                      )
+                                                      handleSaveActivity(beneficiaryIndex, componentIndex, activityIndex, taskIndex)
                                                     }
                                                   >
                                                     Save
                                                   </Button>
-                                                </td>
+                                                </TableCell>
                                               </>
                                             ) : (
                                               <>
-                                                <td>{task.taskName}</td>
-                                                <td>{task.typeOfUnit}</td>
-                                                <td>{task.ratePerUnit}</td>
-                                                <td>{task.units}</td>
-                                                <td>{task.totalCost}</td>
-                                                <td>{task.beneficiaryContribution}</td>
-                                                <td>{task.grantAmount}</td>
-                                                <td>{task.yearOfSanction}</td>
+                                                <TableCell>{task.taskName}</TableCell>
+                                                <TableCell>{task.typeOfUnit}</TableCell>
+                                                <TableCell>{task.ratePerUnit}</TableCell>
+                                                <TableCell>{task.units}</TableCell>
+                                                <TableCell>{task.totalCost}</TableCell>
+                                                <TableCell>{task.beneficiaryContribution}</TableCell>
+                                                <TableCell>{task.grantAmount}</TableCell>
+                                                <TableCell>{task.yearOfSanction}</TableCell>
                                                 {showEdit && (
-                                                  <td>
+                                                  <TableCell>
                                                     <Button
                                                       variant="contained"
-                                                      color="warning"
+                                                      color="primary"
                                                       onClick={() =>
                                                         handleEditActivityClick(
                                                           beneficiaryIndex,
@@ -313,64 +275,74 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
                                                     >
                                                       Edit
                                                     </Button>
-                                                  </td>
+                                                  </TableCell>
                                                 )}
                                               </>
                                             )}
-                                          </tr>
+                                          </TableRow>
                                         ))}
-                                      </tbody>
+                                      </TableBody>
                                     </Table>
                                   </AccordionDetails>
                                 </Accordion>
-                              </div>
-                            ))}
-                          </AccordionDetails>
-                        </Accordion>
-                      </div>
-                    ))}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleSubmit(beneficiaryIndex)}
-                      sx={{ marginTop: '10px' }}
-                    >
-                      Submit
-                    </Button>
-                  </Box>
-                </Collapse>
-              </td>
-            </tr>
-          </React.Fragment>
-        ))}
-      </tbody>
-    </Table>
+                              ))}
+                            </AccordionDetails>
+                          </Accordion>
+                        ))}
 
-    {/* Modal for confirmation */}
-    <Modal
-      open={showConfirmation}
-      onClose={handleCloseConfirmation}
-      aria-labelledby="confirmation-modal-title"
-      aria-describedby="confirmation-modal-description"
-    >
-      <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4 }}>
-        <Typography id="confirmation-modal-title" variant="h6" component="h2">
-          Confirm Submission
-        </Typography>
-        <Typography id="confirmation-modal-description" sx={{ mt: 2 }}>
-          Do you want to submit the changes?
-        </Typography>
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="contained" color="secondary" onClick={handleCloseConfirmation} sx={{ marginRight: 2 }}>
-            Cancel
-          </Button>
-          <Button variant="contained" color="primary" onClick={handleConfirmSubmit}>
-            Yes, Submit
-          </Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleSubmit(beneficiaryIndex)}
+                          sx={{ marginTop: '10px' }}
+                        >
+                          Submit
+                        </Button>
+                      </Box>
+                    </Collapse>
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Modal
+        open={showConfirmation}
+        onClose={handleCloseConfirmation}
+        aria-labelledby="confirmation-modal"
+        aria-describedby="confirmation-modal-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: '8px',
+          }}
+        >
+          <Typography id="confirmation-modal-title" variant="h6" component="h2">
+            Submit Confirmation
+          </Typography>
+          <Typography id="confirmation-modal-description" sx={{ mt: 2 }}>
+            Are you sure you want to submit the data?
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+            <Button variant="contained" color="primary" onClick={handleConfirmSubmit}>
+              Yes
+            </Button>
+            <Button variant="contained" color="secondary" onClick={handleCloseConfirmation}>
+              No
+            </Button>
+          </Box>
         </Box>
-      </Box>
-    </Modal>
-  </div>
+      </Modal>
+    </div>
   );
 };
 

@@ -1,5 +1,27 @@
 import React, { useState } from 'react';
-import { Table, Button, Collapse, Accordion, Form } from 'react-bootstrap';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Button,
+    Collapse,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    TextField,
+    IconButton,
+    Typography,
+} from '@mui/material';
+import {
+    ExpandMore as ExpandMoreIcon,
+    Edit as EditIcon,
+    Save as SaveIcon,
+} from '@mui/icons-material';
+import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
 
 const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
@@ -14,99 +36,89 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
         }));
     };
 
-
     const toggleCollapse = (index) => {
         setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
     };
 
     const toggleTaskDetails = (taskIndex) => {
-        setTaskDetailsOpen((prevState) => ({ ...prevState, [taskIndex]: !prevState[taskIndex] }));
+        setTaskDetailsOpen((prevState) => ({
+            ...prevState,
+            [taskIndex]: !prevState[taskIndex],
+        }));
     };
 
     const handleInputChange = (taskIndex, rowIndex, field, value) => {
-        const updatedBeneficiaries = [...beneficiaries];
-
-        const task = updatedBeneficiaries.flatMap(b =>
-            b.components.flatMap(c =>
-                c.activities.flatMap(a =>
-                    a.tasks
-                )
-            )
-        ).find((t, i) => i === taskIndex);
-
-        if (task) {
-            const row = task.additionalRows[rowIndex];
-    
-            row[field] = value;
-    
-            if (row.unitAchievement && task.ratePerUnit) {
-                row.currentCost = row.unitAchievement * task.ratePerUnit;
-            }
-    
-            setBeneficiaries(updatedBeneficiaries); // Update the state
-        }
         setBeneficiaries((prevBeneficiaries) => {
             const updatedBeneficiaries = [...prevBeneficiaries];
             const task = updatedBeneficiaries
-                .flatMap(b => b.components.flatMap(c => c.activities.flatMap(a => a.tasks)))
+                .flatMap((b) =>
+                    b.components.flatMap((c) =>
+                        c.activities.flatMap((a) => a.tasks)
+                    )
+                )
                 .find((t, i) => i === taskIndex);
 
-            task.additionalRows[rowIndex][field] = value;
-            return updatedBeneficiaries;
+            if (task) {
+                const row = task.additionalRows[rowIndex];
+                if (field === 'otherDocument') {
+                    row.otherDocument = value;
+                } else {
+                    row[field] = value;
+
+                    if (row.unitAchievement && task.ratePerUnit) {
+                        row.currentCost = row.unitAchievement * task.ratePerUnit;
+                    }
+                }
+                return updatedBeneficiaries;
+            }
+            return prevBeneficiaries;
         });
     };
 
     const handleSaveRow = (taskIndex, rowIndex) => {
-        setEditMode((prevState) => ({
-            ...prevState,
-            [`${taskIndex}-${rowIndex}`]: !prevState[`${taskIndex}-${rowIndex}`],
-        }));
-
+        toggleEditMode(taskIndex, rowIndex);
         const task = beneficiaries
-            .flatMap(b => b.components.flatMap(c => c.activities.flatMap(a => a.tasks)))
+            .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
             .find((t, i) => i === taskIndex);
 
-        const changedData = task.additionalRows[rowIndex];
-        console.log(changedData);
-        // axios
-        //     .post('/your-endpoint-url', { taskIndex, rowIndex, ...changedData },
-        //         { headers: { 'Content-Type': 'multipart/form-data' } })
-        //     .then((response) => {
-        //         console.log('Data saved successfully:', response.data);
-        //         toggleEditMode(taskIndex, rowIndex); // Exit edit mode after saving
-        //     })
-        //     .catch((error) => {
-        //         console.error('Error saving data:', error);
-        //     });
+        if (task) {
+            const changedData = task.additionalRows[rowIndex];
+            console.log(changedData);
+            // Implement your save logic here (e.g., API call)
+        }
     };
-
 
     const addNewRow = (taskIndex) => {
         setBeneficiaries((prevBeneficiaries) => {
             const updatedBeneficiaries = [...prevBeneficiaries];
+            const task = updatedBeneficiaries
+                .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
+                .find((t, i) => i === taskIndex);
 
-            const task = updatedBeneficiaries.flatMap(b => b.components.flatMap(c => c.activities.flatMap(a => a.tasks))).find((t, i) => i === taskIndex);
+            if (task) {
+                if (!task.additionalRows) {
+                    task.additionalRows = [];
+                }
 
-            if (!task.additionalRows) {
-                task.additionalRows = [];
+                const lastRow = task.additionalRows[task.additionalRows.length - 1];
+                if (
+                    !lastRow ||
+                    lastRow.unitAchievement !== '' ||
+                    lastRow.payeeName !== '' ||
+                    lastRow.passbookCopy !== ''
+                ) {
+                    task.additionalRows.push({
+                        unitAchievement: '',
+                        currentCost: '',
+                        payeeName: '',
+                        passbookCopy: '',
+                        otherDocument: '',
+                    });
+                }
             }
 
-            if (task.additionalRows.length === 0 || (task.additionalRows[task.additionalRows.length - 1] &&
-                (task.additionalRows[task.additionalRows.length - 1].unitAchievement !== '' ||
-                    task.additionalRows[task.additionalRows.length - 1].payeeName !== '' ||
-                    task.additionalRows[task.additionalRows.length - 1].passbookCopy !== ''))) {
-
-                task.additionalRows.push({
-                    unitAchievement: '',
-                    currentCost: '',
-                    payeeName: '',
-                    passbookCopy: '',
-                    otherDocument:''
-                });
-            }
             return updatedBeneficiaries;
         });
-
     };
 
     const exportToExcel = () => {
@@ -122,13 +134,17 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                     component === beneficiary.components[0] &&
                                     activity === component.activities[0]
                                     ? beneficiary.verticalName
-                                    : '', // Vertical only on first task of first component/activity
+                                    : '',
                             'Type of Project':
-                                taskIndex === 0 && activity === component.activities[0] ? beneficiary.projectType : '', // Type of Project only on first task of first activity
+                                taskIndex === 0 && activity === component.activities[0]
+                                    ? beneficiary.projectType
+                                    : '',
                             'Name of the Project':
-                                taskIndex === 0 && component === beneficiary.components[0] ? beneficiary.projectName : '', // Project Name only on first task of first component
-                            Component: taskIndex === 0 ? component.componentName : '', // Component name only on the first task
-                            Activity: taskIndex === 0 ? activity.activityName : '', // Activity name only on the first task
+                                taskIndex === 0 && component === beneficiary.components[0]
+                                    ? beneficiary.projectName
+                                    : '',
+                            Component: taskIndex === 0 ? component.componentName : '',
+                            Activity: taskIndex === 0 ? activity.activityName : '',
                             Tasks: task.taskName,
                             'Type of Unit': task.typeOfUnit,
                             'Unit Rate': task.ratePerUnit,
@@ -138,9 +154,9 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                             'Grant Amount (Rs.)': task.grantAmount,
                             'Year of Sanction': task.yearOfSanction,
                         });
-                        // Add additional rows
+
                         if (task.additionalRows) {
-                            task.additionalRows.forEach(row => {
+                            task.additionalRows.forEach((row) => {
                                 formattedData.push({
                                     Vertical: '',
                                     'Type of Project': '',
@@ -157,7 +173,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                     'Year of Sanction': '',
                                     'Unit Achievement': row.unitAchievement,
                                     'Remaining Balance': row.remainingBalance,
-                                    'Duration': row.duration,
+                                    Duration: row.duration,
                                     'Payee Name': row.payeeName,
                                     'Passbook Copy': row.passbookCopy,
                                 });
@@ -176,280 +192,394 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
     };
 
     const handleFileChange = (taskIndex, rowIndex, fileType, e) => {
-        const file = e.target.files[0];
+        const files = e.target.files;
 
-        const updatedBeneficiaries = [...beneficiaries];
-        const task = updatedBeneficiaries.flatMap(b =>
-            b.components.flatMap(c =>
-                c.activities.flatMap(a =>
-                    a.tasks
+        setBeneficiaries((prevBeneficiaries) => {
+            const updatedBeneficiaries = [...prevBeneficiaries];
+            const task = updatedBeneficiaries
+                .flatMap((b) =>
+                    b.components.flatMap((c) =>
+                        c.activities.flatMap((a) => a.tasks)
+                    )
                 )
-            )
-        ).find((t, i) => i === taskIndex);
+                .find((t, i) => i === taskIndex);
 
-        if (task && file) {
-            const fileURL = URL.createObjectURL(file);
-            task.additionalRows[rowIndex] = {
-                ...task.additionalRows[rowIndex], 
-                [fileType]: {
-                    file,        
-                    fileURL,
+            if (task && files.length > 0) {
+                if (fileType === 'passbookCopy') {
+                    const file = files[0];
+                    if (file.type === 'image/jpeg') {
+                        const fileURL = URL.createObjectURL(file);
+                        task.additionalRows[rowIndex].passbookCopy = {
+                            file,
+                            fileURL,
+                        };
+                    } else {
+                        alert('Only JPG format is allowed for the passbook copy.');
+                    }
+                } else if (fileType === 'otherDocument') {
+                    const pdfFiles = Array.from(files).filter(
+                        (file) => file.type === 'application/pdf'
+                    );
+                    if (pdfFiles.length === files.length) {
+                        const pdfFileURLs = pdfFiles.map((file) => ({
+                            file,
+                            fileURL: URL.createObjectURL(file),
+                        }));
+
+                        task.additionalRows[rowIndex].otherDocument = {
+                            files: pdfFileURLs,
+                        };
+                    } else {
+                        alert('Only PDF format is allowed for other documents.');
+                    }
                 }
-            };
-            setBeneficiaries(updatedBeneficiaries);
-        }
+            }
+
+            return updatedBeneficiaries;
+        });
     };
 
-
     return (
-        <div>
-            <h3>Beneficiary List</h3>
-            <Button variant="success" onClick={exportToExcel} style={{ marginBottom: '10px' }}>
-                Download Excel
-            </Button>
-            <Table bordered hover responsive>
-                <thead>
-                    <tr>
-                        <th>Project Name</th>
-                        <th>Beneficiary Name</th>
-                        <th>Father/Husband Name</th>
-                        <th>villageName</th>
-                        <th>mandalName</th>
-                        <th>districtName</th>
-                        <th>State</th>
-                        <th>Aadhar</th>
-                        <th>Survey No.</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {beneficiaries.map((beneficiary, beneficiaryIndex) => (
-                        <React.Fragment key={beneficiary.id}>
-                            <tr>
-                                <td>{beneficiary.verticalName}</td>
-                                <td>{beneficiary.beneficiaryName}</td>
-                                <td>{beneficiary.guardianName}</td>
-                                <td>{beneficiary.villageName}</td>
-                                <td>{beneficiary.mandalName}</td>
-                                <td>{beneficiary.districtName}</td>
-                                <td>{beneficiary.state}</td>
-                                <td>{beneficiary.aadhar}</td>
-                                <td>{beneficiary.surveyNo}</td>
-                                <td>
-                                    <Button
-                                        variant="primary"
-                                        onClick={() => toggleCollapse(beneficiaryIndex)}
-                                        aria-controls={`collapse-${beneficiaryIndex}`}
-                                        aria-expanded={open[beneficiaryIndex]}
-                                    >
-                                        View Components
-                                    </Button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colSpan="10" style={{ padding: 0 }}>
-                                    <Collapse in={open[beneficiaryIndex]}>
-                                        <div id={`collapse-${beneficiaryIndex}`} style={{ padding: '10px' }}>
-                                            {beneficiary.components?.map((component) => (
-                                                <div key={component.id}>
-                                                    <Accordion defaultActiveKey="0">
-                                                        <Accordion.Item eventKey={component.id}>
-                                                            <Accordion.Header>{component.componentName}</Accordion.Header>
-                                                            <Accordion.Body>
+        <div style={{ padding: '20px' }} className='listContainer'>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Typography variant="h4" gutterBottom style={{ color: '#888' }}>
+                    Task List
+                </Typography>
+                <IconButton onClick={exportToExcel} >
+                    <DownloadIcon />
+                </IconButton>
+                {/* <Button
+                    variant="contained"
+                    color="success"
+                    onClick={exportToExcel}
+                    style={{ marginBottom: '10px' }}
+                >
+                    Download Excel
+                </Button> */}
+            </div>
+            <TableContainer component={Paper}>
+                <Table aria-label="beneficiary table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Project Name</TableCell>
+                            <TableCell>Beneficiary Name</TableCell>
+                            <TableCell>Father/Husband Name</TableCell>
+                            <TableCell>Village Name</TableCell>
+                            <TableCell>Mandal Name</TableCell>
+                            <TableCell>District Name</TableCell>
+                            <TableCell>State</TableCell>
+                            <TableCell>Aadhar Number</TableCell>
+                            <TableCell>Survey No.</TableCell>
+                            <TableCell>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {beneficiaries.map((beneficiary, beneficiaryIndex) => (
+                            <React.Fragment key={beneficiary.id}>
+                                <TableRow>
+                                    <TableCell>{beneficiary.verticalName}</TableCell>
+                                    <TableCell>{beneficiary.beneficiaryName}</TableCell>
+                                    <TableCell>{beneficiary.guardianName}</TableCell>
+                                    <TableCell>{beneficiary.villageName}</TableCell>
+                                    <TableCell>{beneficiary.mandalName}</TableCell>
+                                    <TableCell>{beneficiary.districtName}</TableCell>
+                                    <TableCell>{beneficiary.state}</TableCell>
+                                    <TableCell>{beneficiary.aadharNumber}</TableCell>
+                                    <TableCell>{beneficiary.surveyNumber}</TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => toggleCollapse(beneficiaryIndex)}
+
+                                        >
+                                            View
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell colSpan={10} style={{ padding: 0 }}>
+                                        <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
+                                            <div style={{ padding: '10px' }}>
+                                                {beneficiary.components?.map((component) => (
+                                                    <div key={component.id}>
+                                                        <Accordion>
+                                                            <AccordionSummary
+                                                                expandIcon={<ExpandMoreIcon />}
+                                                                aria-controls={`component-content-${component.id}`}
+                                                                id={`component-header-${component.id}`}
+                                                            >
+                                                                <Typography>{component.componentName}</Typography>
+                                                            </AccordionSummary>
+                                                            <AccordionDetails>
                                                                 {component.activities?.map((activity) => (
                                                                     <div key={activity.id}>
-                                                                        <Accordion defaultActiveKey="0">
-                                                                            <Accordion.Item eventKey={activity.id}>
-                                                                                <Accordion.Header>{activity.activityName}</Accordion.Header>
-                                                                                <Accordion.Body>
-                                                                                    <Table striped bordered hover>
-                                                                                        <thead>
-                                                                                            <tr>
-                                                                                                <th>Name of the Work</th>
-                                                                                                <th>Type of Unit</th>
-                                                                                                <th>Unit Rate</th>
-                                                                                                <th>No. of Units</th>
-                                                                                                <th>Total Cost</th>
-                                                                                                <th>Beneficiary Contribution</th>
-                                                                                                <th>Grant Amount</th>
-                                                                                                <th>Year of Sanction</th>
-                                                                                                <th>Actions</th>
-                                                                                            </tr>
-                                                                                        </thead>
-                                                                                        <tbody>
+                                                                        <Accordion>
+                                                                            <AccordionSummary
+                                                                                expandIcon={<ExpandMoreIcon />}
+                                                                                aria-controls={`activity-content-${activity.id}`}
+                                                                                id={`activity-header-${activity.id}`}
+                                                                            >
+                                                                                <Typography>{activity.activityName}</Typography>
+                                                                            </AccordionSummary>
+                                                                            <AccordionDetails>
+                                                                                <TableContainer component={Paper} sx={{ mb: 2 }}>
+                                                                                    <Table size="small" aria-label="tasks table">
+                                                                                        <TableHead>
+                                                                                            <TableRow>
+                                                                                                <TableCell>Name of the Work</TableCell>
+                                                                                                <TableCell>Type of Unit</TableCell>
+                                                                                                <TableCell>Unit Rate</TableCell>
+                                                                                                <TableCell>No. of Units</TableCell>
+                                                                                                <TableCell>Total Cost</TableCell>
+                                                                                                <TableCell>Beneficiary Contribution</TableCell>
+                                                                                                <TableCell>Grant Amount</TableCell>
+                                                                                                <TableCell>Year of Sanction</TableCell>
+                                                                                                <TableCell>Actions</TableCell>
+                                                                                            </TableRow>
+                                                                                        </TableHead>
+                                                                                        <TableBody>
                                                                                             {activity.tasks?.map((task, taskIndex) => (
                                                                                                 <React.Fragment key={task.id}>
-                                                                                                    <tr>
-                                                                                                        <td>{task.taskName}</td>
-                                                                                                        <td>{task.typeOfUnit}</td>
-                                                                                                        <td>{task.ratePerUnit}</td>
-                                                                                                        <td>{task.units}</td>
-                                                                                                        <td>{task.totalCost}</td>
-                                                                                                        <td>{task.beneficiaryContribution}</td>
-                                                                                                        <td>{task.grantAmount}</td>
-                                                                                                        <td>{task.yearOfSanction}</td>
-                                                                                                        <td>
+                                                                                                    <TableRow>
+                                                                                                        <TableCell>{task.taskName}</TableCell>
+                                                                                                        <TableCell>{task.typeOfUnit}</TableCell>
+                                                                                                        <TableCell>{task.ratePerUnit}</TableCell>
+                                                                                                        <TableCell>{task.units}</TableCell>
+                                                                                                        <TableCell>{task.totalCost}</TableCell>
+                                                                                                        <TableCell>{task.beneficiaryContribution}</TableCell>
+                                                                                                        <TableCell>{task.grantAmount}</TableCell>
+                                                                                                        <TableCell>{task.yearOfSanction}</TableCell>
+                                                                                                        <TableCell>
                                                                                                             <Button
-                                                                                                                variant="primary"
+                                                                                                                variant="outlined"
+                                                                                                                color="primary"
                                                                                                                 onClick={() => toggleTaskDetails(taskIndex)}
-                                                                                                                aria-controls={`task-details-${taskIndex}`}
-                                                                                                                aria-expanded={taskDetailsOpen[taskIndex]}
+
                                                                                                             >
-                                                                                                                View Task Details
+                                                                                                                View
                                                                                                             </Button>
-                                                                                                        </td>
-                                                                                                    </tr>
-                                                                                                    <tr>
-                                                                                                        <td colSpan="9" style={{ padding: 0 }}>
-                                                                                                            <Collapse in={taskDetailsOpen[taskIndex]}>
-                                                                                                                <div id={`task-details-${taskIndex}`} style={{ padding: '10px' }}>
-                                                                                                                    <Table striped bordered hover>
-                                                                                                                        <thead>
-                                                                                                                            <tr>
-                                                                                                                                <th>Unit Achievement</th>
-                                                                                                                                <th>Current Cost</th>
-                                                                                                                                <th>Payee Name</th>
-                                                                                                                                <th>Passbook Copy</th>
-                                                                                                                                <th>Other Document</th>
-                                                                                                                                <th>Actions</th>
-                                                                                                                            </tr>
-                                                                                                                        </thead>
-                                                                                                                        <tbody>
-                                                                                                                            {(task.additionalRows || []).map((row, rowIndex) => (
-                                                                                                                                <tr key={rowIndex}>
-                                                                                                                                    <td>
-                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
-                                                                                                                                            <Form.Control
-                                                                                                                                                type="text"
-                                                                                                                                                value={row.unitAchievement || ''}
-                                                                                                                                                onChange={(e) => handleInputChange(taskIndex, rowIndex, 'unitAchievement', e.target.value)}
-                                                                                                                                            />
-                                                                                                                                        ) : (
-                                                                                                                                            row.unitAchievement
-                                                                                                                                        )}
-                                                                                                                                    </td>
-                                                                                                                                    <td>
-                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
-                                                                                                                                            <Form.Control
-                                                                                                                                                type="text"
-                                                                                                                                                value={row.currentCost || ''}
-                                                                                                                                                readOnly
-                                                                                                                                            />
-                                                                                                                                        ) : (
-                                                                                                                                            row.currentCost
-                                                                                                                                        )}
-                                                                                                                                    </td>
-                                                                                                                                    <td>
-                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
-                                                                                                                                            <Form.Control
-                                                                                                                                                type="text"
-                                                                                                                                                value={row.payeeName || ''}
-                                                                                                                                                onChange={(e) => handleInputChange(taskIndex, rowIndex, 'payeeName', e.target.value)}
-                                                                                                                                            />
-                                                                                                                                        ) : (
-                                                                                                                                            row.payeeName
-                                                                                                                                        )}
-                                                                                                                                    </td>
-                                                                                                                                    <td>
-                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
-                                                                                                                                            <Form.Control
-                                                                                                                                                type="file"
-                                                                                                                                                accept="image/*"  // Only allow image files
-                                                                                                                                                onChange={(e) => handleFileChange(taskIndex, rowIndex, 'passbookCopy', e)}
-                                                                                                                                            />
-                                                                                                                                        ) : (
-                                                                                                                                            row.passbookCopy ? (
+                                                                                                        </TableCell>
+                                                                                                    </TableRow>
+                                                                                                    <TableRow>
+                                                                                                        <TableCell colSpan={9} style={{ padding: 0 }}>
+                                                                                                            <Collapse
+                                                                                                                in={taskDetailsOpen[taskIndex]}
+                                                                                                                timeout="auto"
+                                                                                                                unmountOnExit
+                                                                                                            >
+                                                                                                                <div style={{ padding: '10px' }}>
+                                                                                                                    <TableContainer component={Paper} sx={{ mb: 2 }}>
+                                                                                                                        <Table size="small" aria-label="task details table">
+                                                                                                                            <TableHead>
+                                                                                                                                <TableRow>
+                                                                                                                                    <TableCell>Unit Achievement</TableCell>
+                                                                                                                                    <TableCell>Current Cost</TableCell>
+                                                                                                                                    <TableCell>Payee Name</TableCell>
+                                                                                                                                    <TableCell>Passbook Copy</TableCell>
+                                                                                                                                    <TableCell>Other Document</TableCell>
+                                                                                                                                    <TableCell>Actions</TableCell>
+                                                                                                                                </TableRow>
+                                                                                                                            </TableHead>
+                                                                                                                            <TableBody>
+                                                                                                                                {(task.additionalRows || []).map((row, rowIndex) => (
+                                                                                                                                    <TableRow key={rowIndex}>
+                                                                                                                                        <TableCell>
+                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                                <TextField
+                                                                                                                                                    variant="outlined"
+                                                                                                                                                    size="small"
+                                                                                                                                                    value={row.unitAchievement || ''}
+                                                                                                                                                    onChange={(e) =>
+                                                                                                                                                        handleInputChange(
+                                                                                                                                                            taskIndex,
+                                                                                                                                                            rowIndex,
+                                                                                                                                                            'unitAchievement',
+                                                                                                                                                            e.target.value
+                                                                                                                                                        )
+                                                                                                                                                    }
+                                                                                                                                                />
+                                                                                                                                            ) : (
+                                                                                                                                                row.unitAchievement
+                                                                                                                                            )}
+                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                                <TextField
+                                                                                                                                                    variant="outlined"
+                                                                                                                                                    size="small"
+                                                                                                                                                    value={row.currentCost || ''}
+                                                                                                                                                    InputProps={{
+                                                                                                                                                        readOnly: true,
+                                                                                                                                                    }}
+                                                                                                                                                />) : (
+                                                                                                                                                row.currentCost
+                                                                                                                                            )}
+                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                                <TextField
+                                                                                                                                                    variant="outlined"
+                                                                                                                                                    size="small"
+                                                                                                                                                    value={row.payeeName || ''}
+                                                                                                                                                    onChange={(e) =>
+                                                                                                                                                        handleInputChange(
+                                                                                                                                                            taskIndex,
+                                                                                                                                                            rowIndex,
+                                                                                                                                                            'payeeName',
+                                                                                                                                                            e.target.value
+                                                                                                                                                        )
+                                                                                                                                                    }
+                                                                                                                                                />
+                                                                                                                                            ) : (
+                                                                                                                                                row.payeeName
+                                                                                                                                            )}
+                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                                <Button
+                                                                                                                                                    variant="contained"
+                                                                                                                                                    component="label"
+                                                                                                                                                >
+                                                                                                                                                    Upload
+                                                                                                                                                    <input
+                                                                                                                                                        type="file"
+                                                                                                                                                        accept="image/jpeg"
+                                                                                                                                                        hidden
+                                                                                                                                                        onChange={(e) =>
+                                                                                                                                                            handleFileChange(
+                                                                                                                                                                taskIndex,
+                                                                                                                                                                rowIndex,
+                                                                                                                                                                'passbookCopy',
+                                                                                                                                                                e
+                                                                                                                                                            )
+                                                                                                                                                        }
+                                                                                                                                                    />
+                                                                                                                                                </Button>
+                                                                                                                                            ) : row.passbookCopy ? (
                                                                                                                                                 <a
                                                                                                                                                     href={row.passbookCopy.fileURL}
-                                                                                                                                                    download={row.passbookCopy.file.name} // Trigger download
-                                                                                                                                                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                                                                                                                                    download={row.passbookCopy.file.name}
+                                                                                                                                                    style={{
+                                                                                                                                                        textDecoration: 'underline',
+                                                                                                                                                        color: 'blue',
+                                                                                                                                                    }}
                                                                                                                                                 >
                                                                                                                                                     {row.passbookCopy.file.name}
                                                                                                                                                 </a>
-
                                                                                                                                             ) : (
-                                                                                                                                                <span>No Image</span> // Placeholder if no image is uploaded
-                                                                                                                                            )
-                                                                                                                                        )}
-                                                                                                                                    </td>
-                                                                                                                                    <td>
-                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
-                                                                                                                                            <Form.Control
-                                                                                                                                                type="file"
-                                                                                                                                                accept=".pdf"
-                                                                                                                                                onChange={(e) => handleFileChange(taskIndex, rowIndex, 'otherDocument', e)}
-                                                                                                                                            />
-                                                                                                                                        ) : (
-                                                                                                                                            row.otherDocument ? (
-                                                                                                                                                <a
-                                                                                                                                                    href={row.otherDocument.fileURL}
-                                                                                                                                                    download={row.otherDocument.file.name}
-                                                                                                                                                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                                                                                                                                <Typography>No Image</Typography>
+                                                                                                                                            )}
+                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                                <Button
+                                                                                                                                                    variant="contained"
+                                                                                                                                                    component="label"
                                                                                                                                                 >
-                                                                                                                                                    {row.otherDocument.file.name}
-                                                                                                                                                </a>
-
+                                                                                                                                                    Upload
+                                                                                                                                                    <input
+                                                                                                                                                        type="file"
+                                                                                                                                                        accept=".pdf"
+                                                                                                                                                        multiple
+                                                                                                                                                        hidden
+                                                                                                                                                        onChange={(e) =>
+                                                                                                                                                            handleFileChange(
+                                                                                                                                                                taskIndex,
+                                                                                                                                                                rowIndex,
+                                                                                                                                                                'otherDocument',
+                                                                                                                                                                e
+                                                                                                                                                            )
+                                                                                                                                                        }
+                                                                                                                                                    />
+                                                                                                                                                </Button>
+                                                                                                                                            ) : row.otherDocument &&
+                                                                                                                                                row.otherDocument.files &&
+                                                                                                                                                row.otherDocument.files.length > 0 ? (
+                                                                                                                                                row.otherDocument.files.map((file, idx) => (
+                                                                                                                                                    <div key={idx}>
+                                                                                                                                                        <a
+                                                                                                                                                            href={file.fileURL}
+                                                                                                                                                            download={file.file.name}
+                                                                                                                                                            style={{
+                                                                                                                                                                textDecoration: 'underline',
+                                                                                                                                                                color: 'blue',
+                                                                                                                                                            }}
+                                                                                                                                                        >
+                                                                                                                                                            {file.file.name}
+                                                                                                                                                        </a>
+                                                                                                                                                    </div>
+                                                                                                                                                ))
                                                                                                                                             ) : (
-                                                                                                                                                <span>No File Uploaded</span> 
-                                                                                                                                            )
-                                                                                                                                        )}
-                                                                                                                                    </td>
-                                                                                                                                    <td>
-                                                                                                                                        {editMode[`${taskIndex}-${rowIndex}`] ? (
-                                                                                                                                            <Button variant="success" onClick={() => handleSaveRow(taskIndex, rowIndex)}>
-                                                                                                                                                Save
-                                                                                                                                            </Button>
-                                                                                                                                        ) : (
-                                                                                                                                            <Button variant="secondary" onClick={() => toggleEditMode(taskIndex, rowIndex)}>
-                                                                                                                                                Edit
-                                                                                                                                            </Button>
-                                                                                                                                        )}
-                                                                                                                                    </td>
-                                                                                                                                    {/* {<pre>{JSON.stringify({ task }, null, 2)}</pre>} */}
-                                                                                                                                </tr>
-                                                                                                                            ))}
-                                                                                                                        </tbody>
-                                                                                                                    </Table>
+                                                                                                                                                <Typography>No File Uploaded</Typography>
+                                                                                                                                            )}
+                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            <IconButton
+                                                                                                                                                color={
+                                                                                                                                                    editMode[`${taskIndex}-${rowIndex}`]
+                                                                                                                                                        ? 'success'
+                                                                                                                                                        : 'primary'
+                                                                                                                                                }
+                                                                                                                                                onClick={() =>
+                                                                                                                                                    editMode[`${taskIndex}-${rowIndex}`]
+                                                                                                                                                        ? handleSaveRow(taskIndex, rowIndex)
+                                                                                                                                                        : toggleEditMode(taskIndex, rowIndex)
+                                                                                                                                                }
+                                                                                                                                            >
+                                                                                                                                                {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                                    <SaveIcon />
+                                                                                                                                                ) : (
+                                                                                                                                                    <EditIcon />
+                                                                                                                                                )}
+                                                                                                                                            </IconButton>
+                                                                                                                                        </TableCell>
+                                                                                                                                    </TableRow>
+                                                                                                                                ))}
+                                                                                                                            </TableBody>
+                                                                                                                        </Table>
+                                                                                                                    </TableContainer>
                                                                                                                     <Button
-                                                                                                                        variant="primary"
+                                                                                                                        variant="contained"
+                                                                                                                        color="primary"
                                                                                                                         onClick={() => addNewRow(taskIndex)}
-                                                                                                                        style={{ marginTop: '10px' }}
                                                                                                                     >
                                                                                                                         Add New Row
                                                                                                                     </Button>
                                                                                                                 </div>
                                                                                                             </Collapse>
-                                                                                                        </td>
-                                                                                                    </tr>
+                                                                                                        </TableCell>
+                                                                                                    </TableRow>
                                                                                                 </React.Fragment>
                                                                                             ))}
-                                                                                        </tbody>
+                                                                                        </TableBody>
                                                                                     </Table>
-                                                                                </Accordion.Body>
-                                                                            </Accordion.Item>
+                                                                                </TableContainer>
+                                                                            </AccordionDetails>
                                                                         </Accordion>
                                                                     </div>
                                                                 ))}
-                                                            </Accordion.Body>
-                                                        </Accordion.Item>
-                                                    </Accordion>
-                                                </div>
-                                            ))}
-                                            <Button
-                                                variant="primary"
-                                                onClick={() => handleSaveRow(null, null)}
-                                                style={{ marginTop: '10px' }}
-                                            >
-                                                Save All
-                                            </Button>
-                                        </div>
-                                    </Collapse>
-                                </td>
-                            </tr>
-                        </React.Fragment>
-                    ))}
-                </tbody>
-            </Table>
+                                                            </AccordionDetails>
+                                                        </Accordion>
+                                                    </div>
+                                                ))}
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={() => handleSaveRow(null, null)}
+                                                    style={{ marginTop: '10px' }}
+                                                >
+                                                    Save All
+                                                </Button>
+                                            </div>
+                                        </Collapse>
+                                    </TableCell>
+                                </TableRow>
+                            </React.Fragment>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
     );
 };

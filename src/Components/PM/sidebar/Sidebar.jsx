@@ -12,7 +12,7 @@ const Sidebar = () => {
     <div className="sidebar">
       <div className="top">
         <Link to="/" style={{ textDecoration: "none" }}>
-          <span><img src={logo} alt="Logo" className="logo"/></span>
+          <span><img src={logo} alt="Logo" className="logo" /></span>
         </Link>
       </div>
       <hr />
@@ -20,29 +20,53 @@ const Sidebar = () => {
         <ul>
           <p className="title">MAIN</p>
           <li>
-            <DashboardIcon className="icon" />
+            <DashboardIcon className="icon" style={{
+              backgroundColor: "rgba(218, 165, 32, 0.2)",
+              color: "goldenrod",
+            }} />
             <span>Dashboard</span>
           </li>
-          <p className="title">LISTS</p>
-          <Link to="/users" style={{ textDecoration: "none" }}>
+          <p className="title">BENEFICIARY</p>
+          <Link to="/beneficiary" style={{ textDecoration: "none" }}>
             <li>
-              <PersonOutlineIcon className="icon" />
+              <PersonOutlineIcon className="icon"
+                style={{ backgroundColor: "rgba(0, 128, 0, 0.2)", color: "green" }}
+              />
               <span>Beneficiary List</span>
             </li>
           </Link>
-          <Link to="/products" style={{ textDecoration: "none" }}>
+          <p className="title">IN-PROGRESS</p>
+          <Link to="/inprogress" style={{ textDecoration: "none" }} >
             <li>
-              <StoreIcon className="icon" />
+              <StoreIcon className="icon"  style={{
+              backgroundColor: "rgba(128, 0, 128, 0.2)",
+              color: "purple",
+            }}/>
               <span>In-Progress List</span>
+            </li>
+          </Link>
+          <Link to="/finalpreview" style={{ textDecoration: "none" }} >
+            <li>
+              <StoreIcon className="icon"  style={{
+              backgroundColor: "rgba(128, 0, 128, 0.2)",
+              color: "purple",
+            }}/>
+              <span>Final Preview</span>
             </li>
           </Link>
           <p className="title">USER</p>
           <li>
-            <AccountCircleOutlinedIcon className="icon" />
+            <AccountCircleOutlinedIcon className="icon" style={{
+              backgroundColor: "rgba(128, 0, 128, 0.2)",
+              color: "pink",
+            }}/>
             <span>Profile</span>
           </li>
           <li>
-            <ExitToAppIcon className="icon" />
+            <ExitToAppIcon className="icon" style={{
+              backgroundColor: "rgba(255, 0, 0, 0.2)",
+              color: "crimson",
+            }}/>
             <span>Logout</span>
           </li>
         </ul>

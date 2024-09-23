@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://3.111.84.98:8080/admin'; // Update with your actual API URL
-const PM_BASE_URL = 'http://3.111.84.98:8080/user/pm';
+const BASE_URL = 'http://3.111.84.98:61002/admin'; // Update with your actual API URL
+const PM_BASE_URL = 'http://3.111.84.98:61002/user/pm';
 
 // Fetch all Projects created by PM **(Riya to use while add Beneficiary)
 export const getUserProjects = async (userId) => {
@@ -93,7 +93,7 @@ export const saveConfiguration = async (projectConfig) => {
 // Save the project **(Riya to use in Add Project)
 export const saveBeneficiaryConfiguration = async (projectDto) => {
     try {
-        const response = await axios.post(`${PM_BASE_URL}/project/save`, projectDto);
+        const response = await axios.post(`${PM_BASE_URL}/beneficiary/create`, projectDto);
         return response.data;
     } catch (error) {
         console.error("Error saving Project:", error);
@@ -113,12 +113,22 @@ export const updateTask = async (taskId, updatedTask) => {
     }
 };
 
-export const getBeneficiary = async (projectName) => {
+export const getBeneficiaryByProjectName = async (projectName) => {
     try {
         const response = await axios.get(`${BASE_URL}/${projectName}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching task by ID:', error);
+        throw error;
+    }
+};
+
+export const getBeneficiary = async (userId) => {
+    try {
+        const response = await axios.get(`${PM_BASE_URL}/beneficiary/criteriaSearch`,{ params: { userId } });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching beneficiary:', error);
         throw error;
     }
 };

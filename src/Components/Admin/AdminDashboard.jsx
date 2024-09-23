@@ -19,6 +19,11 @@ const AdminDashboard = () => {
     }, 300); // Set timeout to match the transition duration
   };
 
+  // Function to handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
+    window.location.href = '/login'; // Redirect to the login page
+  };
 
   // Function to render the selected component
   const renderComponent = () => {
@@ -50,6 +55,10 @@ const AdminDashboard = () => {
           </Button>
           <Button color="inherit" onClick={() => handleComponentSwitch('TaskIframe')}>
             Project Configuration
+          </Button>
+          {/* Logout Button */}
+          <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: 'auto' }}>
+            Logout
           </Button>
         </Toolbar>
       </AppBar>

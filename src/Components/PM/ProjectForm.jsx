@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
-import { Form, Button, Container } from 'react-bootstrap';
+import { Box, TextField, Button } from '@mui/material';
 
 const ProjectForm = ({ addProject }) => {
-  
-    const [project, setProject] = useState({
-        projectName: '',
-        projectType: '',
-        category: '',
-      });
 
+  const [project, setProject] = useState({
+    projectName: '',
+    vertical: ''
+  });
+  const [errors, setErrors] = useState('');
+
+  const validateForm = () => {
+    // Check if all fields are filled
+    let formErrors = {};
+    if (!project.projectName) formErrors.projectName = 'Project name is required';
+    if (!project.vertical) formErrors.vertical = 'vertical is required';
+
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProject((prev) => ({ ...prev, [name]: value }));
-    
+
   };
 
   const handleSubmit = () => {
@@ -22,20 +31,35 @@ const ProjectForm = ({ addProject }) => {
   };
 
   return (
-    <Container className="mt-4">
-      <Form>
-        <Form.Group>
-          <Form.Control type="text" name="projectName" placeholder="Project Name" onChange={handleChange} />
-        </Form.Group>
-        <Form.Group>
-          <Form.Control type="text" name="projectType" placeholder="Project Type" onChange={handleChange} />
-        </Form.Group>
-        <Form.Group>
-          <Form.Control type="text" name="category" placeholder="Category" onChange={handleChange} />
-        </Form.Group>
-        <Button variant="success" onClick={handleSubmit}>Submit</Button>
-      </Form>
-    </Container>
+    <Box sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
+      <TextField
+        fullWidth
+        label="Project Name"
+        name="Project"
+        placeholder="Project Name"
+        onChange={handleChange}
+        margin="normal"
+        required
+        error={!!errors.beneficiaryName}
+        helperText={errors.beneficiaryName}
+      />
+
+      <TextField
+        fullWidth
+        label="Vertical"
+        name="guardianName"
+        placeholder="Vertical"
+        onChange={handleChange}
+        margin="normal"
+        required
+        error={!!errors.guardianName}
+        helperText={errors.guardianName}
+      />
+
+      <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ mt: 2 }}>
+        Submit
+      </Button>
+    </Box>
   );
 };
 
