@@ -6,7 +6,7 @@ const PrivateRoute = ({ children }) => {
 
   // If token is not present, redirect to login page
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   // If token is present, render the children (the protected component)

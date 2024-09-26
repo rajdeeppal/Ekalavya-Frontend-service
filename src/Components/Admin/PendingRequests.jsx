@@ -3,18 +3,23 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, Button, Stack, TextField
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const PendingRequests = () => {
   const [requests, setRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch requests from API
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
     console.log('Inside Pending Requests Component : ', token);
+    console.log('User Role : ', jwtDecode(token).role[0].authority);
+    const userRole = jwtDecode(token).role[0].authority;
 
-    axios.get('http://3.111.84.98:8080/admin/manageRoles', {
+    axios.get('http://3.111.84.98:61002/admin/manageRoles', {
       headers:{
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -28,7 +33,7 @@ const PendingRequests = () => {
         if(error.response && error.response.status === 401){
           console.error('Token has expired, please login again.');
           localStorage.removeItem('jwtToken');
-          window.location.href = '/login';  // Redirect to login page
+          navigate('/');;  // Redirect to login page
         } else {
           console.error('Error fetching requests', error);
         }

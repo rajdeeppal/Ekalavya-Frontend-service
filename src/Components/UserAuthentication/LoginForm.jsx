@@ -2,18 +2,21 @@ import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, Grid, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import LoginRedirect from './LoginRedirect';
+
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const [token, setToken] = React.useState(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://3.111.84.98:8080/auth/login', {
+      const response = await fetch('http://3.111.84.98:61002/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,7 +29,9 @@ const LoginForm = () => {
       if (response.ok) {
         localStorage.setItem('jwtToken', data.jwt);
         console.log('Login successful, JWT token:', data.jwt);
-        navigate('/admindashboard');
+        const jwtToken = data.jwt;
+        setToken(jwtToken);
+        //navigate('/admindashboard');
       } else {
         setErrorMessage(data.message || 'Login failed. Please try again.');
       }
@@ -107,6 +112,7 @@ const LoginForm = () => {
               >
                 Register
               </Button>
+              {token && <LoginRedirect token={token} />}
             </Box>
           </Box>
         </motion.div>

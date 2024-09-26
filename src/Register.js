@@ -35,7 +35,7 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      fetch('http://localhost:8080/self-service/submitRoleRequest', {
+      fetch('http://localhost:61002/self-service/submitRoleRequest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

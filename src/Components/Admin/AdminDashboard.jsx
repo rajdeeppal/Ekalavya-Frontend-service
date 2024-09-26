@@ -4,11 +4,13 @@ import PendingRequests from './PendingRequests';
 import { Fade } from '@mui/material';
 import RoleManagement from './RoleManagement';
 import TaskIframe from './TaskIframe';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   // State to manage which component to render
   const [activeComponent, setActiveComponent] = useState('PendingRequests');
   const [fadeIn, setFadeIn] = useState(true);
+  const navigate = useNavigate();
 
   // Handle switching components with transition
   const handleComponentSwitch = (component) => {
@@ -22,7 +24,7 @@ const AdminDashboard = () => {
   // Function to handle logout
   const handleLogout = () => {
     localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
-    window.location.href = '/login'; // Redirect to the login page
+    navigate('/'); // Redirect to the login page
   };
 
   // Function to render the selected component

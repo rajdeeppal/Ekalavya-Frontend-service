@@ -10,12 +10,15 @@ import RoleManagement from './Components/Admin/RoleManagement';
 import TaskIframe from './Components/Admin/TaskIframe';
 import PrivateRoute from './Components/PrivateRoute';
 import RegisterUserForm from './Components/UserAuthentication/RegisterUserForm';
+import EmailOtpVerification from "./Components/Admin/EmailOtpVerification";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<LoginForm />} />
         <Route path="/register" element={<RegisterUserForm />} />
+
+        <Route path="/otpValidation" element={<EmailOtpVerification />} />
 
         <Route path="/adminDashboard" element={
           <PrivateRoute>

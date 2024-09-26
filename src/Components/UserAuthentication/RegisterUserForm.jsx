@@ -19,7 +19,8 @@ const RegisterUserForm = () => {
     { value: 'PM', label: 'PM' },
     { value: 'CEO', label: 'CEO' },
     { value: 'AO', label: 'AO' },
-    {value: 'TRUSTEE', label: 'TRUSTEE'}
+    {value: 'TRUSTEE', label: 'TRUSTEE'},
+    {value: 'EADMIN', label: 'ADMIN'}
   ];
 
   const handleRegister = async (e) => {
@@ -28,7 +29,7 @@ const RegisterUserForm = () => {
     const formData = { username, password, domain, emailId, requestedRole };
 
     try {
-      const response = await axios.post('http://3.111.84.98:8080/self-service/submitRoleRequest', JSON.stringify(formData), {
+      const response = await axios.post('http://3.111.84.98:61002/self-service/submitRoleRequest', JSON.stringify(formData), {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -42,7 +43,7 @@ const RegisterUserForm = () => {
         setDomain('');
         setEmailId('');
         setRequestedRole('');
-        navigate('/login');
+        navigate('/');
       }
     } catch (error) {
       setErrorMessage('Error registering user. Please try again.');
