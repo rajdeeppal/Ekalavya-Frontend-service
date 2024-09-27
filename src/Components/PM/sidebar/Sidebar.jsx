@@ -6,8 +6,17 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import { Link } from "react-router-dom";
 import logo from '../../images/logo.png';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
+    navigate('/'); // Redirect to the login page
+  };
+
   return (
     <div className="sidebar">
       <div className="top">
@@ -67,7 +76,7 @@ const Sidebar = () => {
               backgroundColor: "rgba(255, 0, 0, 0.2)",
               color: "crimson",
             }}/>
-            <span>Logout</span>
+            <span onClick={handleLogout}>Logout</span>
           </li>
         </ul>
       </div>
