@@ -12,6 +12,8 @@ const PendingRequests = () => {
   const [refresh, setRefresh] = useState(false);
   const navigate = useNavigate();
 
+  const token = localStorage.getItem('jwtToken');
+
   // Fetch requests from API
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
@@ -42,10 +44,14 @@ const PendingRequests = () => {
 
   // Handle status change with approver comments and date
   const handleStatusChange = (requestId, newStatus, approverComments, approvedDate) => {
-    axios.post(`/api/request/${requestId}/update-status`, { 
-        status: newStatus,
-        approverComments,
-        approvedDate
+    axios.post('http://3.111.84.98:61002/admin/approveRoleRequest', {
+        requestId,           // Including requestId in the body
+        approverComments,     // Including approverComments in the body
+      },{
+        headers: {
+          'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
+          'Content-Type': 'application/json', // Ensure the content type is set
+        }
       })
       .then(() => {
         setRefresh(!refresh);  // Trigger a re-fetch of data
@@ -54,6 +60,27 @@ const PendingRequests = () => {
         console.error('Error updating status', error);
       });
   };
+
+  const handleRejectRoleRequest = (requestId, newStatus, approverComments, approvedDate) => {
+    axios.post('http://3.111.84.98:61002/admin/rejectRoleRequest', {
+        requestId,           // Including requestId in the body
+        approverComments,     // Including approverComments in the body
+      },{
+        headers: {
+          'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
+          'Content-Type': 'application/json', // Ensure the content type is set
+        }
+      })
+      .then(() => {
+        setRefresh(!refresh);  // Trigger a re-fetch of data
+      })
+      .catch(error => {
+        console.error('Error updating status', error);
+      });
+  };
+
+
+  
 
   // Handle entering edit mode
   const [editing, setEditing] = useState({});
@@ -65,9 +92,13 @@ const PendingRequests = () => {
     }));
   };
 
-  const handleApproveReject = (request, newStatus) => {
+  const handleApproveRequest = (request, newStatus) => {
     handleStatusChange(request.id, newStatus, request.approverComments, request.approvedDate);
   };
+
+  const handleRejectRequest = (request, newStatus) => {
+    handleRejectRoleRequest(request.id, newStatus, request.approverComments, request.approvedDate)
+  }
 
   const handleChange = (requestId, field, value) => {
     setRequests((prevRequests) =>
@@ -88,7 +119,6 @@ const PendingRequests = () => {
             <TableCell>Status</TableCell>
             <TableCell>Approver Comments</TableCell>
             <TableCell>Requested Date</TableCell>
-            <TableCell>Approved Date</TableCell>
             <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
@@ -101,7 +131,7 @@ const PendingRequests = () => {
               }}
             >
               <TableCell>{request.user.username}</TableCell>
-              <TableCell>{request.user.emailId}</TableCell>
+              <TableCell>{request.user.emailid}</TableCell>
               <TableCell>{request.requestedRole}</TableCell>
               <TableCell>{request.status}</TableCell>
               
@@ -117,18 +147,7 @@ const PendingRequests = () => {
                 )}
               </TableCell>
 
-              <TableCell>
-                {editing[request.id] ? (
-                  <TextField
-                    type="date"
-                    value={request.approvedDate ? new Date(request.approvedDate).toISOString().split('T')[0] : ''}
-                    onChange={(e) => handleChange(request.id, 'approvedDate', e.target.value)}
-                    fullWidth
-                  />
-                ) : (
-                  request.approvedDate ? new Date(request.approvedDate).toLocaleDateString() : '-'
-                )}
-              </TableCell>
+              <TableCell>{request.requestDate}</TableCell>
 
               <TableCell>
                 <Stack direction="row" spacing={1}>
@@ -137,14 +156,14 @@ const PendingRequests = () => {
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => handleApproveReject(request, 'approve')}
+                        onClick={() => handleApproveRequest(request, 'approve')}
                       >
                         Approve
                       </Button>
                       <Button
                         variant="contained"
                         color="secondary"
-                        onClick={() => handleApproveReject(request, 'reject')}
+                        onClick={() => handleRejectRequest(request, 'reject')}
                       >
                         Reject
                       </Button>
