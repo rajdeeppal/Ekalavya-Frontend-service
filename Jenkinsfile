@@ -16,17 +16,17 @@ pipeline {
             }
         }
         
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
+        // stage('Install Dependencies') {
+        //     steps {
+        //         sh 'npm install'
+        //     }
+        // }
 
-        stage('Build React App') {
-            steps {
-                sh 'CI=false npm run build'
-            }
-        }
+        // stage('Build React App') {
+        //     steps {
+        //         sh 'CI=false npm run build'
+        //     }
+        // }
 
         stage('Docker Build') {
             steps {
