@@ -15,7 +15,7 @@ RUN npm install
 COPY . .
 
 # Build the React app for production
-RUN npm run build
+RUN npm run build           
 
 # Stage 2: Serve the built app using Nginx
 FROM nginx:1.23-alpine

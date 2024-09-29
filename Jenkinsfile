@@ -57,7 +57,7 @@ pipeline {
                         docker pull ${IMAGE_NAME}:${env.BUILD_ID} &&
                         docker stop ${IMAGE_NAME} || true &&
                         docker rm ${IMAGE_NAME} || true &&
-                        docker run -d -p 8080:3000 --name react-container ${IMAGE_NAME}:${env.BUILD_ID}
+                        docker run -d -p 8081:3000 --name react-container ${IMAGE_NAME}:${env.BUILD_ID}
                         '
                     """
                 }
