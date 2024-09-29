@@ -4,6 +4,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
 import Paper from "@mui/material/Paper";
 import DownloadIcon from '@mui/icons-material/Download';
+import { updateActivityTask } from '../DataCenter/apiService';
 
 const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   const [open, setOpen] = useState({});
@@ -15,12 +16,14 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
   };
 
-  const handleEditActivityClick = (beneficiaryIndex, componentIndex, activityIndex, taskIndex) => {
+  const handleEditActivityClick = async (beneficiaryIndex, componentIndex, activityIndex, taskIndex) => {
     setEditActivityMode((prevState) => ({
       ...prevState,
       [`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`]:
         !prevState[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`],
     }));
+
+    
   };
 
   const handleActivityInputChange = (beneficiaryIndex, componentIndex, activityIndex, taskIndex, e) => {
@@ -34,11 +37,25 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     }
   };
 
-  const handleSaveActivity = (beneficiaryIndex, componentIndex, activityIndex, taskIndex) => {
+  const handleSaveActivity = async (beneficiaryIndex, componentIndex, activityIndex, taskIndex) => {
     setEditActivityMode((prevState) => ({
       ...prevState,
       [`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`]: false,
     }));
+
+    const updatedBeneficiaries = [...beneficiaries];
+    const activity = updatedBeneficiaries[beneficiaryIndex]?.components[componentIndex]?.activities[activityIndex];
+
+    const criteria={
+      ...activity.tasks[taskIndex]
+    }
+
+    try {
+      const data = await updateActivityTask(taskIndex,criteria);
+      setBeneficiaries(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
   };
 
   const handleSubmit = () => {

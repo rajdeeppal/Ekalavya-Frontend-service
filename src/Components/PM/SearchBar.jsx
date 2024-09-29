@@ -3,11 +3,10 @@ import { TextField, Button, Grid, Container } from '@mui/material';
 
 const SearchBar = ({ onSearch }) => {
   const [searchCriteria, setSearchCriteria] = React.useState({
-    state: '',
+    stateName: '',
     districtName: '',
-    projectName: '',
-    projectType: '',
-    category: '',
+    // projectName: '',
+    // componentName: '',
   });
 
   const handleChange = (e) => {
@@ -22,17 +21,17 @@ const SearchBar = ({ onSearch }) => {
   return (
     <Container sx={{ marginTop: 4 }}>
       <Grid container spacing={3} alignItems="center">
-        <Grid item xs={12} sm={6} md={2}>
+        <Grid item xs={12} sm={6} md={2.5}>
           <TextField
             fullWidth
             variant="outlined"
             label="State"
-            name="state"
+            name="stateName"
             onChange={handleChange}
             size="small"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={2}>
+        <Grid item xs={12} sm={6} md={2.5}>
           <TextField
             fullWidth
             variant="outlined"
@@ -42,7 +41,7 @@ const SearchBar = ({ onSearch }) => {
             size="small"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={2}>
+        <Grid item xs={12} sm={6} md={2.5}>
           <TextField
             fullWidth
             variant="outlined"
@@ -52,22 +51,12 @@ const SearchBar = ({ onSearch }) => {
             size="small"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={2}>
+        <Grid item xs={12} sm={6} md={2.5}>
           <TextField
             fullWidth
             variant="outlined"
             label="Project Type"
-            name="projectType"
-            onChange={handleChange}
-            size="small"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={2}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Category"
-            name="category"
+            name="componentName"
             onChange={handleChange}
             size="small"
           />

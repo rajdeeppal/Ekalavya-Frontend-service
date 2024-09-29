@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
 import ActivityIframe from './ActivityIframe';
-import { getVerticals, getComponents, getActivities, getTasks, saveBeneficiaryConfiguration } from '../DataCenter/apiService';
+import { getVerticals,getUserProjects, getComponents, getActivities, getTasks, saveBeneficiaryConfiguration } from '../DataCenter/apiService';
 
 const BeneficiaryForm = ({ projects, addBeneficiary }) => {
   const [beneficiary, setBeneficiary] = useState({
@@ -10,7 +10,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
     villageName: '',
     mandalName: '',
     districtName: '',
-    stateName: '',
+    state: '',
     aadharNumber: '',
     surveyNumber: '',
   });
@@ -39,6 +39,14 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
 
   useEffect(() => {
     async function fetchVerticals() {
+      const data = await getVerticals();
+      setVerticals(Array.isArray(data) ? data : []);
+    }
+    fetchVerticals();
+  }, []);
+
+  useEffect(() => {
+      async function fetchVerticals() {
       const data = await getVerticals();
       setVerticals(Array.isArray(data) ? data : []);
     }
@@ -97,7 +105,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
     if (!beneficiary.villageName) formErrors.villageName = 'villageName is required';
     if (!beneficiary.mandalName) formErrors.mandalName = 'mandalName is required';
     if (!beneficiary.districtName) formErrors.districtName = 'districtName is required';
-    if (!beneficiary.stateName) formErrors.stateName = 'State is required';
+    if (!beneficiary.state) formErrors.state = 'State is required';
     if (!beneficiary.aadharNumber) formErrors.aadharNumber = 'aadharNumber is required';
     if (!beneficiary.surveyNumber) formErrors.surveyNumber = 'Survey number is required';
     if (!selectedComponent) formErrors.selectedComponent = 'Component is required';
@@ -116,7 +124,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
       villageName: '',
       mandalName: '',
       districtName: '',
-      stateName: '',
+      state: '',
       aadharNumber: '',
       surveyNumber: '',
     });
@@ -172,12 +180,12 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
       // taskName: selectedTask,
       // ...task,
       projectName: selectedVertical,
-      beneficiary: beneficiary.beneficiaryName,
+      beneficiaryName: beneficiary.beneficiaryName,
       guardianName: beneficiary.guardianName,
       villageName: beneficiary.villageName,
       mandalName: beneficiary.mandalName,
       districtName: beneficiary.districtName,
-      stateName: beneficiary.stateName,
+      stateName: beneficiary.state,
       aadharNumber: parseInt(beneficiary.aadharNumber, 10),
       surveyNumber: parseInt(beneficiary.surveyNumber, 10),
       componentName: selectedComponent,
@@ -292,7 +300,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
           <TextField
             fullWidth
             label="State"
-            name="stateName"
+            name="state"
             placeholder="State"
             onChange={handleChange}
             margin="normal"

@@ -1,12 +1,21 @@
 import axios from 'axios';
-
+import { jwtDecode } from 'jwt-decode';
 const BASE_URL = 'http://3.111.84.98:61002/admin'; // Update with your actual API URL
 const PM_BASE_URL = 'http://3.111.84.98:61002/user/pm';
 
+const BENEFICIARY_BASE_URL='http://3.111.84.98:61002/beneficiary';
+
+const token=localStorage.getItem('jwtToken');
+const username = jwtDecode(token).sub;
 // Fetch all Projects created by PM **(Riya to use while add Beneficiary)
-export const getUserProjects = async (userId) => {
+export const getUserProjects = async () => {
     try {
-        const response = await axios.get(`${PM_BASE_URL}/projects/${userId}`);
+        const response = await axios.get(`${PM_BASE_URL}/projects/${username}`,{
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
         return response.data;
     } catch (error) {
         console.error('Error fetching Projects by USERID:', error);
@@ -17,7 +26,12 @@ export const getUserProjects = async (userId) => {
 // Fetch all verticals
 export const getVerticals = async () => {
     try {
-        const response = await axios.get(`${BASE_URL}/verticals`);
+        const response = await axios.get(`${BASE_URL}/verticals`,{
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error("Error fetching verticals:", error);
@@ -28,7 +42,12 @@ export const getVerticals = async () => {
 // Fetch components based on selected vertical
 export const getComponents = async (vertical) => {
     try {
-        const response = await axios.get(`${BASE_URL}/components`, { params: { vertical } });
+        const response = await axios.get(`${BASE_URL}/components`, { params: { vertical },
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error("Error fetching components:", error);
@@ -39,7 +58,12 @@ export const getComponents = async (vertical) => {
 // Fetch components based on selected Project **(Riya to use while add Beneficiary)
 export const getComponentsByProject = async (project) => {
     try {
-        const response = await axios.get(`${PM_BASE_URL}/components`, { params: { project } });
+        const response = await axios.get(`${PM_BASE_URL}/components`, { params: { project } ,
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error("Error fetching components:", error);
@@ -50,7 +74,12 @@ export const getComponentsByProject = async (project) => {
 // Fetch activities based on selected component
 export const getActivities = async (component) => {
     try {
-        const response = await axios.get(`${BASE_URL}/activities`, { params: { component } });
+        const response = await axios.get(`${BASE_URL}/activities`, { params: { component } ,
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error("Error fetching activities:", error);
@@ -61,7 +90,12 @@ export const getActivities = async (component) => {
 // Fetch tasks for editing
 export const getTasks = async (activity) => {
     try {
-        const response = await axios.get(`${BASE_URL}/tasks`, { params: { activity } });
+        const response = await axios.get(`${BASE_URL}/tasks`, { params: { activity } ,
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error("Error fetching tasks:", error);
@@ -72,7 +106,12 @@ export const getTasks = async (activity) => {
 // Fetch tasks by its ID for editing
 export const getTaskById = async (taskId) => {
     try {
-        const response = await axios.get(`${BASE_URL}/task/${taskId}`);
+        const response = await axios.get(`${BASE_URL}/task/${taskId}`,{
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error('Error fetching task by ID:', error);
@@ -83,7 +122,12 @@ export const getTaskById = async (taskId) => {
 // Save the configuration
 export const saveConfiguration = async (projectConfig) => {
     try {
-        const response = await axios.post(`${BASE_URL}/configuration/save`, projectConfig);
+        const response = await axios.post(`${BASE_URL}/configuration/save`, projectConfig,{
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error("Error saving configuration:", error);
@@ -93,7 +137,13 @@ export const saveConfiguration = async (projectConfig) => {
 // Save the project **(Riya to use in Add Project)
 export const saveBeneficiaryConfiguration = async (projectDto) => {
     try {
-        const response = await axios.post(`${PM_BASE_URL}/beneficiary/create`, projectDto);
+        const token = localStorage.getItem('jwtToken');
+        const response = await axios.post(`${BENEFICIARY_BASE_URL}/create`, projectDto,{
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error("Error saving Project:", error);
@@ -105,6 +155,7 @@ export const updateTask = async (taskId, updatedTask) => {
     try {
         await axios.put(`${BASE_URL}/task/${taskId}`, updatedTask, {
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
@@ -115,7 +166,12 @@ export const updateTask = async (taskId, updatedTask) => {
 
 export const getBeneficiaryByProjectName = async (projectName) => {
     try {
-        const response = await axios.get(`${BASE_URL}/${projectName}`);
+        const response = await axios.get(`${BASE_URL}/${projectName}`,{
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
         return response.data;
     } catch (error) {
         console.error('Error fetching task by ID:', error);
@@ -123,12 +179,32 @@ export const getBeneficiaryByProjectName = async (projectName) => {
     }
 };
 
-export const getBeneficiary = async (userId) => {
+export const getBeneficiary = async (object) => {
     try {
-        const response = await axios.get(`${PM_BASE_URL}/beneficiary/criteriaSearch`,{ params: { userId } });
+        const response = await axios.post(`${BENEFICIARY_BASE_URL}/criteriaSearch`,object,{
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
         return response.data;
     } catch (error) {
         console.error('Error fetching beneficiary:', error);
         throw error;
     }
 };
+
+export const updateActivityTask = async (taskId,object)=>{
+    try {
+        const response = await axios.post(`${BENEFICIARY_BASE_URL}/addTask/${taskId}`,object,{
+            headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching beneficiary:', error);
+        throw error;
+    }
+}
