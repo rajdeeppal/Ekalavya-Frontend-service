@@ -51,8 +51,8 @@ pipeline {
                 sh """
                 ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} \
                 "docker pull ${env.IMAGE_NAME}:${env.BUILD_ID} && \
-                docker stop ${env.IMAGE_NAME} || true && \
-                docker rm ${env.IMAGE_NAME} || true && \
+                docker stop ekalavya-frontend-app || true && \
+                docker rm ekalavya-frontend-app || true && \
                 docker run --restart unless-stopped -d --name ekalavya-frontend-app -p 8081:3000 ${env.IMAGE_NAME}:${env.BUILD_ID}"
                     """
             }
