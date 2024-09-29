@@ -15,10 +15,10 @@ const RoleManagement = () => {
   // Fetch roles from backend when the component mounts
   useEffect(() => {
     axios.get('http://3.111.84.98:61002/roleAudit',{
-      headers:{
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      }
+      // headers:{
+      //   'Authorization': `Bearer ${token}`,
+      //   'Content-Type': 'application/json',
+      // }
     }) // Replace with your actual backend API endpoint
       .then((response) => {
         setRoles(response.data); // Assume response data is an array of role objects
@@ -124,7 +124,8 @@ const RoleManagement = () => {
         <MenuItem value="">
           <em>Select a Role</em>
         </MenuItem>
-        {roles.map((role) => (
+        {roles.filter((role) => role.name !== 'EADMIN')
+        .map((role) => (
           <MenuItem key={role.id} value={role.name}>
             {role.name}
           </MenuItem>
@@ -166,7 +167,7 @@ const RoleManagement = () => {
                             <em>Select a Role</em>
                           </MenuItem>
                           {roles
-                            .filter((role) => role.name !== "UNASSIGN") // Exclude the "UNASSIGN" role
+                            .filter((role) => role.name !== 'EADMIN' && role.name !== 'UNASSIGN') // Exclude the "UNASSIGN" role
                             .map((role) => (
                               <MenuItem key={role.id} value={role.name}>
                                 {role.name}
