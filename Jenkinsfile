@@ -48,16 +48,13 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent (credentials: ['ec2-ssh-credentials']) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} '
-                        docker pull ${IMAGE_NAME}:${env.BUILD_ID} &&
-                        docker stop ${IMAGE_NAME} || true &&
-                        docker rm ${IMAGE_NAME} || true &&
-                        docker run -d -p 8081:3000 --name react-container ${IMAGE_NAME}:${env.BUILD_ID}
-                        '
+                sh """
+                ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} \
+                "docker pull ${env.IMAGE_NAME}:${env.BUILD_ID} && \
+                docker stop ${env.IMAGE_NAME} || true && \
+                docker rm ${env.IMAGE_NAME} || true && \
+                docker run --restart unless-stopped -d --name ekalavya-app -p 8081:3000 ${env.IMAGE_NAME}:${env.BUILD_ID}"
                     """
-                }
             }
         }
     }
