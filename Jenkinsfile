@@ -24,7 +24,7 @@ pipeline {
 
         stage('Build React App') {
             steps {
-                sh 'npm run build'
+                sh 'CI=false npm run build'
             }
         }
 
