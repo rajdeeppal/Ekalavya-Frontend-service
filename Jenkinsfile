@@ -41,7 +41,7 @@ pipeline {
                 "docker pull ${env.IMAGE_NAME}:${env.BUILD_ID} && \
                 docker stop ekalavya-frontend-app || true && \
                 docker rm ekalavya-frontend-app || true && \
-                docker run --restart unless-stopped -d --name ekalavya-frontend-app -p 80:80 ${env.IMAGE_NAME}:${env.BUILD_ID}"
+                docker run --restart unless-stopped -d --name ekalavya-frontend-app -p 80:3000 ${env.IMAGE_NAME}:${env.BUILD_ID}"
                     """
             }
         }
