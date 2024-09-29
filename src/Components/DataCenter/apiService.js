@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 const BASE_URL = 'http://3.111.84.98:61002/admin'; // Update with your actual API URL
 const PM_BASE_URL = 'http://3.111.84.98:61002/user/pm';
 
@@ -12,11 +13,12 @@ const getAuthorizationHeader = () => {
         'Content-Type': 'application/json',
     }:{};
 };
+const userId=jwtDecode(getToken()).sub;
 // Fetch all Projects created by PM **(Riya to use while add Beneficiary)
-export const getUserProjects = async (username) => {
-   
+export const getUserProjects = async () => {
+  
     try {
-        const response = await axios.get(`${PM_BASE_URL}/projects/${username}`,{
+        const response = await axios.get(`${PM_BASE_URL}/projects/${userId}`,{
          header:getAuthorizationHeader()
         });
         return response.data;
@@ -134,6 +136,18 @@ export const saveBeneficiaryConfiguration = async (projectDto) => {
         console.error("Error saving Project:", error);
     }
 };
+
+export const saveProjectConfiguration = async (projectDto) => {
+    try {  
+        const response = await axios.post(`${PM_BASE_URL}/project/save/${userId}`, projectDto,{
+            headers:getAuthorizationHeader()
+          });
+        return response.data;
+    } catch (error) {
+        console.error("Error saving Project:", error);
+    }
+};
+
 
 // Update an existing task
 export const updateTask = async (taskId, updatedTask) => {

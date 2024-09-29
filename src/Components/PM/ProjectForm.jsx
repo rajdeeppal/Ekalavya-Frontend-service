@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, TextField, Button, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
+import { saveProjectConfiguration, getVerticals } from '../DataCenter/apiService';
 
 const ProjectForm = ({ addProject }) => {
 
   const [project, setProject] = useState({
     projectName: '',
-    vertical: ''
+    verticalName: ''
   });
   const [errors, setErrors] = useState('');
+  const [verticals, setVerticals] = useState([]);
+  const [selectedVertical, setSelectedVertical] = useState('');
+
+  useEffect(() => {
+    async function fetchVerticals() {
+      const data = await getVerticals();
+      setVerticals(Array.isArray(data) ? data : []);
+    }
+    fetchVerticals();
+  }, []);
 
   const validateForm = () => {
     // Check if all fields are filled
@@ -25,7 +36,17 @@ const ProjectForm = ({ addProject }) => {
 
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    try {
+      await saveProjectConfiguration(project);
+      alert('Project saved successfully!');
+      addProject(project); // Call addProject only after successful save
+      setProject({ projectName: '', verticalName: '' }); // Reset form
+
+    } catch (error) {
+      console.error('Error saving beneficiary and task:', error);
+      alert('Failed to save. Please try again.');
+    }
     addProject(project);
     console.log(project);
   };
@@ -35,7 +56,7 @@ const ProjectForm = ({ addProject }) => {
       <TextField
         fullWidth
         label="Project Name"
-        name="Project"
+        name="projectName"
         placeholder="Project Name"
         onChange={handleChange}
         margin="normal"
@@ -44,17 +65,23 @@ const ProjectForm = ({ addProject }) => {
         helperText={errors.beneficiaryName}
       />
 
-      <TextField
-        fullWidth
-        label="Vertical"
-        name="guardianName"
-        placeholder="Vertical"
-        onChange={handleChange}
-        margin="normal"
-        required
-        error={!!errors.guardianName}
-        helperText={errors.guardianName}
-      />
+      <FormControl fullWidth margin="normal">
+        <InputLabel>Vertical</InputLabel>
+        <Select
+          name="verticalName"
+          value={selectedVertical}
+          onChange={handleChange}
+          required
+        >
+          <MenuItem value="">Select Vertical</MenuItem>
+          {verticals.map((project) => (
+            <MenuItem key={project.id} value={project.verticalName}>
+              {project.verticalName}
+            </MenuItem>
+          ))}
+        </Select>
+        {errors.selectedVertical && <Alert severity="error">{errors.selectedVertical}</Alert>}
+      </FormControl>
 
       <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ mt: 2 }}>
         Submit
