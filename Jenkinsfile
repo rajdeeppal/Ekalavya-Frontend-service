@@ -15,18 +15,6 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/rajdeeppal/Ekalavya-Frontend-service.git'
             }
         }
-        
-        // stage('Install Dependencies') {
-        //     steps {
-        //         sh 'npm install'
-        //     }
-        // }
-
-        // stage('Build React App') {
-        //     steps {
-        //         sh 'CI=false npm run build'
-        //     }
-        // }
 
         stage('Docker Build') {
             steps {
@@ -53,7 +41,7 @@ pipeline {
                 "docker pull ${env.IMAGE_NAME}:${env.BUILD_ID} && \
                 docker stop ekalavya-frontend-app || true && \
                 docker rm ekalavya-frontend-app || true && \
-                docker run --restart unless-stopped -d --name ekalavya-frontend-app -p 8081:3000 ${env.IMAGE_NAME}:${env.BUILD_ID}"
+                docker run --restart unless-stopped -d --name ekalavya-frontend-app -p 8081:8081 ${env.IMAGE_NAME}:${env.BUILD_ID}"
                     """
             }
         }
