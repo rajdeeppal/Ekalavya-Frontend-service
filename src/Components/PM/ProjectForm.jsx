@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
 import { saveProjectConfiguration, getVerticals } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
 
 const ProjectForm = ({ addProject }) => {
-
+  const { userId } = useAuth();
   const [project, setProject] = useState({
     projectName: '',
     verticalName: ''
@@ -32,13 +33,16 @@ const ProjectForm = ({ addProject }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'verticalName') {
+      setSelectedVertical(value);
+    }
     setProject((prev) => ({ ...prev, [name]: value }));
 
   };
 
   const handleSubmit = async () => {
     try {
-      await saveProjectConfiguration(project);
+      await saveProjectConfiguration(userId, project);
       alert('Project saved successfully!');
       addProject(project); // Call addProject only after successful save
       setProject({ projectName: '', verticalName: '' }); // Reset form
