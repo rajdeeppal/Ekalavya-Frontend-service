@@ -24,7 +24,7 @@ FROM nginx:1.23-alpine
 COPY --from=build /app/build /usr/share/nginx/html
 
 # Expose port 8080 to the outside world
-EXPOSE 8080
+EXPOSE 8081
 
 # Copy custom nginx configuration if necessary (optional)
 # COPY nginx.conf /etc/nginx/nginx.conf
