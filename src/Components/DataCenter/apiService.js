@@ -1,20 +1,23 @@
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 const BASE_URL = 'http://3.111.84.98:61002/admin'; // Update with your actual API URL
 const PM_BASE_URL = 'http://3.111.84.98:61002/user/pm';
 
 const BENEFICIARY_BASE_URL='http://3.111.84.98:61002/beneficiary';
 
-const token=localStorage.getItem('jwtToken');
-const username = jwtDecode(token).sub;
+const getToken = () => localStorage.getItem('jwtToken');
+const getAuthorizationHeader = () => {
+    const token = getToken();
+    return token ? {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+    }:{};
+};
 // Fetch all Projects created by PM **(Riya to use while add Beneficiary)
-export const getUserProjects = async () => {
+export const getUserProjects = async (username) => {
+   
     try {
         const response = await axios.get(`${PM_BASE_URL}/projects/${username}`,{
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
+         header:getAuthorizationHeader()
         });
         return response.data;
     } catch (error) {
@@ -25,12 +28,10 @@ export const getUserProjects = async () => {
 
 // Fetch all verticals
 export const getVerticals = async () => {
+   
     try {
         const response = await axios.get(`${BASE_URL}/verticals`,{
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -41,12 +42,10 @@ export const getVerticals = async () => {
 
 // Fetch components based on selected vertical
 export const getComponents = async (vertical) => {
+   
     try {
         const response = await axios.get(`${BASE_URL}/components`, { params: { vertical },
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -57,12 +56,10 @@ export const getComponents = async (vertical) => {
 
 // Fetch components based on selected Project **(Riya to use while add Beneficiary)
 export const getComponentsByProject = async (project) => {
+    
     try {
         const response = await axios.get(`${PM_BASE_URL}/components`, { params: { project } ,
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -73,12 +70,10 @@ export const getComponentsByProject = async (project) => {
 
 // Fetch activities based on selected component
 export const getActivities = async (component) => {
+ 
     try {
         const response = await axios.get(`${BASE_URL}/activities`, { params: { component } ,
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -89,12 +84,10 @@ export const getActivities = async (component) => {
 
 // Fetch tasks for editing
 export const getTasks = async (activity) => {
+  
     try {
         const response = await axios.get(`${BASE_URL}/tasks`, { params: { activity } ,
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -105,12 +98,10 @@ export const getTasks = async (activity) => {
 
 // Fetch tasks by its ID for editing
 export const getTaskById = async (taskId) => {
+
     try {
         const response = await axios.get(`${BASE_URL}/task/${taskId}`,{
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -123,10 +114,7 @@ export const getTaskById = async (taskId) => {
 export const saveConfiguration = async (projectConfig) => {
     try {
         const response = await axios.post(`${BASE_URL}/configuration/save`, projectConfig,{
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -137,12 +125,9 @@ export const saveConfiguration = async (projectConfig) => {
 // Save the project **(Riya to use in Add Project)
 export const saveBeneficiaryConfiguration = async (projectDto) => {
     try {
-        const token = localStorage.getItem('jwtToken');
+        
         const response = await axios.post(`${BENEFICIARY_BASE_URL}/create`, projectDto,{
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -154,10 +139,7 @@ export const saveBeneficiaryConfiguration = async (projectDto) => {
 export const updateTask = async (taskId, updatedTask) => {
     try {
         await axios.put(`${BASE_URL}/task/${taskId}`, updatedTask, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthorizationHeader(),
         });
     } catch (error) {
         console.error("Error updating task:", error);
@@ -167,10 +149,7 @@ export const updateTask = async (taskId, updatedTask) => {
 export const getBeneficiaryByProjectName = async (projectName) => {
     try {
         const response = await axios.get(`${BASE_URL}/${projectName}`,{
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthorizationHeader(),
         });
         return response.data;
     } catch (error) {
@@ -182,10 +161,7 @@ export const getBeneficiaryByProjectName = async (projectName) => {
 export const getBeneficiary = async (object) => {
     try {
         const response = await axios.post(`${BENEFICIARY_BASE_URL}/criteriaSearch`,object,{
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
@@ -197,10 +173,7 @@ export const getBeneficiary = async (object) => {
 export const updateActivityTask = async (taskId,object)=>{
     try {
         const response = await axios.post(`${BENEFICIARY_BASE_URL}/addTask/${taskId}`,object,{
-            headers:{
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
+            headers:getAuthorizationHeader()
           });
         return response.data;
     } catch (error) {
