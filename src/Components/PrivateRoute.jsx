@@ -28,7 +28,7 @@ export const PrivateRoute = ({ children }) => {
 
   // If token is not present or expired, redirect to the homepage
   if (!token) {
-    window.alert('You are not logged in. Redirecting to the homepage.');
+    window.alert('You are not logged in. Redirecting to the login page.');
     return <Navigate to="/" />;
   }
 
