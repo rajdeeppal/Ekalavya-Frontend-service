@@ -54,10 +54,11 @@ const AdminDashboard = () => {
 
           {/* Updated navigation buttons with dynamic styling */}
           <Button
-            color={activeComponent === 'PendingRequests' ? 'secondary' : 'inherit'}
+            color={activeComponent === 'PendingRequests' ? 'inherit' : 'inherit'}
             sx={{
               fontWeight: activeComponent === 'PendingRequests' ? 'bold' : 'normal',
-              borderBottom: activeComponent === 'PendingRequests' ? '2px solid #ffeb3b' : 'none',
+              color: activeComponent === 'PendingRequests' ? '#8ce0f5' : 'inherit', // Light blue color
+              borderBottom: activeComponent === 'PendingRequests' ? '2px solid #8ce0f5' : 'none',
             }}
             onClick={() => handleComponentSwitch('PendingRequests')}
           >
@@ -66,20 +67,22 @@ const AdminDashboard = () => {
             </Badge>
           </Button>
           <Button
-            color={activeComponent === 'RoleManagement' ? 'secondary' : 'inherit'}
+            color={activeComponent === 'RoleManagement' ? 'inherit' : 'inherit'}
             sx={{
               fontWeight: activeComponent === 'RoleManagement' ? 'bold' : 'normal',
-              borderBottom: activeComponent === 'RoleManagement' ? '2px solid #ffeb3b' : 'none',
+              color: activeComponent === 'RoleManagement' ? '#8ce0f5' : 'inherit', // Light blue color
+              borderBottom: activeComponent === 'RoleManagement' ? '2px solid #8ce0f5' : 'none',
             }}
             onClick={() => handleComponentSwitch('RoleManagement')}
           >
             Role Management
           </Button>
           <Button
-            color={activeComponent === 'TaskIframe' ? 'secondary' : 'inherit'}
+            color={activeComponent === 'TaskIframe' ? 'inherit' : 'inherit'}
             sx={{
               fontWeight: activeComponent === 'TaskIframe' ? 'bold' : 'normal',
-              borderBottom: activeComponent === 'TaskIframe' ? '2px solid #ffeb3b' : 'none',
+              color: activeComponent === 'TaskIframe' ? '#8ce0f5' : 'inherit', // Light blue color
+              borderBottom: activeComponent === 'TaskIframe' ? '2px solid #8ce0f5' : 'none',
             }}
             onClick={() => handleComponentSwitch('TaskIframe')}
           >

@@ -1,7 +1,6 @@
-import React ,{createContext,useContext} from 'react';
+import React, { createContext, useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-
 
 const AuthContext = createContext();
 
@@ -12,7 +11,7 @@ export const useAuth = () => {
 
 export const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('jwtToken');
-  const userId=jwtDecode(token).sub;
+
   // Function to check if token is expired
   const isTokenExpired = (token) => {
     try {
@@ -28,17 +27,24 @@ export const PrivateRoute = ({ children }) => {
   };
 
   // If token is not present or expired, redirect to the homepage
-  if (!token || isTokenExpired(token)) {
-    window.alert('Your Session has timed out.');
+  if (!token) {
+    window.alert('You are not logged in. Redirecting to the homepage.');
     return <Navigate to="/" />;
   }
+
+  if (isTokenExpired(token)) {
+    window.alert('Your session has timed out.');
+    return <Navigate to="/" />;
+  }
+
+  const userId = jwtDecode(token).sub; // Decode the token after ensuring it's not null or expired
+
   const value = {
     token,
     userId,
     isTokenExpired,
   };
+
   // If token is valid, render the children (protected component)
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-
