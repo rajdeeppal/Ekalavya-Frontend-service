@@ -1,37 +1,39 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Button, Typography, Container, Box } from '@mui/material';
+import { AppBar, Toolbar, Button, Typography, Container, Box, Fade, IconButton, Badge } from '@mui/material';
 import PendingRequests from './PendingRequests';
-import { Fade } from '@mui/material';
 import RoleManagement from './RoleManagement';
 import TaskIframe from './TaskIframe';
 import { useNavigate } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout'; // Icon for logout
 
 const AdminDashboard = () => {
-  // State to manage which component to render
   const [activeComponent, setActiveComponent] = useState('PendingRequests');
   const [fadeIn, setFadeIn] = useState(true);
   const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState(0);
 
-  // Handle switching components with transition
+  // Handle switching components with fade animation
   const handleComponentSwitch = (component) => {
-    setFadeIn(false);
-    setTimeout(() => {
-      setActiveComponent(component);
-      setFadeIn(true);
-    }, 300); // Set timeout to match the transition duration
+    if (activeComponent !== component) {
+      setFadeIn(false);
+      setTimeout(() => {
+        setActiveComponent(component);
+        setFadeIn(true);
+      }, 300); // Set timeout to match the transition duration
+    }
   };
 
-  // Function to handle logout
+  // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
     navigate('/'); // Redirect to the login page
   };
 
-  // Function to render the selected component
+  // Render the selected component
   const renderComponent = () => {
     switch (activeComponent) {
       case 'PendingRequests':
-        return <PendingRequests />;
+        return <PendingRequests setPendingCount={setPendingCount} />;
       case 'RoleManagement':
         return <RoleManagement />;
       case 'TaskIframe':
@@ -44,31 +46,66 @@ const AdminDashboard = () => {
   return (
     <div>
       {/* Navigation Header */}
-      <AppBar position="static">
+      <AppBar position="static" sx={{ backgroundColor: '#3f51b5' }}>
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
             Admin Dashboard
           </Typography>
-          <Button color="inherit" onClick={() => handleComponentSwitch('PendingRequests')}>
-            Pending Requests
+
+          {/* Updated navigation buttons with dynamic styling */}
+          <Button
+            color={activeComponent === 'PendingRequests' ? 'secondary' : 'inherit'}
+            sx={{
+              fontWeight: activeComponent === 'PendingRequests' ? 'bold' : 'normal',
+              borderBottom: activeComponent === 'PendingRequests' ? '2px solid #ffeb3b' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('PendingRequests')}
+          >
+            <Badge badgeContent={pendingCount} color="error">
+              Pending Requests
+            </Badge>
           </Button>
-          <Button color="inherit" onClick={() => handleComponentSwitch('RoleManagement')}>
+          <Button
+            color={activeComponent === 'RoleManagement' ? 'secondary' : 'inherit'}
+            sx={{
+              fontWeight: activeComponent === 'RoleManagement' ? 'bold' : 'normal',
+              borderBottom: activeComponent === 'RoleManagement' ? '2px solid #ffeb3b' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('RoleManagement')}
+          >
             Role Management
           </Button>
-          <Button color="inherit" onClick={() => handleComponentSwitch('TaskIframe')}>
+          <Button
+            color={activeComponent === 'TaskIframe' ? 'secondary' : 'inherit'}
+            sx={{
+              fontWeight: activeComponent === 'TaskIframe' ? 'bold' : 'normal',
+              borderBottom: activeComponent === 'TaskIframe' ? '2px solid #ffeb3b' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('TaskIframe')}
+          >
             Project Configuration
           </Button>
-          {/* Logout Button */}
-          <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: 'auto' }}>
-            Logout
-          </Button>
+
+          {/* Logout Button with an Icon */}
+          <IconButton
+            color="inherit"
+            onClick={handleLogout}
+            sx={{ marginLeft: 'auto', color: '#ffeb3b' }} // Yellow color for logout
+          >
+            <LogoutIcon />
+            <Typography variant="body2" sx={{ marginLeft: 1 }}>
+              Logout
+            </Typography>
+          </IconButton>
         </Toolbar>
       </AppBar>
 
-      {/* Content with Transition */}
-      <Container>
+      {/* Main Content Area with Fade Transition */}
+      <Container maxWidth={false} disableGutters>
         <Fade in={fadeIn} timeout={300}>
-          <Box mt={4}>{renderComponent()}</Box>
+          <Box mt={4} sx={{ backgroundColor: '#f5f5f5', borderRadius: 2, p: 4, boxShadow: 3 }}>
+            {renderComponent()}
+          </Box>
         </Fade>
       </Container>
     </div>

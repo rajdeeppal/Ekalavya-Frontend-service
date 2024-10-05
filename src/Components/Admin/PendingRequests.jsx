@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Button, Stack, TextField
+  Paper, Button, Stack, TextField, Badge, Typography, IconButton, Tooltip,
+  Card, CardContent, Avatar
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import { motion } from 'framer-motion';  // Add smooth animations
 
-const PendingRequests = () => {
+const PendingRequests = ({ setPendingCount }) => {
   const [requests, setRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const navigate = useNavigate();
@@ -17,8 +22,6 @@ const PendingRequests = () => {
   // Fetch requests from API
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-    console.log('Inside Pending Requests Component : ', token);
-    console.log('User Role : ', jwtDecode(token).role[0].authority);
     const userRole = jwtDecode(token).role[0].authority;
 
     axios.get('http://3.111.84.98:61002/admin/manageRoles', {
@@ -29,28 +32,27 @@ const PendingRequests = () => {
     })
       .then(response => {
         setRequests(response.data);
-        console.log(response.data);
+        setPendingCount(response.data.length);  // Set pending requests count
       })
       .catch(error => {
         if(error.response && error.response.status === 401){
-          console.error('Token has expired, please login again.');
           localStorage.removeItem('jwtToken');
-          navigate('/');;  // Redirect to login page
+          navigate('/');  // Redirect to login page
         } else {
           console.error('Error fetching requests', error);
         }
       });
-  }, [refresh]);
+  }, [refresh, setPendingCount, navigate]);
 
-  // Handle status change with approver comments and date
-  const handleStatusChange = (requestId, newStatus, approverComments, approvedDate) => {
+  // Handle status change
+  const handleStatusChange = (requestId, newStatus, approverComments) => {
     axios.post('http://3.111.84.98:61002/admin/approveRoleRequest', {
-        requestId,           // Including requestId in the body
-        approverComments,     // Including approverComments in the body
+        requestId,
+        approverComments,
       },{
         headers: {
-          'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
-          'Content-Type': 'application/json', // Ensure the content type is set
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         }
       })
       .then(() => {
@@ -61,14 +63,14 @@ const PendingRequests = () => {
       });
   };
 
-  const handleRejectRoleRequest = (requestId, newStatus, approverComments, approvedDate) => {
+  const handleRejectRoleRequest = (requestId, approverComments) => {
     axios.post('http://3.111.84.98:61002/admin/rejectRoleRequest', {
-        requestId,           // Including requestId in the body
-        approverComments,     // Including approverComments in the body
+        requestId,
+        approverComments,
       },{
         headers: {
-          'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
-          'Content-Type': 'application/json', // Ensure the content type is set
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         }
       })
       .then(() => {
@@ -78,9 +80,6 @@ const PendingRequests = () => {
         console.error('Error updating status', error);
       });
   };
-
-
-  
 
   // Handle entering edit mode
   const [editing, setEditing] = useState({});
@@ -92,13 +91,13 @@ const PendingRequests = () => {
     }));
   };
 
-  const handleApproveRequest = (request, newStatus) => {
-    handleStatusChange(request.id, newStatus, request.approverComments, request.approvedDate);
+  const handleApproveRequest = (request) => {
+    handleStatusChange(request.id, 'approved', request.approverComments);
   };
 
-  const handleRejectRequest = (request, newStatus) => {
-    handleRejectRoleRequest(request.id, newStatus, request.approverComments, request.approvedDate)
-  }
+  const handleRejectRequest = (request) => {
+    handleRejectRoleRequest(request.id, request.approverComments);
+  };
 
   const handleChange = (requestId, field, value) => {
     setRequests((prevRequests) =>
@@ -109,80 +108,95 @@ const PendingRequests = () => {
   };
 
   return (
-    <TableContainer component={Paper} sx={{ padding: 2 }}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>Email ID</TableCell>
-            <TableCell>Request Role</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Approver Comments</TableCell>
-            <TableCell>Requested Date</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {requests.map((request, index) => (
-            <TableRow
-              key={request.id}
-              sx={{
-                backgroundColor: index % 2 === 0 ? 'white' : 'lightblue',
-              }}
-            >
-              <TableCell>{request.user.username}</TableCell>
-              <TableCell>{request.user.emailid}</TableCell>
-              <TableCell>{request.requestedRole}</TableCell>
-              <TableCell>{request.status}</TableCell>
-              
-              <TableCell>
-                {editing[request.id] ? (
-                  <TextField
-                    value={request.approverComments}
-                    onChange={(e) => handleChange(request.id, 'approverComments', e.target.value)}
-                    fullWidth
-                  />
-                ) : (
-                  request.approverComments || '-'
-                )}
-              </TableCell>
-
-              <TableCell>{request.requestDate}</TableCell>
-
-              <TableCell>
-                <Stack direction="row" spacing={1}>
-                  {editing[request.id] ? (
-                    <>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleApproveRequest(request, 'approve')}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => handleRejectRequest(request, 'reject')}
-                      >
-                        Reject
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      onClick={() => toggleEdit(request.id)}
-                    >
-                      Edit
-                    </Button>
-                  )}
-                </Stack>
-              </TableCell>
+    <Card sx={{ p: 2 }}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
+        Pending Role Requests
+      </Typography>
+      <TableContainer component={Paper} sx={{ maxHeight: '70vh', overflow: 'auto' }}>
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell>Profile</TableCell>
+              <TableCell>Username</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Request Role</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Approver Comments</TableCell>
+              <TableCell>Requested Date</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {requests.map((request, index) => (
+              <TableRow key={request.id}>
+                <TableCell>
+                  <Avatar alt={request.user.username} />
+                </TableCell>
+                <TableCell>{request.user.username}</TableCell>
+                <TableCell>{request.user.emailid}</TableCell>
+                <TableCell>{request.requestedRole}</TableCell>
+                <TableCell>
+                  <Typography variant="caption" sx={{ color: request.status === 'approved' ? 'green' : 'red' }}>
+                    {request.status}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  {editing[request.id] ? (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        value={request.approverComments}
+                        onChange={(e) => handleChange(request.id, 'approverComments', e.target.value)}
+                      />
+                    </motion.div>
+                  ) : (
+                    request.approverComments || '-'
+                  )}
+                </TableCell>
+                <TableCell>{request.requestDate}</TableCell>
+                <TableCell>
+                  <Stack direction="row" spacing={1}>
+                    {editing[request.id] ? (
+                      <>
+                        <Tooltip title="Approve">
+                          <motion.div whileHover={{ scale: 1.1 }}>
+                            <IconButton
+                              color="primary"
+                              onClick={() => handleApproveRequest(request)}
+                            >
+                              <CheckIcon />
+                            </IconButton>
+                          </motion.div>
+                        </Tooltip>
+                        <Tooltip title="Reject">
+                          <motion.div whileHover={{ scale: 1.1 }}>
+                            <IconButton
+                              color="secondary"
+                              onClick={() => handleRejectRequest(request)}
+                            >
+                              <CloseIcon />
+                            </IconButton>
+                          </motion.div>
+                        </Tooltip>
+                      </>
+                    ) : (
+                      <Tooltip title="Edit">
+                        <motion.div whileHover={{ scale: 1.1 }}>
+                          <IconButton onClick={() => toggleEdit(request.id)}>
+                            <EditIcon />
+                          </IconButton>
+                        </motion.div>
+                      </Tooltip>
+                    )}
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Card>
   );
 };
 

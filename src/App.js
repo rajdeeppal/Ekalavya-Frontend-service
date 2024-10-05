@@ -11,6 +11,7 @@ import TaskIframe from "./Components/Admin/TaskIframe";
 import { PrivateRoute } from "./Components/PrivateRoute";
 import RegisterUserForm from "./Components/UserAuthentication/RegisterUserForm";
 import EmailOtpVerification from "./Components/Admin/EmailOtpVerification";
+import UserProfile from "./Components/MyProfile/UserProfile";
 
 function App() {
   return (
@@ -57,6 +58,14 @@ function App() {
         element={
           <PrivateRoute>
             <MainApp />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/myprofile"
+        element={
+          <PrivateRoute>
+            <UserProfile />
           </PrivateRoute>
         }
       />

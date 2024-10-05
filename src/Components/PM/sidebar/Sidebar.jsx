@@ -4,9 +4,8 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import StoreIcon from "@mui/icons-material/Store";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
-import { useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
 
@@ -15,6 +14,10 @@ const Sidebar = () => {
   const handleLogout = () => {
     localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
     navigate('/'); // Redirect to the login page
+  };
+
+  const handleProfileClick = () => {
+    navigate('/myprofile'); // Redirect to My Profile page
   };
 
   return (
@@ -64,7 +67,7 @@ const Sidebar = () => {
             </li>
           </Link>
           <p className="title">USER</p>
-          <li>
+          <li onClick={handleProfileClick}> {/* Profile click handler */}
             <AccountCircleOutlinedIcon className="icon" style={{
               backgroundColor: "rgba(128, 0, 128, 0.2)",
               color: "pink",

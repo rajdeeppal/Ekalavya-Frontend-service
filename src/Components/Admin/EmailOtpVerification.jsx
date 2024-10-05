@@ -15,6 +15,10 @@ const EmailOtpVerification = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Mobile responsive check
 
+  // Colors
+  const successColor = theme.palette.success.main;
+  const errorColor = theme.palette.error.main;
+
   // Handle form submission to request OTP
   const handleRequestOtp = async (e) => {
     e.preventDefault();
@@ -37,27 +41,23 @@ const EmailOtpVerification = () => {
 
     try {
       const response = await axios.post('http://3.111.84.98:61002/admin/validateOtp', { username, otp });
-      console.log(response);
       if (response.data === 'Otp Validated Successfully!') {
         setMessage('OTP verified successfully!');
-        // Redirect to the desired page (e.g., admin dashboard)
         navigate('/adminDashboard');
       } else {
-        window.alert('Invalid OTP. Please try again.'); // Show alert popup
-        setOtp(''); // Clear OTP input field
+        setOtp('');
         setMessage('Invalid OTP. Please try again.');
       }
     } catch (error) {
-      window.alert('Error verifying OTP. Please login again.');
-      setMessage('Error verifying OTP. Please try again.');
+      setMessage('Error verifying OTP. Please login again.');
       localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
-      navigate('/'); // Redirect to the login page
+      navigate('/');
     }
   };
 
   return (
     <Container maxWidth="sm">
-      <Typography variant={isMobile ? 'h5' : 'h4'} align="center" gutterBottom>
+      <Typography variant={isMobile ? 'h5' : 'h4'} align="center" gutterBottom color="primary">
         OTP Verification
       </Typography>
       {!isOtpSent ? (
@@ -72,17 +72,28 @@ const EmailOtpVerification = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 type="text"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'primary.main',
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
                 fullWidth
-                disabled={loading} // Disable button while loading
+                disabled={loading}
+                sx={{
+                  backgroundColor: successColor,
+                  '&:hover': { backgroundColor: theme.palette.success.dark },
+                  transition: 'background-color 0.3s ease',
+                }}
               >
-                {loading ? <CircularProgress size={24} /> : 'Request OTP'} {/* Show spinner when loading */}
+                {loading ? <CircularProgress size={24} /> : 'Request OTP'}
               </Button>
             </Grid>
           </Grid>
@@ -91,8 +102,8 @@ const EmailOtpVerification = () => {
         <form onSubmit={handleVerifyOtp}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography variant="h6" align="center" gutterBottom>
-                Enter the OTP sent to the email associated with {username}
+              <Typography variant="h6" align="center" gutterBottom color="textSecondary">
+                Enter the OTP sent to the email associated with <strong>{username}</strong>
               </Typography>
             </Grid>
             <Grid item xs={12}>
@@ -103,15 +114,25 @@ const EmailOtpVerification = () => {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 required
-                type="text"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.info.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
                 fullWidth
+                sx={{
+                  backgroundColor: theme.palette.info.main,
+                  '&:hover': { backgroundColor: theme.palette.info.dark },
+                  transition: 'background-color 0.3s ease',
+                }}
               >
                 Verify OTP
               </Button>
@@ -122,9 +143,12 @@ const EmailOtpVerification = () => {
       {message && (
         <Typography
           variant="body1"
-          color={message.includes('Error') ? 'error' : 'primary'}
           align="center"
-          style={{ marginTop: '20px' }}
+          sx={{
+            mt: 2,
+            color: message.includes('Error') ? errorColor : successColor,
+            fontWeight: 500,
+          }}
         >
           {message}
         </Typography>
