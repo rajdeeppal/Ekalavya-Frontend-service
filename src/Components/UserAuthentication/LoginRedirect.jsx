@@ -1,28 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode }   from 'jwt-decode';
+import EmailOtpVerification from '../Admin/EmailOtpVerification';
+ // Import the OTP component
 
 const LoginRedirect = ({ token }) => {
   const navigate = useNavigate();
+  const [showOtpModal, setShowOtpModal] = useState(false); // State to show OTP pop-up
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     if (token) {
       try {
         // Decode the JWT token
         const decodedToken = jwtDecode(token);
+        const userRole = decodedToken.role[0].authority;
+        const decodedUsername = decodedToken.sub;
 
-        const userRole = jwtDecode(token).role[0].authority;
-        const username = jwtDecode(token).sub;
+        setUsername(decodedUsername);
 
-        if (userRole == 'EADMIN') {
-          // If the user is an ADMIN, navigate to the email OTP verification page, from email otp verification
-          // navigate to admin dashboard
+        if (userRole === 'EADMIN') {
           console.log("Admin User has logged in....");
-          navigate('/otpValidation', { state: { username } });
+          setShowOtpModal(true); // Show OTP modal instead of navigating
         } else {
-          // Otherwise, navigate to the beneficiary dashboard
           console.log("Non Admin User has logged in....");
-        navigate('/beneficiary');
+          navigate('/beneficiary');
         }
       } catch (error) {
         console.error('Invalid token', error);
@@ -31,7 +33,11 @@ const LoginRedirect = ({ token }) => {
     }
   }, [token, navigate]);
 
-  return null; // Since we're only handling navigation, there's no need to render anything
+  return (
+    <>
+      {showOtpModal && <EmailOtpVerification username={username}  />} {/* Pass username as props */}
+    </>
+  );
 };
 
 export default LoginRedirect;

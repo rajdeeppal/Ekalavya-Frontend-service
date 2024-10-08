@@ -143,6 +143,9 @@ const RoleManagement = () => {
           <MenuItem value="">
             <em>Select a Role</em>
           </MenuItem>
+          <MenuItem value="UNASSIGN">
+            <em>UNASSIGN</em>
+          </MenuItem>
           {roles.filter((role) => role.name !== 'EADMIN')
             .map((role) => (
               <MenuItem key={role.id} value={role.name}>
@@ -195,6 +198,9 @@ const RoleManagement = () => {
                           <MenuItem value="">
                             <em>Select a Role</em>
                           </MenuItem>
+                            {/* <MenuItem value="UNASSIGN">
+                              <em>UNASSIGN</em>
+                            </MenuItem> */}
                           {roles.filter((role) => role.name !== 'EADMIN' && role.name !== 'UNASSIGN')
                             .map((role) => (
                               <MenuItem key={role.id} value={role.name}>
