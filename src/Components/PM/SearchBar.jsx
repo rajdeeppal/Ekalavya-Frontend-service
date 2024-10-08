@@ -1,13 +1,37 @@
-import React from 'react';
-import { TextField, Button, Grid, Container } from '@mui/material';
+import React,{ useState, useEffect} from 'react';
+import { TextField, Button, Grid, Container,FormControl, InputLabel, Select, MenuItem, Alert} from '@mui/material';
+import {getUserProjects, getComponentsByProject } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
 
 const SearchBar = ({ onSearch }) => {
+  const { userId } = useAuth();
   const [searchCriteria, setSearchCriteria] = React.useState({
     stateName: '',
     districtName: '',
     // projectName: '',
     // componentName: '',
   });
+  const [projects, setProjects] = useState([]);
+  const [components, setComponents] = useState([]);
+  const [selectedProject, setSelectedProject] = useState('');
+  const [selectedComponent, setSelectedComponent] = useState('');
+
+  useEffect(() => {
+    async function fetchProjects() {
+      const data = await getUserProjects(userId);
+      setProjects(Array.isArray(data) ? data : []);
+    }
+    fetchProjects();
+  }, [userId]);
+
+  useEffect(() => {
+    async function fetchComponents() {
+      if (!selectedProject) return;
+      const data = await getComponentsByProject(selectedProject);
+      setComponents(Array.isArray(data) ? data : []);
+    }
+    fetchComponents();
+  }, [selectedProject]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,6 +39,11 @@ const SearchBar = ({ onSearch }) => {
   };
 
   const handleSearch = () => {
+    const data={
+      ...searchCriteria,
+      projectName:selectedProject,
+      componentName:selectedComponent
+    }
     onSearch(searchCriteria);
   };
 
@@ -42,24 +71,45 @@ const SearchBar = ({ onSearch }) => {
           />
         </Grid>
         <Grid item xs={12} sm={6} md={2.5}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Project Name"
-            name="projectName"
-            onChange={handleChange}
-            size="small"
-          />
+        <FormControl fullWidth margin="normal">
+            <InputLabel>Project Name</InputLabel>
+            <Select
+              name="projectName"
+              value={selectedProject}
+              onChange={(e) => {
+                setSelectedProject(e.target.value);
+                
+              }}
+              required
+            >
+              <MenuItem value="">Select Project</MenuItem>
+              {projects.map((project) => (
+                <MenuItem key={project.id} value={project.projectName} >
+                  {project.projectName}
+                </MenuItem>
+              ))}
+            </Select>
+           
+          </FormControl>
         </Grid>
         <Grid item xs={12} sm={6} md={2.5}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Project Type"
-            name="componentName"
-            onChange={handleChange}
-            size="small"
-          />
+        <FormControl fullWidth margin="normal">
+            <InputLabel>Component Name</InputLabel>
+            <Select
+              value={selectedComponent}
+              onChange={(e)=>setSelectedComponent(e.target.value)}
+              required
+            >
+              <MenuItem value="">Select Component</MenuItem>
+              {components.map((component) => (
+                <MenuItem key={component.id} value={component.componentName}>
+                  {component.componentName}
+                </MenuItem>
+              ))}
+            </Select>
+           
+          </FormControl>
+
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
           <Button

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
 import ActivityIframe from './ActivityIframe';
-import { getVerticals,getUserProjects, getComponents, getActivities, getTasks, saveBeneficiaryConfiguration } from '../DataCenter/apiService';
+import { getVerticals,getUserProjects, getComponentsByProject, getActivities, getTasks, saveBeneficiaryConfiguration } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
 
-const BeneficiaryForm = ({ projects, addBeneficiary }) => {
+const BeneficiaryForm = ({  addBeneficiary }) => {
+  const { userId } = useAuth();
   const [beneficiary, setBeneficiary] = useState({
     beneficiaryName: '',
     guardianName: '',
@@ -15,7 +17,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
     surveyNumber: '',
   });
 
-  const [verticals, setVerticals] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [components, setComponents] = useState([
   
   ]);
@@ -25,7 +27,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
   const [tasks, setTasks] = useState([
   ]);
 
-  const [selectedVertical, setSelectedVertical] = useState('');
+  const [selectedProject, setSelectedProject] = useState('');
   const [selectedComponent, setSelectedComponent] = useState('');
   const [selectedActivity, setSelectedActivity] = useState('');
   const [selectedTask, setSelectedTask] = useState('');
@@ -38,29 +40,23 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
   const [errors, setErrors] = useState({}); // State to track input validation errors
 
   useEffect(() => {
-    async function fetchVerticals() {
-      const data = await getVerticals();
-      setVerticals(Array.isArray(data) ? data : []);
+    async function fetchProjects() {
+      const data = await getUserProjects(userId);
+      setProjects(Array.isArray(data) ? data : []);
     }
-    fetchVerticals();
-  }, []);
+    fetchProjects();
+  }, [userId]);
 
-  useEffect(() => {
-      async function fetchVerticals() {
-      const data = await getVerticals();
-      setVerticals(Array.isArray(data) ? data : []);
-    }
-    fetchVerticals();
-  }, []);
+ 
 
   useEffect(() => {
     async function fetchComponents() {
-      if (!selectedVertical) return;
-      const data = await getComponents(selectedVertical);
+      if (!selectedProject) return;
+      const data = await getComponentsByProject(selectedProject);
       setComponents(Array.isArray(data) ? data : []);
     }
     fetchComponents();
-  }, [selectedVertical]);
+  }, [selectedProject]);
 
   useEffect(() => {
     async function fetchActivities() {
@@ -99,7 +95,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
   const validateForm = () => {
     // Check if all fields are filled
     let formErrors = {};
-    if (!selectedVertical) formErrors.selectedVertical = 'Project name is required';
+    if (!selectedProject) formErrors.selectedProject = 'Project name is required';
     if (!beneficiary.beneficiaryName) formErrors.beneficiaryName = 'Beneficiary name is required';
     if (!beneficiary.guardianName) formErrors.guardianName = 'Father/Husband name is required';
     if (!beneficiary.villageName) formErrors.villageName = 'villageName is required';
@@ -128,7 +124,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
       aadharNumber: '',
       surveyNumber: '',
     });
-    setSelectedVertical('');
+    setSelectedProject('');
     setSelectedComponent('');
     setSelectedActivity('');
     setSelectedTask('');
@@ -179,7 +175,7 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
       // activityName: selectedActivity,
       // taskName: selectedTask,
       // ...task,
-      projectName: selectedVertical,
+      projectName: selectedProject,
       beneficiaryName: beneficiary.beneficiaryName,
       guardianName: beneficiary.guardianName,
       villageName: beneficiary.villageName,
@@ -220,21 +216,21 @@ const BeneficiaryForm = ({ projects, addBeneficiary }) => {
             <InputLabel>Project Name</InputLabel>
             <Select
               name="projectName"
-              value={selectedVertical}
+              value={selectedProject}
               onChange={(e) => {
-                setSelectedVertical(e.target.value);
+                setSelectedProject(e.target.value);
                 setErrors((prevErrors) => ({ ...prevErrors, selectedVertical: '' }));
               }}
               required
             >
               <MenuItem value="">Select Project</MenuItem>
-              {verticals.map((project) => (
-                <MenuItem key={project.id} value={project.verticalName}>
-                  {project.verticalName}
+              {projects.map((project) => (
+                <MenuItem key={project.id} value={project.projectName}>
+                  {project.projectName}
                 </MenuItem>
               ))}
             </Select>
-            {errors.selectedVertical && <Alert severity="error">{errors.selectedVertical}</Alert>}
+            {errors.selectedProject && <Alert severity="error">{errors.selectedProject}</Alert>}
           </FormControl>
 
           <TextField

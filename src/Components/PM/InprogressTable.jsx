@@ -23,11 +23,13 @@ import {
 } from '@mui/icons-material';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
+import { updatedBeneficiarySubTask } from '../DataCenter/apiService';
 
 const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
+    const [newTask, setNewTask] = useState(false);
 
     const toggleEditMode = (taskIndex, rowIndex) => {
         setEditMode((prevEditMode) => ({
@@ -65,9 +67,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                 } else {
                     row[field] = value;
 
-                    if (row.unitAchievement && task.ratePerUnit) {
-                        row.currentCost = row.unitAchievement * task.ratePerUnit;
+                    if (row.unitAchievement) {
+                        row.currentCost = row.unitAchievement * 25;
                     }
+                    console.log(row.currentCost);
                 }
                 return updatedBeneficiaries;
             }
@@ -75,17 +78,50 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
         });
     };
 
-    const handleSaveRow = (taskIndex, rowIndex) => {
+    const handleSaveRow = async (taskIndex, rowIndex) => {
         toggleEditMode(taskIndex, rowIndex);
         const task = beneficiaries
             .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
             .find((t, i) => i === taskIndex);
 
-        if (task) {
+        if (!newTask) {
             const changedData = task.additionalRows[rowIndex];
             console.log(changedData);
             // Implement your save logic here (e.g., API call)
         }
+
+        const formData = new FormData();
+
+
+        try {
+            if (newTask) {
+
+                formData.append("currentCost", task.additionalRows[0].currentCost);
+                formData.append("achievementUnit", parseInt(task.additionalRows[0].achievementUnit,10));
+                formData.append("payeeName", task.additionalRows[0].payeeName);
+                formData.append("passbookCopy", task.additionalRows[0].passbookCopy);
+                formData.append("otherDocument", task.additionalRows[0].otherDocument);
+                // Append other documents to formData
+                // task.additionalRows[0].otherDocs.forEach((doc, index) => {
+                //     formData.append(`otherDocs[${index}]`, doc);
+                // });
+
+                console.log(formData);
+                await updatedBeneficiarySubTask(taskIndex,formData);
+                setNewTask(false);
+                alert('Project saved successfully!');
+
+            } else {
+                await updatedBeneficiarySubTask(rowIndex, task);
+                alert('Project saved successfully!');
+            }
+
+
+        } catch (error) {
+            console.error("Error submitting task update:", error);
+            alert("An error occurred while updating the task.");
+        }
+
     };
 
     const addNewRow = (taskIndex) => {
@@ -107,12 +143,13 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                     lastRow.payeeName !== '' ||
                     lastRow.passbookCopy !== ''
                 ) {
+                    setNewTask(true);
                     task.additionalRows.push({
                         unitAchievement: '',
                         currentCost: '',
                         payeeName: '',
-                        passbookCopy: '',
-                        otherDocument: '',
+                        passbookCopy: null,
+                        otherDocument: [],
                     });
                 }
             }
@@ -232,6 +269,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                     } else {
                         alert('Only PDF format is allowed for other documents.');
                     }
+                    console.log(pdfFiles)
                 }
             }
 
@@ -409,9 +447,8 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                                     variant="outlined"
                                                                                                                                                     size="small"
                                                                                                                                                     value={row.currentCost || ''}
-                                                                                                                                                    InputProps={{
-                                                                                                                                                        readOnly: true,
-                                                                                                                                                    }}
+
+                                                                                                                                                    readonly
                                                                                                                                                 />) : (
                                                                                                                                                 row.currentCost
                                                                                                                                             )}

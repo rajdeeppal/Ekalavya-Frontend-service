@@ -30,55 +30,35 @@ const Sidebar = () => {
       <hr />
       <div className="center">
         <ul>
-          <p className="title">MAIN</p>
-          <li>
-            <DashboardIcon className="icon" style={{
-              backgroundColor: "rgba(218, 165, 32, 0.2)",
-              color: "goldenrod",
-            }} />
-            <span>Dashboard</span>
-          </li>
-          <p className="title">BENEFICIARY</p>
+         
           <Link to="/beneficiary" style={{ textDecoration: "none" }}>
             <li>
               <PersonOutlineIcon className="icon"
-                style={{ backgroundColor: "rgba(0, 128, 0, 0.2)", color: "green" }}
+                style={{ color: "black" }}
               />
               <span>Beneficiary List</span>
             </li>
           </Link>
-          <p className="title">IN-PROGRESS</p>
+        
           <Link to="/inprogress" style={{ textDecoration: "none" }} >
             <li>
-              <StoreIcon className="icon"  style={{
-              backgroundColor: "rgba(128, 0, 128, 0.2)",
-              color: "purple",
-            }}/>
+              <StoreIcon className="icon"  style={{ color: "black" }}/>
               <span>In-Progress List</span>
             </li>
           </Link>
           <Link to="/finalpreview" style={{ textDecoration: "none" }} >
             <li>
-              <StoreIcon className="icon"  style={{
-              backgroundColor: "rgba(128, 0, 128, 0.2)",
-              color: "purple",
-            }}/>
+              <StoreIcon className="icon"  style={{ color: "black" }}/>
               <span>Final Preview</span>
             </li>
           </Link>
-          <p className="title">USER</p>
+         
           <li onClick={handleProfileClick}> {/* Profile click handler */}
-            <AccountCircleOutlinedIcon className="icon" style={{
-              backgroundColor: "rgba(128, 0, 128, 0.2)",
-              color: "pink",
-            }}/>
+            <AccountCircleOutlinedIcon className="icon" style={{ color: "black" }}/>
             <span>Profile</span>
           </li>
           <li>
-            <ExitToAppIcon className="icon" style={{
-              backgroundColor: "rgba(255, 0, 0, 0.2)",
-              color: "crimson",
-            }}/>
+            <ExitToAppIcon className="icon" style={{ color: "black" }}/>
             <span onClick={handleLogout}>Logout</span>
           </li>
         </ul>

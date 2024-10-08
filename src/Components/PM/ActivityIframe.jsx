@@ -56,7 +56,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
       task: taskName,
       nameOfWork: '',
       typeOfUnit: typeOfUnit,
-      ratePerUnit: unitRate,
+      unitRate: unitRate,
       noOfUnits: '',
       totalCost: '',
       beneficiaryContribution: '',

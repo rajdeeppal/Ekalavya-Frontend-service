@@ -195,3 +195,17 @@ export const updateActivityTask = async (taskId,object)=>{
         throw error;
     }
 }
+
+export const updatedBeneficiarySubTask = async (taskId,object)=>{
+    try {
+        const response = await axios.post(`${BENEFICIARY_BASE_URL}/addTaskUpdate/${taskId}`,object,{
+            headers:{...getAuthorizationHeader(),
+                "Content-Type": "multipart/form-data"
+            }
+          });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching beneficiary:', error);
+        throw error;
+    }
+}
