@@ -412,10 +412,13 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                             <TableHead>
                                                                                                                                 <TableRow>
                                                                                                                                     <TableCell>Unit Achievement</TableCell>
+                                                                                                                                    <TableCell>Beneficiary Contribution</TableCell>
                                                                                                                                     <TableCell>Current Cost</TableCell>
                                                                                                                                     <TableCell>Payee Name</TableCell>
+                                                                                                                                    <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
+                                                                                                                                    <TableCell>Domain Expert</TableCell>
                                                                                                                                     <TableCell>Actions</TableCell>
                                                                                                                                 </TableRow>
                                                                                                                             </TableHead>

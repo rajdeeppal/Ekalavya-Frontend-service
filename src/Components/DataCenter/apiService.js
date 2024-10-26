@@ -19,7 +19,7 @@ export const getUserProjects = async (userId) => {
   
     try {
         const response = await axios.get(`${PM_BASE_URL}/projects/${userId}`,{
-         header:getAuthorizationHeader()
+         headers:getAuthorizationHeader()
         });
         return response.data;
     } catch (error) {
@@ -172,12 +172,18 @@ export const getBeneficiaryByProjectName = async (projectName) => {
     }
 };
 
-export const getBeneficiary = async (object) => {
+export const getBeneficiary = async (userId,data) => {
+    // http://localhost:61002/beneficiary/filter/1001?projectName=GTA&componentName=CON&stage=sanction
     try {
-        const response = await axios.post(`${BENEFICIARY_BASE_URL}/criteriaSearch`,object,{
-            headers:getAuthorizationHeader()
-          });
-        return response.data;
+        // const response = await axios.post(`${BENEFICIARY_BASE_URL}/criteriaSearch`,object,{
+        //     headers:getAuthorizationHeader()
+        //   });
+        console.log(data);
+        const {stateName,districtName,projectName,componentName}=data;
+        const response = await axios.get(`http://3.111.84.98:61002/beneficiary/filter/${userId}?projectName=${projectName}&componentName=${componentName}&stateName=${stateName}&districtName=${districtName}&stage=sanction`,{
+                headers:getAuthorizationHeader()
+              });
+        return response.data.beneficiaries;
     } catch (error) {
         console.error('Error fetching beneficiary:', error);
         throw error;
@@ -186,7 +192,7 @@ export const getBeneficiary = async (object) => {
 
 export const updateActivityTask = async (taskId,object)=>{
     try {
-        const response = await axios.post(`${BENEFICIARY_BASE_URL}/addTask/${taskId}`,object,{
+        const response = await axios.put(`${BENEFICIARY_BASE_URL}/addTask/${taskId}`,object,{
             headers:getAuthorizationHeader()
           });
         return response.data;
@@ -209,3 +215,39 @@ export const updatedBeneficiarySubTask = async (taskId,object)=>{
         throw error;
     }
 }
+
+export const getStateDetails = async () => {
+  
+    try {
+        const response = await axios.get(`https://cdn-api.co-vin.in/api/v2/admin/location/states`);
+        return response.data.states;
+    } catch (error) {
+        console.error('Error fetching Projects by USERID:', error);
+        throw error;
+    }
+};
+
+export const getDistrictDetails = async (state_id) => {
+  
+    try {
+        const response = await axios.get(`https://cdn-api.co-vin.in/api/v2/admin/location/districts/${state_id}`);
+        return response.data.districts;
+    } catch (error) {
+        console.error('Error fetching Projects by USERID:', error);
+        throw error;
+    }
+};
+
+
+export const getAadharDetails = async (aadhar_id) => {
+  
+    try {
+        const response = await axios.get(`${BENEFICIARY_BASE_URL}/search/beneficiary-aadhar/${aadhar_id}`,{
+            headers:getAuthorizationHeader()
+          });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching Projects by USERID:', error);
+        throw error;
+    }
+};

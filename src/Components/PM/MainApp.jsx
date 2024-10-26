@@ -6,16 +6,17 @@ import BeneficiaryForm from './BeneficiaryForm';
 import BeneficiaryTable from './BeneficiaryTable';
 import { getBeneficiary } from '../DataCenter/apiService';
 import Sidebar from './sidebar/Sidebar';
-
+import { useAuth } from '../PrivateRoute';
 
 const MainApp = () => {
-
+  const { userId } = useAuth();
   
   const [projects, setProjects] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([
     {
       "id": 1,
       "verticalName": "BT",
+
       "components": [
         {
           "id": 1,
@@ -75,6 +76,7 @@ const MainApp = () => {
           ]
         }
       ]
+      
     }
   ]);
   const [showTable, setShowTable] = useState(true);
@@ -108,9 +110,11 @@ const MainApp = () => {
   const handleSearch = async (criteria) => {
     if (!criteria) return;
     try {
-      const data = await getBeneficiary(criteria);
+      console.log("ok");
+      const data = await getBeneficiary(userId,criteria);
       setBeneficiaries(Array.isArray(data) ? data : []);
       setShowTable(true)
+      console.log(beneficiaries);
     } catch (error) {
       console.error('Error fetching activities:', error);
     }

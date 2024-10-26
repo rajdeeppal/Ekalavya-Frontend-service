@@ -46,12 +46,24 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     const updatedBeneficiaries = [...beneficiaries];
     const activity = updatedBeneficiaries[beneficiaryIndex]?.components[componentIndex]?.activities[activityIndex];
 
+    const task=activity.tasks[taskIndex];
     const criteria={
-      ...activity.tasks[taskIndex]
+      taskName: task.taskName,
+      beneficiaryContribution: parseFloat(task.beneficiaryContribution),
+      grantAmount: parseFloat(task.grantAmount),
+      // nameOfWork: task.nameOfWork,
+      units: parseInt(task.units, 10),
+      totalCost: parseFloat(task.totalCost),
+      typeOfUnit: task.typeOfUnit,
+      ratePerUnit: parseFloat(task.ratePerUnit),
+      yearOfSanction: parseInt(task.yearOfSanction, 10),
     }
 
+    console.log(criteria);
     try {
-      const data = await updateActivityTask(taskIndex,criteria);
+      const taskId=task.id;
+      console.log(taskId);
+      const data = await updateActivityTask(taskId,criteria);
       setBeneficiaries(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching activities:', error);
@@ -141,7 +153,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
             {beneficiaries.map((beneficiary, beneficiaryIndex) => (
               <React.Fragment key={beneficiary.id}>
                 <TableRow>
-                  <TableCell>{beneficiary.verticalName}</TableCell>
+                  <TableCell>{beneficiary.projectName}</TableCell>
                   <TableCell>{beneficiary.beneficiaryName}</TableCell>
                   <TableCell>{beneficiary.guardianName}</TableCell>
                   <TableCell>{beneficiary.villageName}</TableCell>

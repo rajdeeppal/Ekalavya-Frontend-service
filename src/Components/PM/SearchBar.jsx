@@ -1,6 +1,6 @@
 import React,{ useState, useEffect} from 'react';
 import { TextField, Button, Grid, Container,FormControl, InputLabel, Select, MenuItem, Alert} from '@mui/material';
-import {getUserProjects, getComponentsByProject } from '../DataCenter/apiService';
+import {getUserProjects, getComponentsByProject, getStateDetails, getDistrictDetails } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 
 const SearchBar = ({ onSearch }) => {
@@ -12,8 +12,12 @@ const SearchBar = ({ onSearch }) => {
     // componentName: '',
   });
   const [projects, setProjects] = useState([]);
+  const [states, setStates] = useState([]);
+  const [district, setDistrict] = useState([]);
   const [components, setComponents] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedComponent, setSelectedComponent] = useState('');
 
   useEffect(() => {
@@ -33,6 +37,27 @@ const SearchBar = ({ onSearch }) => {
     fetchComponents();
   }, [selectedProject]);
 
+  useEffect(() => {
+    async function fetchStates() {
+      const data = await getStateDetails();
+      setStates(Array.isArray(data) ? data : []);
+      console.log(states);
+    }
+    fetchStates();
+  }, []);
+
+  useEffect(() => {
+    async function fetchDistricts() {
+      if (!selectedState) return;
+      const state = states.find(s => s.state_name === selectedState);
+      if (state) {
+        const data = await getDistrictDetails(state.state_id);
+        setDistrict(Array.isArray(data) ? data : []);
+      }
+    }
+    fetchDistricts();
+  }, [selectedState, states]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
@@ -40,35 +65,62 @@ const SearchBar = ({ onSearch }) => {
 
   const handleSearch = () => {
     const data={
-      ...searchCriteria,
+      stateName: selectedState,
+      districtName: selectedDistrict,
       projectName:selectedProject,
       componentName:selectedComponent
     }
-    onSearch(searchCriteria);
+    console.log("hello");
+    onSearch(data);
   };
 
   return (
     <Container sx={{ marginTop: 4 }}>
       <Grid container spacing={3} alignItems="center">
         <Grid item xs={12} sm={6} md={2.5}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="State"
-            name="stateName"
-            onChange={handleChange}
-            size="small"
-          />
+        <FormControl fullWidth margin="normal">
+            <InputLabel>State</InputLabel>
+            <Select
+              name="stateName"
+              value={selectedState}
+              onChange={(e) => {
+                setSelectedState(e.target.value);
+                
+              }}
+              required
+            >
+              <MenuItem value="">Select State</MenuItem>
+              {states.map((state) => (
+                <MenuItem key={state.id} value={state.state_name} >
+                  {state.state_name}
+                </MenuItem>
+              ))}
+            </Select>
+           
+          </FormControl>
         </Grid>
         <Grid item xs={12} sm={6} md={2.5}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="District Name"
-            name="districtName"
-            onChange={handleChange}
-            size="small"
-          />
+        <FormControl fullWidth margin="normal">
+            <InputLabel>District</InputLabel>
+            <Select
+              name="districtName"
+              value={selectedDistrict}
+              onChange={(e) => {
+                setSelectedDistrict(e.target.value);
+                
+              }}
+              required
+            >
+              <MenuItem value="">Select District</MenuItem>
+              {district.map((district) => (
+                <MenuItem key={district.id} value={district.district_name} >
+                  {district.district_name}
+                </MenuItem>
+              ))}
+            </Select>
+           
+          </FormControl>
+          
         </Grid>
         <Grid item xs={12} sm={6} md={2.5}>
         <FormControl fullWidth margin="normal">
@@ -98,7 +150,7 @@ const SearchBar = ({ onSearch }) => {
             <Select
               value={selectedComponent}
               onChange={(e)=>setSelectedComponent(e.target.value)}
-              required
+              
             >
               <MenuItem value="">Select Component</MenuItem>
               {components.map((component) => (
