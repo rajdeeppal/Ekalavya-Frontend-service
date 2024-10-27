@@ -172,23 +172,64 @@ export const getBeneficiaryByProjectName = async (projectName) => {
     }
 };
 
-export const getBeneficiary = async (userId,data) => {
-    // http://localhost:61002/beneficiary/filter/1001?projectName=GTA&componentName=CON&stage=sanction
+// export const getBeneficiary = async (userId,data,category) => {
+//     // http://localhost:61002/beneficiary/filter/1001?projectName=GTA&componentName=CON&stage=sanction
+//     try {
+//         // const response = await axios.post(`${BENEFICIARY_BASE_URL}/criteriaSearch`,object,{
+//         //     headers:getAuthorizationHeader()
+//         //   });
+//         console.log(data);
+//         const {stateName,districtName,projectName,componentName}=data;
+//         if(!stateName && !districtName && !componentName){
+//             const response = await axios.get(`http://3.111.84.98:61002/beneficiary/filter/${userId}?projectName=${projectName}&stage=${category}`,{
+//                 headers:getAuthorizationHeader()
+//               });
+//         return response.data.beneficiaries;
+//         }else if(!stateName && !districtName){
+//             const response = await axios.get(`http://3.111.84.98:61002/beneficiary/filter/${userId}?projectName=${projectName}&stage=${category}`,{
+//                 headers:getAuthorizationHeader()
+//               });
+//         return response.data.beneficiaries;
+//         }
+//         const response = await axios.get(`http://3.111.84.98:61002/beneficiary/filter/${userId}?projectName=${projectName}&componentName=${componentName}&stateName=${stateName}&districtName=${districtName}&stage=${category}`,{
+//                 headers:getAuthorizationHeader()
+//               });
+//         return response.data.beneficiaries;
+//     } catch (error) {
+//         console.error('Error fetching beneficiary:', error);
+//         throw error;
+//     }
+// };
+
+export const getBeneficiary = async (userId, data, category) => {
     try {
-        // const response = await axios.post(`${BENEFICIARY_BASE_URL}/criteriaSearch`,object,{
-        //     headers:getAuthorizationHeader()
-        //   });
-        console.log(data);
-        const {stateName,districtName,projectName,componentName}=data;
-        const response = await axios.get(`http://3.111.84.98:61002/beneficiary/filter/${userId}?projectName=${projectName}&componentName=${componentName}&stateName=${stateName}&districtName=${districtName}&stage=sanction`,{
-                headers:getAuthorizationHeader()
-              });
-        return response.data.beneficiaries;
+      const { stateName, districtName, projectName, componentName } = data;
+      
+      // Start building the query parameters
+      let url = `http://3.111.84.98:61002/beneficiary/filter/${userId}`;
+      const params = new URLSearchParams();
+  
+      // Add parameters if they are provided
+      if (componentName) params.append("componentName", componentName);
+      if (stateName) params.append("stateName", stateName);
+      if (districtName) params.append("districtName", districtName);
+
+      // Construct the final URL
+      url = `${url}?${params.toString()}&projectName=${projectName}&stage=${category}`;
+      
+      // Send the request with authorization headers
+      const response = await axios.get(url, {
+        headers: getAuthorizationHeader()
+      });
+      
+      return response.data.beneficiaries;
+      
     } catch (error) {
-        console.error('Error fetching beneficiary:', error);
-        throw error;
+      console.error('Error fetching beneficiary:', error);
+      throw error;
     }
-};
+  };
+  
 
 export const updateActivityTask = async (taskId,object)=>{
     try {
