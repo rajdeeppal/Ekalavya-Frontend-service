@@ -4,115 +4,119 @@ import SearchBar from './SearchBar';
 import Sidebar from './sidebar/Sidebar';
 import InprogressTable from './InprogressTable';
 import { getBeneficiary } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
 
 const ProgressIframe = () => {
+    const { userId } = useAuth();
     const [beneficiaries, setBeneficiaries] = useState([
-        {
-            "id": 1,
-            "verticalName": "BT",
-            "guardianName": 'Yes',
-            "villageName": 'Yes',
-            "mandalName": 'Yes',
-            "districtName": 'Yes',
-            "state": 'Yes',
-            "aadharNumber": 'Yes',
-            "surveyNumber": 'Yes',
-            "components": [
-                {
-                    "id": 2,
-                    "componentName": "Enterprise",
-                    "activities": [
-                        {
-                            "id": 3,
-                            "activityName": "AIB",
-                            "tasks": [
-                                {
-                                    "id": 4,
-                                    "taskName": "VOICE",
-                                    "typeOfUnit": "gm",
-                                    "units": "10",
-                                    "ratePerUnit": "800",
-                                    "totalCost": "234",
-                                    "beneficiaryContribution": "12",
-                                    "grantAmount": "234",
-                                    "yearOfSanction": "2009",
-                                    "additionalRows": [
-                                        {
-                                            unitAchievement: '',
-                                            remainingBalance: '',
-                                            duration: '',
-                                            payeeName: '',
-                                            passbookCopy: ''
-                                        }
-                                    ]
-                                },
-                                {
-                                    "id": 5,
-                                    "taskName": "CV",
-                                    "typeOfUnit": "gm",
-                                    "units": "20",
-                                    "ratePerUnit": "700",
-                                    "totalCost": "234",
-                                    "beneficiaryContribution": "12",
-                                    "grantAmount": "234",
-                                    "yearOfSanction": "2009",
-                                    "additionalRows": [
-                                        {
-                                            unitAchievement: '',
-                                            remainingBalance: '',
-                                            duration: '',
-                                            payeeName: '',
-                                            passbookCopy: ''
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "id": 6,
-                    "componentName": "Consumer",
-                    "activities": [
-                        {
-                            "id": 7,
-                            "activityName": "OFS",
-                            "tasks": [
-                                {
-                                    "id": 8,
-                                    "taskName": "Global",
-                                    "typeOfUnit": "gm",
-                                    "units": "96",
-                                    "ratePerUnit": "89",
-                                    "totalCost": "234",
-                                    "beneficiaryContribution": "12",
-                                    "grantAmount": "234",
-                                    "yearOfSanction": "2009",
-                                    "additionalRows": [
-                                        {
-                                            unitAchievement: '',
-                                            remainingBalance: '',
-                                            duration: '',
-                                            payeeName: '',
-                                            passbookCopy: ''
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
+        // {
+        //     "id": 1,
+        //     "verticalName": "BT",
+        //     "guardianName": 'Yes',
+        //     "villageName": 'Yes',
+        //     "mandalName": 'Yes',
+        //     "districtName": 'Yes',
+        //     "state": 'Yes',
+        //     "aadharNumber": 'Yes',
+        //     "surveyNumber": 'Yes',
+        //     "components": [
+        //         {
+        //             "id": 2,
+        //             "componentName": "Enterprise",
+        //             "activities": [
+        //                 {
+        //                     "id": 3,
+        //                     "activityName": "AIB",
+        //                     "tasks": [
+        //                         {
+        //                             "id": 4,
+        //                             "taskName": "VOICE",
+        //                             "typeOfUnit": "gm",
+        //                             "units": "10",
+        //                             "ratePerUnit": "800",
+        //                             "totalCost": "234",
+        //                             "beneficiaryContribution": "12",
+        //                             "grantAmount": "234",
+        //                             "yearOfSanction": "2009",
+        //                             "taskUpdates": [
+        //                                 {
+        //                                     achievementUnit: '',
+        //                                     remainingBalance: '',
+        //                                     duration: '',
+        //                                     payeeName: '',
+        //                                     passbookCopy: ''
+        //                                 }
+        //                             ]
+        //                         },
+        //                         {
+        //                             "id": 5,
+        //                             "taskName": "CV",
+        //                             "typeOfUnit": "gm",
+        //                             "units": "20",
+        //                             "ratePerUnit": "700",
+        //                             "totalCost": "234",
+        //                             "beneficiaryContribution": "12",
+        //                             "grantAmount": "234",
+        //                             "yearOfSanction": "2009",
+        //                             "taskUpdates": [
+        //                                 {
+        //                                     achievementUnit: '',
+        //                                     remainingBalance: '',
+        //                                     duration: '',
+        //                                     payeeName: '',
+        //                                     passbookCopy: ''
+        //                                 }
+        //                             ]
+        //                         }
+        //                     ]
+        //                 }
+        //             ]
+        //         },
+        //         {
+        //             "id": 6,
+        //             "componentName": "Consumer",
+        //             "activities": [
+        //                 {
+        //                     "id": 7,
+        //                     "activityName": "OFS",
+        //                     "tasks": [
+        //                         {
+        //                             "id": 8,
+        //                             "taskName": "Global",
+        //                             "typeOfUnit": "gm",
+        //                             "units": "96",
+        //                             "ratePerUnit": "89",
+        //                             "totalCost": "234",
+        //                             "beneficiaryContribution": "12",
+        //                             "grantAmount": "234",
+        //                             "yearOfSanction": "2009",
+        //                             "taskUpdates": [
+        //                                 {
+        //                                     achievementUnit: '',
+        //                                     remainingBalance: '',
+        //                                     duration: '',
+        //                                     payeeName: '',
+        //                                     passbookCopy: ''
+        //                                 }
+        //                             ]
+        //                         }
+        //                     ]
+        //                 }
+        //             ]
+        //         }
+        //     ]
+        // }
     ]);
     const [showTable, setShowTable] = useState(true);
 
-    const handleSearch = async (criteria) => {
+      const handleSearch = async (criteria) => {
         if (!criteria) return;
         try {
-          const data = await getBeneficiary(criteria);
+          console.log("ok");
+          const data = await getBeneficiary(userId,criteria,'sanction');
           setBeneficiaries(Array.isArray(data) ? data : []);
           setShowTable(true)
+          console.log(beneficiaries);
         } catch (error) {
           console.error('Error fetching activities:', error);
         }

@@ -260,7 +260,9 @@ export const updatedBeneficiarySubTask = async (taskId,object)=>{
 export const getStateDetails = async () => {
   
     try {
-        const response = await axios.get(`https://cdn-api.co-vin.in/api/v2/admin/location/states`);
+        const response = await axios.get(`http://3.111.84.98:61002/api/states`,{
+            headers:getAuthorizationHeader()
+          });
         return response.data.states;
     } catch (error) {
         console.error('Error fetching Projects by USERID:', error);
@@ -271,7 +273,9 @@ export const getStateDetails = async () => {
 export const getDistrictDetails = async (state_id) => {
   
     try {
-        const response = await axios.get(`https://cdn-api.co-vin.in/api/v2/admin/location/districts/${state_id}`);
+        const response = await axios.get(`http://3.111.84.98:61002/api/districts/${state_id}`,{
+            headers:getAuthorizationHeader()
+          });
         return response.data.districts;
     } catch (error) {
         console.error('Error fetching Projects by USERID:', error);

@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 import { Box } from '@mui/material';
 import SearchBar from './SearchBar';
 import Sidebar from './sidebar/Sidebar';
-import InprogressTable from './InprogressTable';
+import FinalPreviewList from './FinalPreviewList';
 import { getBeneficiary } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
 
 const FinalPreview = () => {
+    const { userId } = useAuth();
     const [beneficiaries, setBeneficiaries] = useState([
         {
             "id": 1,
@@ -36,9 +38,9 @@ const FinalPreview = () => {
                                     "beneficiaryContribution": "12",
                                     "grantAmount": "234",
                                     "yearOfSanction": "2009",
-                                    "additionalRows": [
+                                    "taskUpdates": [
                                         {
-                                            unitAchievement: '',
+                                            achievementUnit: '',
                                             remainingBalance: '',
                                             duration: '',
                                             payeeName: '',
@@ -56,9 +58,9 @@ const FinalPreview = () => {
                                     "beneficiaryContribution": "12",
                                     "grantAmount": "234",
                                     "yearOfSanction": "2009",
-                                    "additionalRows": [
+                                    "taskUpdates": [
                                         {
-                                            unitAchievement: '',
+                                            achievementUnit: '',
                                             remainingBalance: '',
                                             duration: '',
                                             payeeName: '',
@@ -88,9 +90,9 @@ const FinalPreview = () => {
                                     "beneficiaryContribution": "12",
                                     "grantAmount": "234",
                                     "yearOfSanction": "2009",
-                                    "additionalRows": [
+                                    "taskUpdates": [
                                         {
-                                            unitAchievement: '',
+                                            achievementUnit: '',
                                             remainingBalance: '',
                                             duration: '',
                                             payeeName: '',
@@ -109,9 +111,11 @@ const FinalPreview = () => {
     const handleSearch = async (criteria) => {
         if (!criteria) return;
         try {
-          const data = await getBeneficiary(criteria);
+          console.log("ok");
+          const data = await getBeneficiary(userId,criteria,'sanction');
           setBeneficiaries(Array.isArray(data) ? data : []);
           setShowTable(true)
+          console.log(beneficiaries);
         } catch (error) {
           console.error('Error fetching activities:', error);
         }
@@ -133,7 +137,7 @@ const FinalPreview = () => {
                     <SearchBar onSearch={handleSearch} />
                 </Box>
                 {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-                <InprogressTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} />
+                <FinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} />
                 </Box>}
             </Box>
         </Box>
