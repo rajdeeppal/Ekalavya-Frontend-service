@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Select, MenuItem, InputLabel, FormControl, Box, Typography } from '@mui/material';
-import { getVerticals, getComponents, getActivities, getTasks, getTaskById, updateTask, saveConfiguration } from '../DataCenter/apiService';
+import { getVerticals, getComponents, getRestrictedComponents, getActivities, getTasks, getTaskById, updateTask, saveConfiguration } from '../DataCenter/apiService';
 
 function TaskIframe() {
     const [verticals, setVerticals] = useState([]);
@@ -26,23 +26,33 @@ function TaskIframe() {
         fetchVerticals();
     }, []);
 
+    // Fetch components based on selected vertical
     useEffect(() => {
         if (selectedVertical && selectedVertical !== 'other') {
             async function fetchComponents() {
-                const data = await getComponents(selectedVertical);
-                setComponents(Array.isArray(data) ? data : []);
+                if (selectedComponent === 'all') {
+                    const allComponents = await getRestrictedComponents(); // Fetch all components
+                    console.log('Fetched all components:', allComponents); // Debug log
+                    setComponents(allComponents); // Update state with all components
+                } else {
+                    const data = await getComponents(selectedVertical);
+                    console.log('Fetched components for vertical:', data); // Debug log
+                    setComponents(Array.isArray(data) ? data : []);
+                }
             }
             fetchComponents();
         }
-    }, [selectedVertical]);
+    }, [selectedVertical, selectedComponent]);
 
     useEffect(() => {
-        if (selectedComponent && selectedComponent !== 'other') {
+        if (selectedComponent && selectedComponent !== 'other' && selectedComponent !== 'all') {
             async function fetchActivities() {
                 const data = await getActivities(selectedComponent);
                 setActivities(Array.isArray(data) ? data : []);
             }
             fetchActivities();
+        } else {
+            setActivities([]); // Clear activities if 'all' or 'other' is selected
         }
     }, [selectedComponent]);
 
@@ -53,6 +63,8 @@ function TaskIframe() {
                 setTasks(Array.isArray(data) ? data : []);
             }
             fetchTasks();
+        } else {
+            setTasks([]); // Clear tasks if 'other' is selected
         }
     }, [selectedActivity]);
 
@@ -73,16 +85,16 @@ function TaskIframe() {
         }
     }, [selectedTask]);
 
-    const handleSave = async () => {
-        const projectConfig = {
-            verticalName: selectedVertical === 'other' ? newVerticalName : selectedVertical,
-            componentName: selectedComponent === 'other' ? newComponentName : selectedComponent,
-            activityName: selectedActivity === 'other' ? newActivityName : selectedActivity,
-            taskName,
-            units,
-            ratePerUnit
-        };
-
+const handleSave = async () => {
+    // Ensure 'all' is treated correctly in projectConfig
+    const projectConfig = {
+        verticalName: selectedVertical === 'other' ? newVerticalName : selectedVertical,
+        componentName: selectedComponent === 'all' ? null : (selectedComponent === 'other' ? newComponentName : selectedComponent),
+        activityName: selectedActivity === 'other' ? newActivityName : selectedActivity,
+        taskName,
+        units,
+        ratePerUnit
+    };
         if (selectedTask && selectedTask !== 'other') {
             await updateTask(selectedTask, projectConfig); // Update existing task
         } else {
@@ -145,7 +157,11 @@ function TaskIframe() {
                     <InputLabel id="component-select-label">Component</InputLabel>
                     <Select
                         labelId="component-select-label"
-                        onChange={(e) => setSelectedComponent(e.target.value)}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            console.log('Selected component:', value); // Debug log
+                            setSelectedComponent(value);
+                        }}
                         value={selectedComponent}
                         sx={{ fontSize: '14px' }}
                     >
@@ -154,10 +170,12 @@ function TaskIframe() {
                             <MenuItem key={c.id} value={c.componentName}>{c.componentName}</MenuItem>
                         ))}
                         <MenuItem value="other">Other</MenuItem>
+                        <MenuItem value="all">All</MenuItem>
                     </Select>
                 </FormControl>
             )}
 
+            {/* Input field for adding new component if 'Other' is selected */}
             {selectedComponent === 'other' && (
                 <TextField
                     label="New Component Name"
@@ -169,7 +187,7 @@ function TaskIframe() {
             )}
 
             {/* Activity dropdown */}
-            {selectedComponent && (
+            {selectedComponent && selectedComponent !== 'all' && (
                 <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel id="activity-select-label">Activity</InputLabel>
                     <Select

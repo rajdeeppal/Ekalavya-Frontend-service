@@ -56,6 +56,19 @@ export const getComponents = async (vertical) => {
     }
 };
 
+// Fetch All components
+export const getRestrictedComponents = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/restrict/components`, {
+            headers:getAuthorizationHeader()
+          });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching components:", error);
+        return [];
+    }
+};
+
 // Fetch components based on selected Project **(Riya to use while add Beneficiary)
 export const getComponentsByProject = async (project) => {
     
@@ -181,17 +194,17 @@ export const getBeneficiaryByProjectName = async (projectName) => {
 //         console.log(data);
 //         const {stateName,districtName,projectName,componentName}=data;
 //         if(!stateName && !districtName && !componentName){
-//             const response = await axios.get(`http://3.111.84.98:61002/beneficiary/filter/${userId}?projectName=${projectName}&stage=${category}`,{
+//             const response = await axios.get(`http://localhost:61002/beneficiary/filter/${userId}?projectName=${projectName}&stage=${category}`,{
 //                 headers:getAuthorizationHeader()
 //               });
 //         return response.data.beneficiaries;
 //         }else if(!stateName && !districtName){
-//             const response = await axios.get(`http://3.111.84.98:61002/beneficiary/filter/${userId}?projectName=${projectName}&stage=${category}`,{
+//             const response = await axios.get(`http://localhost:61002/beneficiary/filter/${userId}?projectName=${projectName}&stage=${category}`,{
 //                 headers:getAuthorizationHeader()
 //               });
 //         return response.data.beneficiaries;
 //         }
-//         const response = await axios.get(`http://3.111.84.98:61002/beneficiary/filter/${userId}?projectName=${projectName}&componentName=${componentName}&stateName=${stateName}&districtName=${districtName}&stage=${category}`,{
+//         const response = await axios.get(`http://localhost:61002/beneficiary/filter/${userId}?projectName=${projectName}&componentName=${componentName}&stateName=${stateName}&districtName=${districtName}&stage=${category}`,{
 //                 headers:getAuthorizationHeader()
 //               });
 //         return response.data.beneficiaries;
@@ -206,7 +219,7 @@ export const getBeneficiary = async (userId, data, category) => {
       const { stateName, districtName, projectName, componentName } = data;
       
       // Start building the query parameters
-      let url = `http://3.111.84.98:61002/beneficiary/filter/${userId}`;
+      let url = `http://localhost:61002/beneficiary/filter/${userId}`;
       const params = new URLSearchParams();
   
       // Add parameters if they are provided
@@ -260,7 +273,7 @@ export const updatedBeneficiarySubTask = async (taskId,object)=>{
 export const getStateDetails = async () => {
   
     try {
-        const response = await axios.get(`http://3.111.84.98:61002/api/states`,{
+        const response = await axios.get(`http://localhost:61002/api/states`,{
             headers:getAuthorizationHeader()
           });
         return response.data.states;
@@ -273,7 +286,7 @@ export const getStateDetails = async () => {
 export const getDistrictDetails = async (state_id) => {
   
     try {
-        const response = await axios.get(`http://3.111.84.98:61002/api/districts/${state_id}`,{
+        const response = await axios.get(`http://localhost:61002/api/districts/${state_id}`,{
             headers:getAuthorizationHeader()
           });
         return response.data.districts;
