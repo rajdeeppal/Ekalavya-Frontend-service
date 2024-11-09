@@ -46,7 +46,7 @@ const Sidebar = () => {
           <Link to="/resolution-list" style={{ textDecoration: "none" }} >
             <li>
               <StoreIcon className="icon"  style={{ color: "black" }}/>
-              <span>Resolution</span>
+              <span>ResolutionList</span>
             </li>
           </Link>
          

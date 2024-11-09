@@ -30,11 +30,19 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
     const [newTask, setNewTask] = useState(false);
+    const [taskUpdateDTO, setTaskUpdateDTO] = useState({
+        domainExpertEmpId: '',
+        payeeName:'',
+        accountNumber: '',
+        currentBeneficiaryContribution: '',
+        achievementUnit:  '',
+        currentCost: '',
+    });
 
     const toggleEditMode = (taskIndex, rowIndex) => {
         setEditMode((prevEditMode) => ({
             ...prevEditMode,
-            [`${taskIndex}-${rowIndex}`]: !prevEditMode[`${taskIndex}-${rowIndex}`],
+            [`${rowIndex}`]: !prevEditMode[`${rowIndex}`],
         }));
     };
 
@@ -51,63 +59,79 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
 
     const handleInputChange = (taskIndex, rowIndex, field, value) => {
         setBeneficiaries((prevBeneficiaries) => {
-            const updatedBeneficiaries = [...prevBeneficiaries];
-            const task = updatedBeneficiaries
-                .flatMap((b) =>
-                    b.components.flatMap((c) =>
-                        c.activities.flatMap((a) => a.tasks)
-                    )
-                )
-                .find((t, i) => i === taskIndex);
-
-            if (task) {
-                const row = task.taskUpdates[rowIndex];
-                if (field === 'otherDocument') {
-                    row.otherDocument = value;
-                } else {
-                    row[field] = value;
-
-                    if (row.achievementUnit) {
-                        row.currentCost = row.achievementUnit * 25;
-                    }
-                    console.log(row.currentCost);
-                }
-                return updatedBeneficiaries;
-            }
-            return prevBeneficiaries;
+            return prevBeneficiaries.map((beneficiary) => ({
+                ...beneficiary,
+                components: beneficiary.components.map((component) => ({
+                    ...component,
+                    activities: component.activities.map((activity) => ({
+                        ...activity,
+                        tasks: activity.tasks.map((task) => {
+                            if (task.id === taskIndex) {
+                                const updatedTaskUpdates = [...task.taskUpdates];
+                                const updatedRow = {
+                                    ...updatedTaskUpdates[rowIndex],
+                                    [field]: value,
+                                };
+    
+                                // Calculate `currentCost` if `achievementUnit` is updated
+                                if (field === 'achievementUnit') {
+                                    updatedRow.currentCost = (value * activity.ratePerUnit)-updatedRow.beneficiaryContribution;
+                                }
+    
+                                // Update the specific row within taskUpdates
+                                updatedTaskUpdates[rowIndex] = updatedRow;
+    
+                                return { ...task, taskUpdates: updatedTaskUpdates };
+                            }
+                            return task;
+                        })
+                    }))
+                }))
+            }));
         });
     };
+    
 
     const handleSaveRow = async (taskIndex, rowIndex) => {
         toggleEditMode(taskIndex, rowIndex);
         const task = beneficiaries
             .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
-            .find((t, i) => i === taskIndex);
+            .find((t, i) => t.id === taskIndex);
 
         if (!newTask) {
             const changedData = task.taskUpdates[rowIndex];
             console.log(changedData);
             // Implement your save logic here (e.g., API call)
         }
+        const changedData = task.taskUpdates[rowIndex];
+        console.log(changedData);
+        setTaskUpdateDTO({
+            domainExpertEmpId: task.taskUpdates[rowIndex].domainExpertEmpId,
+            payeeName: task.taskUpdates[rowIndex].payeeName,
+            accountNumber: parseInt(task.taskUpdates[rowIndex].accountNumber, 10),
+            benContribution: parseFloat(task.taskUpdates[rowIndex].currentBeneficiaryContribution),
+            achievementUnit:  parseInt(task.taskUpdates[rowIndex].achievementUnit, 10),
+            currentCost: parseFloat(task.taskUpdates[rowIndex].currentCost),
+        });
 
+        console.log(taskUpdateDTO);
+    
         const formData = new FormData();
-
+        formData.append("taskUpdateDTO", JSON.stringify(taskUpdateDTO));
+        formData.append("passbookDoc", task.taskUpdates[rowIndex].passbookDoc);
+        // formData.append("otherDocs", task.taskUpdates[rowIndex].otherDocs);
 
         try {
             if (newTask) {
 
-                formData.append("currentCost", task.taskUpdates[0].currentCost);
-                formData.append("achievementUnit", parseInt(task.taskUpdates[0].achievementUnit,10));
-                formData.append("payeeName", task.taskUpdates[0].payeeName);
-                formData.append("passbookCopy", task.taskUpdates[0].passbookCopy);
-                formData.append("otherDocument", task.taskUpdates[0].otherDocument);
+                
                 // Append other documents to formData
                 // task.taskUpdates[0].otherDocs.forEach((doc, index) => {
                 //     formData.append(`otherDocs[${index}]`, doc);
                 // });
 
                 console.log(formData);
-                await updatedBeneficiarySubTask(taskIndex,formData);
+                await updatedBeneficiarySubTask(task.id, formData);
                 setNewTask(false);
                 alert('Project saved successfully!');
 
@@ -125,12 +149,15 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
     };
 
     const addNewRow = (taskIndex) => {
+        console.log(taskIndex);
         setBeneficiaries((prevBeneficiaries) => {
             const updatedBeneficiaries = [...prevBeneficiaries];
+
             const task = updatedBeneficiaries
                 .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
-                .find((t, i) => i === taskIndex);
+                .find((t, i) => t.id === taskIndex);
 
+            console.log(task);
             if (task) {
                 if (!task.taskUpdates) {
                     task.taskUpdates = [];
@@ -140,16 +167,19 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                 if (
                     !lastRow ||
                     lastRow.achievementUnit !== '' ||
+                    lastRow.currentBeneficiaryContribution !== '' ||
                     lastRow.payeeName !== '' ||
-                    lastRow.passbookCopy !== ''
+                    lastRow.passbookDoc !== ''
                 ) {
                     setNewTask(true);
                     task.taskUpdates.push({
                         achievementUnit: '',
+                        currentBeneficiaryContribution: '',
                         currentCost: '',
                         payeeName: '',
-                        passbookCopy: null,
-                        otherDocument: [],
+                        passbookDoc: null,
+                        otherDocs: [],
+                        domainExpertEmpId: ''
                     });
                 }
             }
@@ -212,7 +242,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                     'Remaining Balance': row.remainingBalance,
                                     Duration: row.duration,
                                     'Payee Name': row.payeeName,
-                                    'Passbook Copy': row.passbookCopy,
+                                    'Passbook Copy': row.passbookDoc,
                                 });
                             });
                         }
@@ -239,21 +269,15 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                         c.activities.flatMap((a) => a.tasks)
                     )
                 )
-                .find((t, i) => i === taskIndex);
+                .find((t, i) => t.id === taskIndex);
 
             if (task && files.length > 0) {
-                if (fileType === 'passbookCopy') {
+                if (fileType === 'passbookDoc') {
                     const file = files[0];
-                    if (file.type === 'image/jpeg') {
-                        const fileURL = URL.createObjectURL(file);
-                        task.taskUpdates[rowIndex].passbookCopy = {
-                            file,
-                            fileURL,
-                        };
-                    } else {
-                        alert('Only JPG format is allowed for the passbook copy.');
-                    }
-                } else if (fileType === 'otherDocument') {
+                    
+                    task.taskUpdates[rowIndex].passbookDoc = file;
+                    
+                } else if (fileType === 'otherDocs') {
                     const pdfFiles = Array.from(files).filter(
                         (file) => file.type === 'application/pdf'
                     );
@@ -263,7 +287,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                             fileURL: URL.createObjectURL(file),
                         }));
 
-                        task.taskUpdates[rowIndex].otherDocument = {
+                        task.taskUpdates[rowIndex].otherDocs = {
                             files: pdfFileURLs,
                         };
                     } else {
@@ -392,7 +416,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                             <Button
                                                                                                                 variant="outlined"
                                                                                                                 color="primary"
-                                                                                                                onClick={() => toggleTaskDetails(taskIndex)}
+                                                                                                                onClick={() => toggleTaskDetails(task.id)}
 
                                                                                                             >
                                                                                                                 View
@@ -402,7 +426,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                     <TableRow>
                                                                                                         <TableCell colSpan={9} style={{ padding: 0 }}>
                                                                                                             <Collapse
-                                                                                                                in={taskDetailsOpen[taskIndex]}
+                                                                                                                in={taskDetailsOpen[task.id]}
                                                                                                                 timeout="auto"
                                                                                                                 unmountOnExit
                                                                                                             >
@@ -426,14 +450,14 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                 {(task.taskUpdates || []).map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
                                                                                                                                         <TableCell>
-                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            {editMode[`${rowIndex}`] ? (
                                                                                                                                                 <TextField
                                                                                                                                                     variant="outlined"
                                                                                                                                                     size="small"
                                                                                                                                                     value={row.achievementUnit || ''}
                                                                                                                                                     onChange={(e) =>
                                                                                                                                                         handleInputChange(
-                                                                                                                                                            taskIndex,
+                                                                                                                                                            task.id,
                                                                                                                                                             rowIndex,
                                                                                                                                                             'achievementUnit',
                                                                                                                                                             e.target.value
@@ -445,7 +469,26 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                             )}
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>
-                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            {editMode[`${rowIndex}`] ? (
+                                                                                                                                                <TextField
+                                                                                                                                                    variant="outlined"
+                                                                                                                                                    size="small"
+                                                                                                                                                    value={row.currentBeneficiaryContribution || ''}
+                                                                                                                                                    onChange={(e) =>
+                                                                                                                                                        handleInputChange(
+                                                                                                                                                            task.id,
+                                                                                                                                                            rowIndex,
+                                                                                                                                                            'currentBeneficiaryContribution',
+                                                                                                                                                            e.target.value
+                                                                                                                                                        )
+                                                                                                                                                    }
+                                                                                                                                                />
+                                                                                                                                            ) : (
+                                                                                                                                                row.currentBeneficiaryContribution
+                                                                                                                                            )}
+                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            {editMode[`${rowIndex}`] ? (
                                                                                                                                                 <TextField
                                                                                                                                                     variant="outlined"
                                                                                                                                                     size="small"
@@ -457,14 +500,14 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                             )}
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>
-                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            {editMode[`${rowIndex}`] ? (
                                                                                                                                                 <TextField
                                                                                                                                                     variant="outlined"
                                                                                                                                                     size="small"
                                                                                                                                                     value={row.payeeName || ''}
                                                                                                                                                     onChange={(e) =>
                                                                                                                                                         handleInputChange(
-                                                                                                                                                            taskIndex,
+                                                                                                                                                            task.id,
                                                                                                                                                             rowIndex,
                                                                                                                                                             'payeeName',
                                                                                                                                                             e.target.value
@@ -476,7 +519,26 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                             )}
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>
-                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            {editMode[`${rowIndex}`] ? (
+                                                                                                                                                <TextField
+                                                                                                                                                    variant="outlined"
+                                                                                                                                                    size="small"
+                                                                                                                                                    value={row.accountNumber || ''}
+                                                                                                                                                    onChange={(e) =>
+                                                                                                                                                        handleInputChange(
+                                                                                                                                                            task.id,
+                                                                                                                                                            rowIndex,
+                                                                                                                                                            'accountNumber',
+                                                                                                                                                            e.target.value
+                                                                                                                                                        )
+                                                                                                                                                    }
+                                                                                                                                                />
+                                                                                                                                            ) : (
+                                                                                                                                                row.accountNumber
+                                                                                                                                            )}
+                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            {editMode[`${rowIndex}`] ? (
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     component="label"
@@ -484,35 +546,35 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                                     Upload
                                                                                                                                                     <input
                                                                                                                                                         type="file"
-                                                                                                                                                        accept="image/jpeg"
+                                                                                                                                                        accept=".pdf"
                                                                                                                                                         hidden
                                                                                                                                                         onChange={(e) =>
                                                                                                                                                             handleFileChange(
-                                                                                                                                                                taskIndex,
+                                                                                                                                                                task.id,
                                                                                                                                                                 rowIndex,
-                                                                                                                                                                'passbookCopy',
+                                                                                                                                                                'passbookDoc',
                                                                                                                                                                 e
                                                                                                                                                             )
                                                                                                                                                         }
                                                                                                                                                     />
                                                                                                                                                 </Button>
-                                                                                                                                            ) : row.passbookCopy ? (
+                                                                                                                                            ) : row.passbookDoc ? (
                                                                                                                                                 <a
-                                                                                                                                                    href={row.passbookCopy.fileURL}
-                                                                                                                                                    download={row.passbookCopy.file.name}
+                                                                                                                                                    href={row.passbookDoc.downloadUrl}
+                                                                                                                                                    download={row.passbookDoc.downloadUrl}
                                                                                                                                                     style={{
                                                                                                                                                         textDecoration: 'underline',
                                                                                                                                                         color: 'blue',
                                                                                                                                                     }}
                                                                                                                                                 >
-                                                                                                                                                    {row.passbookCopy.file.name}
+                                                                                                                                                    {row.passbookDoc.fileName}
                                                                                                                                                 </a>
                                                                                                                                             ) : (
                                                                                                                                                 <Typography>No Image</Typography>
                                                                                                                                             )}
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>
-                                                                                                                                            {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                            {editMode[`${rowIndex}`] ? (
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     component="label"
@@ -525,18 +587,18 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                                         hidden
                                                                                                                                                         onChange={(e) =>
                                                                                                                                                             handleFileChange(
-                                                                                                                                                                taskIndex,
+                                                                                                                                                                task.id,
                                                                                                                                                                 rowIndex,
-                                                                                                                                                                'otherDocument',
+                                                                                                                                                                'otherDocs',
                                                                                                                                                                 e
                                                                                                                                                             )
                                                                                                                                                         }
                                                                                                                                                     />
                                                                                                                                                 </Button>
-                                                                                                                                            ) : row.otherDocument &&
-                                                                                                                                                row.otherDocument.files &&
-                                                                                                                                                row.otherDocument.files.length > 0 ? (
-                                                                                                                                                row.otherDocument.files.map((file, idx) => (
+                                                                                                                                            ) : row.otherDocs &&
+                                                                                                                                                row.otherDocs.files &&
+                                                                                                                                                row.otherDocs.files.length > 0 ? (
+                                                                                                                                                row.otherDocs.files.map((file, idx) => (
                                                                                                                                                     <div key={idx}>
                                                                                                                                                         <a
                                                                                                                                                             href={file.fileURL}
@@ -555,19 +617,38 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                             )}
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>
+                                                                                                                                            {editMode[`${rowIndex}`] ? (
+                                                                                                                                                <TextField
+                                                                                                                                                    variant="outlined"
+                                                                                                                                                    size="small"
+                                                                                                                                                    value={row.domainExpertEmpId || ''}
+                                                                                                                                                    onChange={(e) =>
+                                                                                                                                                        handleInputChange(
+                                                                                                                                                            task.id,
+                                                                                                                                                            rowIndex,
+                                                                                                                                                            'domainExpertEmpId',
+                                                                                                                                                            e.target.value
+                                                                                                                                                        )
+                                                                                                                                                    }
+                                                                                                                                                />
+                                                                                                                                            ) : (
+                                                                                                                                                row.domainExpertEmpId
+                                                                                                                                            )}
+                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>
                                                                                                                                             <IconButton
                                                                                                                                                 color={
-                                                                                                                                                    editMode[`${taskIndex}-${rowIndex}`]
+                                                                                                                                                    editMode[`${rowIndex}`]
                                                                                                                                                         ? 'success'
                                                                                                                                                         : 'primary'
                                                                                                                                                 }
                                                                                                                                                 onClick={() =>
-                                                                                                                                                    editMode[`${taskIndex}-${rowIndex}`]
-                                                                                                                                                        ? handleSaveRow(taskIndex, rowIndex)
-                                                                                                                                                        : toggleEditMode(taskIndex, rowIndex)
+                                                                                                                                                    editMode[`${rowIndex}`]
+                                                                                                                                                        ? handleSaveRow(task.id, rowIndex)
+                                                                                                                                                        : toggleEditMode(task.id, rowIndex)
                                                                                                                                                 }
                                                                                                                                             >
-                                                                                                                                                {editMode[`${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                                {editMode[`${rowIndex}`] ? (
                                                                                                                                                     <SaveIcon />
                                                                                                                                                 ) : (
                                                                                                                                                     <EditIcon />
@@ -582,7 +663,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                     <Button
                                                                                                                         variant="contained"
                                                                                                                         color="primary"
-                                                                                                                        onClick={() => addNewRow(taskIndex)}
+                                                                                                                        onClick={() => addNewRow(task.id)}
                                                                                                                     >
                                                                                                                         Add New Row
                                                                                                                     </Button>

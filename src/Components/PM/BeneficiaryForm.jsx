@@ -137,32 +137,6 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
         districtName:  data.districtName 
       });
   
-      // Fetch state and district details based on stateName
-      // const selectedState = states.find((s) => s.state_name === data.stateName);
-      // if (selectedState) {
-      //   const districtData = await getDistrictDetails(selectedState.state_id);
-      //   setDistrict(districtData);
-      //   // Now that districts are loaded, check if districtName is in the list
-      //   const matchedDistrict = districtData.find((d) => d.district_name === data.districtName);
-      //   console.log(matchedDistrict);
-      //   setBeneficiary((prevBeneficiary) => ({
-      //     ...prevBeneficiary,
-      //     districtName: matchedDistrict ? data.districtName : "",
-      //   }));
-  
-      //   console.log(beneficiary.districtName);
-      //   if (!matchedDistrict) {
-      //     setErrors((prevErrors) => ({
-      //       ...prevErrors,
-      //       districtName: 'District not found for the selected state.',
-      //     }));
-      //   }
-      // } else {
-      //   setErrors((prevErrors) => ({
-      //     ...prevErrors,
-      //     stateName: 'State not found in the available options.',
-      //   }));
-      // }
     } catch (error) {
       console.error('Error fetching Aadhaar details:', error);
     }

@@ -52,7 +52,13 @@ const Sidebar = () => {
               <span>Final Preview</span>
             </li>
           </Link>
-         
+          <Link to="/resolution" style={{ textDecoration: "none" }} >
+            <li>
+              <StoreIcon className="icon"  style={{ color: "black" }}/>
+              <span>Resolution</span>
+            </li>
+          </Link>
+
           <li onClick={handleProfileClick}> {/* Profile click handler */}
             <AccountCircleOutlinedIcon className="icon" style={{ color: "black" }}/>
             <span>Profile</span>
