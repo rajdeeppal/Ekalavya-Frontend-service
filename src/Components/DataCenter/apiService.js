@@ -1,9 +1,9 @@
 import axios from "axios";
 // import { jwtDecode } from 'jwt-decode';
-const BASE_URL = "http://3.111.84.98:61002/admin"; // Update with your actual API URL
-const PM_BASE_URL = "http://3.111.84.98:61002/user/pm";
+const BASE_URL = "http://localhost:61002/admin"; // Update with your actual API URL http://3.111.84.98:61002/admin
+const PM_BASE_URL = "http://localhost:61002/user/pm";
 
-const BENEFICIARY_BASE_URL = "http://3.111.84.98:61002/beneficiary";
+const BENEFICIARY_BASE_URL = "http://localhost:61002/beneficiary";
 
 const getToken = () => localStorage.getItem("jwtToken");
 const getAuthorizationHeader = () => {
@@ -228,7 +228,7 @@ export const getBeneficiary = async (userId, data, category) => {
       const { stateName, districtName, projectName, componentName } = data;
       
       // Start building the query parameters
-      let url = `http://3.111.84.98:61002/beneficiary/filter/${userId}`;
+      let url = `http://localhost:61002/beneficiary/filter/${userId}`;
       const params = new URLSearchParams();
   
       // Add parameters if they are provided
@@ -289,7 +289,7 @@ export const updatedBeneficiarySubTask = async (taskId, object) => {
 export const getStateDetails = async () => {
   
     try {
-        const response = await axios.get(`http://3.111.84.98:61002/api/states`,{
+        const response = await axios.get(`http://localhost:61002/api/states`,{
             headers:getAuthorizationHeader()
           });
         return response.data.states;
@@ -302,7 +302,7 @@ export const getStateDetails = async () => {
 export const getDistrictDetails = async (state_id) => {
   
     try {
-        const response = await axios.get(`http://3.111.84.98:61002/api/districts/${state_id}`,{
+        const response = await axios.get(`http://localhost:61002/api/districts/${state_id}`,{
             headers:getAuthorizationHeader()
           });
         return response.data.districts;

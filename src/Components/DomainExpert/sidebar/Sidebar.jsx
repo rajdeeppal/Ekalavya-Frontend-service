@@ -4,8 +4,11 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import StoreIcon from "@mui/icons-material/Store";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import { Link, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
+import PendingIcon from '@mui/icons-material/Pending';
 
 const Sidebar = () => {
 
@@ -31,21 +34,23 @@ const Sidebar = () => {
       <div className="center">
         <ul>
         
-          <Link to="/domain-inprogress" style={{ textDecoration: "none" }} >
+          <Link to="/inprogress-list" style={{ textDecoration: "none" }} >
             <li>
-              <StoreIcon className="icon"  style={{ color: "black" }}/>
-              <span>In-Progress List</span>
+              <PendingIcon className="icon"  style={{ color: "black" }}/>
+              <span>InProgress Table</span>
             </li>
           </Link>
+
           <Link to="/review-list" style={{ textDecoration: "none" }} >
             <li>
-              <StoreIcon className="icon"  style={{ color: "black" }}/>
-              <span>Review list</span>
+              <RateReviewOutlinedIcon className="icon"  style={{ color: "black" }}/>
+              <span>ReviewList</span>
             </li>
           </Link>
+
           <Link to="/resolution-list" style={{ textDecoration: "none" }} >
             <li>
-              <StoreIcon className="icon"  style={{ color: "black" }}/>
+              <FormatListBulletedIcon className="icon"  style={{ color: "black" }}/>
               <span>ResolutionList</span>
             </li>
           </Link>

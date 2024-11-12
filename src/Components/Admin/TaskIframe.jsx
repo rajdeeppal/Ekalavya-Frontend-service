@@ -17,6 +17,7 @@ function TaskIframe() {
     const [taskName, setTaskName] = useState('');
     const [units, setUnits] = useState('');
     const [ratePerUnit, setRatePerUnit] = useState('');
+    const [isAll,setIsAll]=useState(false);
 
     useEffect(() => {
         async function fetchVerticals() {
@@ -30,11 +31,12 @@ function TaskIframe() {
     useEffect(() => {
         if (selectedVertical && selectedVertical !== 'other') {
             async function fetchComponents() {
-                if (selectedComponent === 'all') {
+                if (selectedComponent === 'all' || isAll) {
                     const allComponents = await getRestrictedComponents(); // Fetch all components
                     console.log('Fetched all components:', allComponents); // Debug log
                     setComponents(allComponents); // Update state with all components
-                } else {
+                    setIsAll(selectedComponent === 'all');
+                } else{
                     const data = await getComponents(selectedVertical);
                     console.log('Fetched components for vertical:', data); // Debug log
                     setComponents(Array.isArray(data) ? data : []);

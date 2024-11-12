@@ -14,6 +14,8 @@ import RegisterUserForm from "./Components/UserAuthentication/RegisterUserForm";
 import EmailOtpVerification from "./Components/Admin/EmailOtpVerification";
 import UserProfile from "./Components/MyProfile/UserProfile";
 import ResolutionList from "./Components/DomainExpert/ResolutionList";
+import ReviewPage from "./Components/DomainExpert/ReviewPage";
+import RejectPage from "./Components/DomainExpert/RejectPage";
 
 function App() {
   return (
@@ -100,6 +102,24 @@ function App() {
         element={
           <PrivateRoute>
             <ResolutionList />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/inprogress-list"
+        element={
+          <PrivateRoute>
+            <ReviewPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/review-list"
+        element={
+          <PrivateRoute>
+            <RejectPage />
           </PrivateRoute>
         }
       />

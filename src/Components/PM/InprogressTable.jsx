@@ -72,11 +72,19 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                     ...updatedTaskUpdates[rowIndex],
                                     [field]: value,
                                 };
-    
                                 // Calculate `currentCost` if `achievementUnit` is updated
-                                if (field === 'achievementUnit') {
-                                    updatedRow.currentCost = (value * activity.ratePerUnit)-updatedRow.beneficiaryContribution;
+                                if (field === 'currentBeneficiaryContribution') {
+                                    const ratePerUnit = task.ratePerUnit || 0;
+                                    const data = updatedRow.achievementUnit;
+                                    const beneficiaryContribution = updatedRow.currentBeneficiaryContribution || 0;
+    
+                                    updatedRow.currentCost = (data * ratePerUnit) - beneficiaryContribution;
+    
+                                    console.log('ratePerUnit:', ratePerUnit);
+                                    console.log('beneficiaryContribution:', beneficiaryContribution);
+                                    console.log('Calculated currentCost:', updatedRow.currentCost);
                                 }
+                                console.log(activity.ratePerUnit)
     
                                 // Update the specific row within taskUpdates
                                 updatedTaskUpdates[rowIndex] = updatedRow;
@@ -119,6 +127,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
         const formData = new FormData();
         formData.append("taskUpdateDTO", JSON.stringify(taskUpdateDTO));
         formData.append("passbookDoc", task.taskUpdates[rowIndex].passbookDoc);
+        console.log(task.taskUpdates[rowIndex].passbookDoc);
         // formData.append("otherDocs", task.taskUpdates[rowIndex].otherDocs);
 
         try {
@@ -276,7 +285,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                     const file = files[0];
                     
                     task.taskUpdates[rowIndex].passbookDoc = file;
-                    
+                    console.log(file)
                 } else if (fileType === 'otherDocs') {
                     const pdfFiles = Array.from(files).filter(
                         (file) => file.type === 'application/pdf'
@@ -567,7 +576,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                                         color: 'blue',
                                                                                                                                                     }}
                                                                                                                                                 >
-                                                                                                                                                    {row.passbookDoc.fileName}
+                                                                                                                                                    {row.passbookDoc.name}
                                                                                                                                                 </a>
                                                                                                                                             ) : (
                                                                                                                                                 <Typography>No Image</Typography>
