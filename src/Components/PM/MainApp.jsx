@@ -79,7 +79,7 @@ const MainApp = () => {
       
     }
   ]);
-  const [showTable, setShowTable] = useState(true);
+  const [showTable, setShowTable] = useState(false);
 
   // useEffect(() => {
   //   async function fetchBeneficiary() {
@@ -113,7 +113,7 @@ const MainApp = () => {
       console.log("ok");
       const data = await getBeneficiary(userId,criteria,'sanction');
       setBeneficiaries(Array.isArray(data) ? data : []);
-      setShowTable(true)
+      setShowTable(true);
       console.log(beneficiaries);
     } catch (error) {
       console.error('Error fetching activities:', error);

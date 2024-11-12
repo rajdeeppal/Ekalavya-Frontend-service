@@ -360,3 +360,18 @@ export const getUploadDetails = async (projectName) => {
     throw error;
   }
 };
+
+export const submitDetails = async (object) => {
+  try {
+    const response = await axios.post(
+      `${BENEFICIARY_BASE_URL}/sanction/submit`,object,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};

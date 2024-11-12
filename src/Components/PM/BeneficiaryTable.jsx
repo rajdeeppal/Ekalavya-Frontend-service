@@ -4,7 +4,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
 import Paper from "@mui/material/Paper";
 import DownloadIcon from '@mui/icons-material/Download';
-import { updateActivityTask } from '../DataCenter/apiService';
+import { updateActivityTask, submitDetails } from '../DataCenter/apiService';
 
 const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   const [open, setOpen] = useState({});
@@ -75,8 +75,15 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     setShowEdit(false);
   };
 
-  const handleConfirmSubmit = () => {
-    setShowConfirmation(false);
+  const handleConfirmSubmit = async () => {
+    try {
+      console.log(beneficiaries);
+      await submitDetails(...beneficiaries);
+      alert("Beneficiary have been submitted successfully");
+      setShowConfirmation(false);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
   };
 
   const handleCloseConfirmation = () => {
