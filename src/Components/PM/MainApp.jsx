@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal, Typography, Box } from '@mui/material';
+import { Button, Modal, Typography, Box,Grid  } from '@mui/material';
 import SearchBar from './SearchBar';
 import ProjectForm from './ProjectForm';
 import BeneficiaryForm from './BeneficiaryForm';
 import BeneficiaryTable from './BeneficiaryTable';
 import { getBeneficiary } from '../DataCenter/apiService';
 import Sidebar from './sidebar/Sidebar';
+
+import Navbar from './navbar/Navbar';
 import { useAuth } from '../PrivateRoute';
 
 const MainApp = () => {
@@ -121,8 +123,11 @@ const MainApp = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <div className="home">
+   <Grid container spacing={2}>
       <Sidebar />
+      <div className="homeContainer">
+      {/* <Navbar/> */}
       <Box
         component="main"
         sx={{
@@ -197,7 +202,9 @@ const MainApp = () => {
           <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} />
         </Box>}
       </Box>
-    </Box>
+      </div>
+      </Grid >
+      </div>
   );
 };
 

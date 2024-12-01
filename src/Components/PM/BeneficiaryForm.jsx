@@ -75,38 +75,41 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
 
   useEffect(() => {
     async function fetchComponents() {
+      const id=projects.find(item => item.projectName === selectedProject)?.id;
       if (!selectedProject) return;
-      const data = await getComponentsByProject(selectedProject);
+      const data = await getComponentsByProject(id);
       setComponents(Array.isArray(data) ? data : []);
     }
     fetchComponents();
-  }, [selectedProject]);
+  }, [selectedProject,projects]);
 
   useEffect(() => {
     async function fetchActivities() {
+      const id=components.find(item => item.componentName === selectedComponent)?.id;
       if (!selectedComponent) return;
       try {
-        const data = await getActivities(selectedComponent);
+        const data = await getActivities(id);
         setActivities(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching activities:', error);
       }
     }
     fetchActivities();
-  }, [selectedComponent]);
+  }, [selectedComponent, components]);
 
   useEffect(() => {
     async function fetchTasks() {
+      const id=activities.find(item => item.activityName === selectedActivity)?.id;
       if (!selectedActivity) return;
       try {
-        const data = await getTasks(selectedActivity);
+        const data = await getTasks(id);
         setTasks(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching Tasks:', error);
       }
     }
     fetchTasks();
-  }, [selectedActivity]);
+  }, [selectedActivity, activities]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

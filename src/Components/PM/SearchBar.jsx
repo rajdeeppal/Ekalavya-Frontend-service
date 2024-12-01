@@ -30,12 +30,13 @@ const SearchBar = ({ onSearch }) => {
 
   useEffect(() => {
     async function fetchComponents() {
+      const id=projects.find(item => item.projectName === selectedProject)?.id;
       if (!selectedProject) return;
-      const data = await getComponentsByProject(selectedProject);
+      const data = await getComponentsByProject(id);
       setComponents(Array.isArray(data) ? data : []);
     }
     fetchComponents();
-  }, [selectedProject]);
+  }, [selectedProject,projects]);
 
   useEffect(() => {
     async function fetchStates() {

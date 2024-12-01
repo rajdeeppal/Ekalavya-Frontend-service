@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Typography, Box } from '@mui/material';
 import Sidebar from '../DomainExpert/sidebar/Sidebar';
+
+import Navbar from "../PM/navbar/Navbar";
 import SearchBar from '../PM/SearchBar';
 import { getBeneficiary } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
@@ -80,7 +82,9 @@ function RejectPage() {
       };
   return (
     <Box sx={{ display: 'flex' }}>
-      <Sidebar />
+            <Sidebar />
+            <div className="homeContainer">
+            <Navbar />
       <Box
         component="main"
         sx={{
@@ -99,6 +103,7 @@ function RejectPage() {
           <ReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview}/>
         </Box>}
       </Box>
+    </div>
     </Box>
   )
 }

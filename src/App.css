@@ -19,3 +19,6 @@
 .App-link {
   color: #61dafb;
 }
+ .homeContainer {
+  flex: 6 1;
+}

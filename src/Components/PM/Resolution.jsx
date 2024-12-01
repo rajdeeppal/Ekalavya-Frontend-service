@@ -11,7 +11,7 @@ function Resolution() {
     const { userId } = useAuth();
     const [selectedProject, setSelectedProject] = useState('');
     const [projects, setProjects] = useState([]);
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
     useEffect(() => {
         async function fetchProjects() {
@@ -22,20 +22,25 @@ function Resolution() {
     }, [userId]);
 
     const handleFileUpload = (event) => {
-        setSelectedFile(event.target.files[0]);
+        const files = Array.from(event.target.files); // Convert FileList to Array
+        setSelectedFiles(files);
     };
 
 
-    const handleRemoveFile = () => {
-        setSelectedFile(null); // Clear the selected file
+    const handleRemoveFile = (fileToRemove) => {
+        setSelectedFiles((prevFiles) =>
+            prevFiles.filter((file) => file !== fileToRemove)
+        );
     };
 
 
     const handleSearch = async () => {
         const formData = new FormData();
         formData.append("projectName", selectedProject);
-        if (selectedFile) {
-            formData.append("file", selectedFile);
+        if (selectedFiles) {
+            selectedFiles.forEach((doc, index) => {
+                formData.append("file", doc);
+            });
         }
 
         for (const [key, value] of formData.entries()) {
@@ -46,6 +51,9 @@ function Resolution() {
         try {
             console.log("ok");
             await uploadDetails(userId, formData);
+            alert("Resolution files are uploaded successfully");
+            setSelectedProject("");
+            setSelectedFiles([]);
         } catch (error) {
             console.error('Error fetching activities:', error);
         }
@@ -89,7 +97,7 @@ function Resolution() {
                             </Grid>
 
                             <Grid item xs={12} sm={6} md={2.5}>
-                            {!selectedFile ?  (<Button
+                                {selectedFiles.length === 0 ? (<Button
                                     variant="outlined"
                                     component="label"
                                     fullWidth
@@ -100,28 +108,33 @@ function Resolution() {
                                     <input
                                         type="file"
                                         hidden
+                                        multiple
                                         onChange={handleFileUpload}
                                     />
                                 </Button>)
                                     :
-                                 (
-                                    <Alert
-                                        severity="info"
-                                        action={
-                                            <IconButton
-                                                aria-label="remove file"
-                                                color="inherit"
-                                                size="small"
-                                                onClick={handleRemoveFile}
-                                            >
-                                                <CloseIcon fontSize="inherit" />
-                                            </IconButton>
-                                        }
-                                        sx={{ mt: 1 }}
-                                    >
-                                        {selectedFile.name}
-                                    </Alert>
-                                )}
+                                    (<>
+                                        {
+                                            selectedFiles.map((file, index) => (
+                                                <Alert
+                                                    severity="info"
+                                                    action={
+                                                        <IconButton
+                                                            aria-label="remove file"
+                                                            color="inherit"
+                                                            size="small"
+                                                            onClick={() => handleRemoveFile(file)}
+                                                        >
+                                                            <CloseIcon fontSize="inherit" />
+                                                        </IconButton>
+                                                    }
+                                                    sx={{ mt: 1 }}
+                                                >
+                                                    <div key={index}>{file.name}</div>
+                                                </Alert>
+                                            ))
+                                        }</>
+                                    )}
                             </Grid>
 
                             <Grid item xs={12} sm={6} md={2}>

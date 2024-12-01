@@ -4,6 +4,7 @@ const BASE_URL = "http://localhost:61002/admin"; // Update with your actual API 
 const PM_BASE_URL = "http://localhost:61002/user/pm";
 
 const BENEFICIARY_BASE_URL = "http://localhost:61002/beneficiary";
+const SUBMIT_BASE_URL = "http://localhost:61002/ops/pm";
 
 const getToken = () => localStorage.getItem("jwtToken");
 const getAuthorizationHeader = () => {
@@ -43,10 +44,10 @@ export const getVerticals = async () => {
 };
 
 // Fetch components based on selected vertical
-export const getComponents = async (vertical) => {
+export const getComponents = async (verticalId) => {
   try {
     const response = await axios.get(`${BASE_URL}/components`, {
-      params: { vertical },
+      params: { verticalId },
       headers: getAuthorizationHeader(),
     });
     return response.data;
@@ -70,10 +71,10 @@ export const getRestrictedComponents = async () => {
 };
 
 // Fetch components based on selected Project **(Riya to use while add Beneficiary)
-export const getComponentsByProject = async (project) => {
+export const getComponentsByProject = async (projectId) => {
   try {
     const response = await axios.get(`${PM_BASE_URL}/components`, {
-      params: { project },
+      params: { projectId },
       headers: getAuthorizationHeader(),
     });
     return response.data;
@@ -84,10 +85,10 @@ export const getComponentsByProject = async (project) => {
 };
 
 // Fetch activities based on selected component
-export const getActivities = async (component) => {
+export const getActivities = async (componentId) => {
   try {
     const response = await axios.get(`${BASE_URL}/activities`, {
-      params: { component },
+      params: { componentId },
       headers: getAuthorizationHeader(),
     });
     return response.data;
@@ -98,10 +99,10 @@ export const getActivities = async (component) => {
 };
 
 // Fetch tasks for editing
-export const getTasks = async (activity) => {
+export const getTasks = async (activityId) => {
   try {
     const response = await axios.get(`${BASE_URL}/tasks`, {
-      params: { activity },
+      params: { activityId },
       headers: getAuthorizationHeader(),
     });
     return response.data;
@@ -194,35 +195,6 @@ export const getBeneficiaryByProjectName = async (projectName) => {
   }
 };
 
-// export const getBeneficiary = async (userId,data,category) => {
-//     // http://localhost:61002/beneficiary/filter/1001?projectName=GTA&componentName=CON&stage=sanction
-//     try {
-//         // const response = await axios.post(`${BENEFICIARY_BASE_URL}/criteriaSearch`,object,{
-//         //     headers:getAuthorizationHeader()
-//         //   });
-//         console.log(data);
-//         const {stateName,districtName,projectName,componentName}=data;
-//         if(!stateName && !districtName && !componentName){
-//             const response = await axios.get(`http://localhost:61002/beneficiary/filter/${userId}?projectName=${projectName}&stage=${category}`,{
-//                 headers:getAuthorizationHeader()
-//               });
-//         return response.data.beneficiaries;
-//         }else if(!stateName && !districtName){
-//             const response = await axios.get(`http://localhost:61002/beneficiary/filter/${userId}?projectName=${projectName}&stage=${category}`,{
-//                 headers:getAuthorizationHeader()
-//               });
-//         return response.data.beneficiaries;
-//         }
-//         const response = await axios.get(`http://localhost:61002/beneficiary/filter/${userId}?projectName=${projectName}&componentName=${componentName}&stateName=${stateName}&districtName=${districtName}&stage=${category}`,{
-//                 headers:getAuthorizationHeader()
-//               });
-//         return response.data.beneficiaries;
-//     } catch (error) {
-//         console.error('Error fetching beneficiary:', error);
-//         throw error;
-//     }
-// };
-
 export const getBeneficiary = async (userId, data, category) => {
     try {
       const { stateName, districtName, projectName, componentName } = data;
@@ -267,10 +239,29 @@ export const updateActivityTask = async (taskId, object) => {
   }
 };
 
-export const updatedBeneficiarySubTask = async (taskId, object) => {
+export const newBeneficiarySubTask = async (taskId, object) => {
   try {
     const response = await axios.post(
       `${BENEFICIARY_BASE_URL}/addTaskUpdate/${taskId}`,
+      object,
+      {
+        headers: {
+          ...getAuthorizationHeader(),
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching beneficiary:", error);
+    throw error;
+  }
+};
+
+export const updatedBeneficiarySubTask = async (rowId, object) => {
+  try {
+    const response = await axios.put(
+      `${BENEFICIARY_BASE_URL}/addTaskUpdate/${rowId}`,
       object,
       {
         headers: {
@@ -364,7 +355,67 @@ export const getUploadDetails = async (projectName) => {
 export const submitDetails = async (object) => {
   try {
     const response = await axios.post(
-      `${BENEFICIARY_BASE_URL}/sanction/submit`,object,
+      `${SUBMIT_BASE_URL}/sanction/submit`,object,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};
+
+export const bulkSubmitDetails = async (object) => {
+  try {
+    const response = await axios.post(
+      `${SUBMIT_BASE_URL}/sanction/bulkSubmit`,object,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};
+
+export const submitInProgressDetails = async (object) => {
+  try {
+    const response = await axios.post(
+      `${SUBMIT_BASE_URL}/inprogress/submit`,object,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};
+
+export const bulkInProgressSubmitDetails = async (object) => {
+  try {
+    const response = await axios.post(
+      `${SUBMIT_BASE_URL}/inprogress/bulkSubmit`,object,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};
+
+export const domainDetails = async (taskId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/user/search/domain-expert/${taskId}`,
       {
         headers: getAuthorizationHeader(),
       }

@@ -17,7 +17,7 @@ function TaskIframe() {
     const [taskName, setTaskName] = useState('');
     const [units, setUnits] = useState('');
     const [ratePerUnit, setRatePerUnit] = useState('');
-    const [isAll,setIsAll]=useState(false);
+    const [isAll,setIsAll]=useState(false);   
 
     useEffect(() => {
         async function fetchVerticals() {
@@ -31,44 +31,47 @@ function TaskIframe() {
     useEffect(() => {
         if (selectedVertical && selectedVertical !== 'other') {
             async function fetchComponents() {
+                const id=verticals.find(item => item.verticalName === selectedVertical)?.id;
                 if (selectedComponent === 'all' || isAll) {
                     const allComponents = await getRestrictedComponents(); // Fetch all components
                     console.log('Fetched all components:', allComponents); // Debug log
                     setComponents(allComponents); // Update state with all components
                     setIsAll(selectedComponent === 'all');
                 } else{
-                    const data = await getComponents(selectedVertical);
+                    const data = await getComponents(id);
                     console.log('Fetched components for vertical:', data); // Debug log
                     setComponents(Array.isArray(data) ? data : []);
                 }
             }
             fetchComponents();
         }
-    }, [selectedVertical, selectedComponent]);
+    }, [selectedVertical, selectedComponent, verticals]);
 
     useEffect(() => {
         if (selectedComponent && selectedComponent !== 'other' && selectedComponent !== 'all') {
             async function fetchActivities() {
-                const data = await getActivities(selectedComponent);
+                const id=components.find(item => item.componentName === selectedComponent)?.id;
+                const data = await getActivities(id);
                 setActivities(Array.isArray(data) ? data : []);
             }
             fetchActivities();
         } else {
             setActivities([]); // Clear activities if 'all' or 'other' is selected
         }
-    }, [selectedComponent]);
+    }, [selectedComponent, components]);
 
     useEffect(() => {
         if (selectedActivity && selectedActivity !== 'other') {
             async function fetchTasks() {
-                const data = await getTasks(selectedActivity);
+                const id=activities.find(item => item.activityName === selectedActivity)?.id;
+                const data = await getTasks(id);
                 setTasks(Array.isArray(data) ? data : []);
             }
             fetchTasks();
         } else {
             setTasks([]); // Clear tasks if 'other' is selected
         }
-    }, [selectedActivity]);
+    }, [selectedActivity, activities]);
 
     useEffect(() => {
         if (selectedTask && selectedTask !== 'other') {

@@ -16,6 +16,8 @@ import UserProfile from "./Components/MyProfile/UserProfile";
 import ResolutionList from "./Components/DomainExpert/ResolutionList";
 import ReviewPage from "./Components/DomainExpert/ReviewPage";
 import RejectPage from "./Components/DomainExpert/RejectPage";
+import "./App.css";
+import RejectIframe from "./Components/PM/RejectIframe";
 
 function App() {
   return (
@@ -120,6 +122,15 @@ function App() {
         element={
           <PrivateRoute>
             <RejectPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/rejectedList"
+        element={
+          <PrivateRoute>
+            <RejectIframe />
           </PrivateRoute>
         }
       />

@@ -11,6 +11,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   const [editActivityMode, setEditActivityMode] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showEdit, setShowEdit] = useState(true);
+  const [isBulk, setIsBulk] = useState(false);
 
   const toggleCollapse = (index) => {
     setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
@@ -23,7 +24,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
         !prevState[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`],
     }));
 
-    
+
   };
 
   const handleActivityInputChange = (beneficiaryIndex, componentIndex, activityIndex, taskIndex, e) => {
@@ -46,8 +47,8 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     const updatedBeneficiaries = [...beneficiaries];
     const activity = updatedBeneficiaries[beneficiaryIndex]?.components[componentIndex]?.activities[activityIndex];
 
-    const task=activity.tasks[taskIndex];
-    const criteria={
+    const task = activity.tasks[taskIndex];
+    const criteria = {
       taskName: task.taskName,
       beneficiaryContribution: parseFloat(task.beneficiaryContribution),
       grantAmount: parseFloat(task.grantAmount),
@@ -61,9 +62,9 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
 
     console.log(criteria);
     try {
-      const taskId=task.id;
+      const taskId = task.id;
       console.log(taskId);
-      const data = await updateActivityTask(taskId,criteria);
+      const data = await updateActivityTask(taskId, criteria);
       setBeneficiaries(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching activities:', error);
@@ -75,7 +76,24 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     setShowEdit(false);
   };
 
+  const handleBulkSubmit = () => {
+    setShowConfirmation(true);
+    setShowEdit(false);
+    setIsBulk(true);
+  };
+
   const handleConfirmSubmit = async () => {
+    try {
+      console.log(beneficiaries);
+      await submitDetails(...beneficiaries);
+      alert("Beneficiary have been submitted successfully");
+      setShowConfirmation(false);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
+  };
+
+  const handleBulkConfirmSubmit = async () => {
     try {
       console.log(beneficiaries);
       await submitDetails(...beneficiaries);
@@ -132,14 +150,6 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
           <DownloadIcon />
         </IconButton>
       </div>
-      {/* <Button
-        variant="contained"
-        color="success"
-        onClick={exportToExcel}
-        sx={{ marginBottom: '20px' }}
-      >
-        Download Excel
-      </Button> */}
       <TableContainer component={Paper} className="table">
         <Table sx={{ minWidth: 650 }} aria-label="beneficiary table">
           <TableHead>
@@ -329,7 +339,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
                         <Button
                           variant="contained"
                           color="primary"
-                          onClick={() => handleSubmit(beneficiaryIndex)}
+                          onClick={() => handleSubmit()}
                           sx={{ marginTop: '10px' }}
                         >
                           Submit
@@ -343,6 +353,9 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Button variant="contained" color="primary" onClick={() => handleSubmit()}>
+        Bulk Submit
+      </Button>
       <Modal
         open={showConfirmation}
         onClose={handleCloseConfirmation}
@@ -369,7 +382,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
             Are you sure you want to submit the data?
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
-            <Button variant="contained" color="primary" onClick={handleConfirmSubmit}>
+            <Button variant="contained" color="primary" onClick={isBulk ? handleBulkConfirmSubmit : handleConfirmSubmit}>
               Yes
             </Button>
             <Button variant="contained" color="secondary" onClick={handleCloseConfirmation}>
