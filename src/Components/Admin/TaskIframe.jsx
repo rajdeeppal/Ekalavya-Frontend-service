@@ -101,7 +101,7 @@ const handleSave = async () => {
         ratePerUnit
     };
         if (selectedTask && selectedTask !== 'other') {
-            await updateTask(selectedTask, projectConfig); // Update existing task
+            await saveConfiguration(projectConfig); // Update existing task
         } else {
             await saveConfiguration(projectConfig); // Save new configuration
         }
