@@ -112,7 +112,7 @@ const FinalPreview = () => {
         if (!criteria) return;
         try {
           console.log("ok");
-          const data = await getBeneficiary(userId,criteria,'sanction');
+          const data = await getBeneficiary(userId,criteria,'preview');
           setBeneficiaries(Array.isArray(data) ? data : []);
           setShowTable(true)
           console.log(beneficiaries);
