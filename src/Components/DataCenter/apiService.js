@@ -258,6 +258,21 @@ export const newBeneficiarySubTask = async (taskId, object) => {
   }
 };
 
+export const deletedBeneficiaryTask = async (taskId) => {
+  try {
+    const response = await axios.delete(
+      `${BENEFICIARY_BASE_URL}/${taskId}`,
+      {
+        headers:getAuthorizationHeader()
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching beneficiary:", error);
+    throw error;
+  }
+};
+
 export const updatedBeneficiarySubTask = async (rowId, object) => {
   try {
     const response = await axios.put(

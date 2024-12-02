@@ -18,7 +18,7 @@ import {
     Alert,
     Box,
     Modal,
-    FormControl, Select, MenuItem,  Divider
+    FormControl, Select, MenuItem, Divider
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -26,9 +26,10 @@ import {
     Save as SaveIcon,
 } from '@mui/icons-material';
 import Avatar from '@mui/material/Avatar';
+import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask, newBeneficiarySubTask, submitDetails, domainDetails } from '../DataCenter/apiService';
+import { updatedBeneficiarySubTask, newBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask } from '../DataCenter/apiService';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 
@@ -43,10 +44,12 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
     const [domainId, setDomainId] = useState([]);
     const [taskId, setTaskId] = useState('');
     const [comments, setComments] = useState([]);
+    const [id, setId] = useState([]);
+    const [isBulk, setIsBulk] = useState(false);
 
     useEffect(() => {
         async function fetchDomain() {
-            if(!taskId) return;
+            if (!taskId) return;
             try {
                 const data = await domainDetails(taskId);
                 setDomainId(Array.isArray(data) ? data : []);
@@ -109,8 +112,11 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = (index) => {
+        setId(index);
         setShowConfirmation(true);
+        setIsEdit(false);
+        setIsBulk(false);
     };
 
     const toggleViewMode = (comments) => {
@@ -120,8 +126,25 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
 
     const handleConfirmSubmit = async () => {
         try {
-            console.log(beneficiaries);
-            await submitDetails(...beneficiaries);
+            console.log(id)
+            const data = beneficiaries.find((beneficiary) => beneficiary.id === id)
+            const filteredData = JSON.parse(JSON.stringify(data));
+
+            filteredData.components.forEach((component) => {
+                component.activities.forEach((activity) => {
+                    activity.tasks.forEach((task) => {
+
+                        delete task.taskUpdates.forEach((update) => {
+                            delete update.otherDocs;
+                            delete update.passbookDoc;
+                            delete update.createdDate;
+                        });
+
+                    });
+                });
+            });
+            console.log("submit", filteredData);
+            await submitInProgressDetails(filteredData);
             alert("Beneficiary have been submitted successfully");
             setShowConfirmation(false);
         } catch (error) {
@@ -182,6 +205,17 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         });
     };
 
+    const handleDelete = async (index) => {
+        try {
+
+            await deletedBeneficiaryTask(index);
+
+            alert('Beneficiary deleted successfully!');
+        } catch (error) {
+            console.error("Error deleting benficiary:", error);
+            alert("An error occurred while deleting the task.");
+        }
+    }
 
     const handleSaveRow = async (taskIndex, rowIndex, row) => {
         toggleEditMode(taskIndex, rowIndex);
@@ -215,7 +249,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
             changedData.otherDocs.forEach((doc, index) => {
                 formData.append(`otherDocs`, doc.file);
             });
-        }else{
+        } else {
             formData.append(`otherDocs`, null);
         }
         console.log(formData.otherDocs);
@@ -449,14 +483,24 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                     <TableCell>{beneficiary.aadharNumber}</TableCell>
                                     <TableCell>{beneficiary.surveyNumber}</TableCell>
                                     <TableCell>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => toggleCollapse(beneficiaryIndex)}
-
-                                        >
-                                            View
-                                        </Button>
+                                        <Box display="flex" gap={1} justifyContent="flex-start" alignItems="center">
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => toggleCollapse(beneficiaryIndex)}
+                                                size="small"
+                                                style={{ textTransform: "none" }} // Optional: Disable uppercase
+                                            >
+                                                View
+                                            </Button>
+                                            <IconButton
+                                                sx={{ color: "red" }}
+                                                onClick={() => handleDelete(beneficiary.id)}
+                                                size="small"
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Box>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
@@ -832,10 +876,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                 <Button
                                                     variant="contained"
                                                     color="primary"
-                                                    onClick={() => handleSubmit()}
+                                                    onClick={() => handleSubmit(beneficiary.id)}
                                                     style={{ marginTop: '10px' }}
                                                 >
-                                                    Save All
+                                                    Save
                                                 </Button>
                                             </div>
                                         </Collapse>

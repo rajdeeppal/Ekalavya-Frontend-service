@@ -4,7 +4,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
 import Paper from "@mui/material/Paper";
 import DownloadIcon from '@mui/icons-material/Download';
-import { updateActivityTask, submitDetails } from '../DataCenter/apiService';
+import { updateActivityTask, submitDetails, bulkSubmitDetails } from '../DataCenter/apiService';
 
 const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   const [open, setOpen] = useState({});
@@ -12,6 +12,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showEdit, setShowEdit] = useState(true);
   const [isBulk, setIsBulk] = useState(false);
+  const [id, setId] = useState('');
 
   const toggleCollapse = (index) => {
     setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
@@ -71,9 +72,11 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (index) => {
+    setId(index);
     setShowConfirmation(true);
     setShowEdit(false);
+    setIsBulk(false);
   };
 
   const handleBulkSubmit = () => {
@@ -84,8 +87,10 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
 
   const handleConfirmSubmit = async () => {
     try {
-      console.log(beneficiaries);
-      await submitDetails(...beneficiaries);
+      console.log(id)
+      const data=beneficiaries.find((beneficiary) => beneficiary.id === id)
+      console.log("submit",data);
+      await submitDetails(data);
       alert("Beneficiary have been submitted successfully");
       setShowConfirmation(false);
     } catch (error) {
@@ -95,8 +100,11 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
 
   const handleBulkConfirmSubmit = async () => {
     try {
-      console.log(beneficiaries);
-      await submitDetails(...beneficiaries);
+      console.log("bulk",beneficiaries);
+      const data={
+        "beneficiaries":beneficiaries
+      }
+      await bulkSubmitDetails(data);
       alert("Beneficiary have been submitted successfully");
       setShowConfirmation(false);
     } catch (error) {
@@ -339,7 +347,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
                         <Button
                           variant="contained"
                           color="primary"
-                          onClick={() => handleSubmit()}
+                          onClick={() => handleSubmit(beneficiary.id)}
                           sx={{ marginTop: '10px' }}
                         >
                           Submit
@@ -353,7 +361,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Button variant="contained" color="primary" onClick={() => handleSubmit()}>
+      <Button variant="contained" color="primary" onClick={() => handleBulkSubmit()}>
         Bulk Submit
       </Button>
       <Modal
