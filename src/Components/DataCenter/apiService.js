@@ -2,6 +2,7 @@ import axios from "axios";
 // import { jwtDecode } from 'jwt-decode';
 const BASE_URL = "http://localhost:61002/admin"; // Update with your actual API URL http://3.111.84.98:61002/admin
 const PM_BASE_URL = "http://localhost:61002/user/pm";
+const BASE_PUBLIC_URL = "http://localhost:61002/self-service";
 
 const BENEFICIARY_BASE_URL = "http://localhost:61002/beneficiary";
 const SUBMIT_BASE_URL = "http://localhost:61002/ops/pm";
@@ -43,10 +44,32 @@ export const getVerticals = async () => {
   }
 };
 
+export const getPublicVerticals = async () => {
+  try {
+    const response = await axios.get(`${BASE_PUBLIC_URL}/verticals`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching verticals:", error);
+    return [];
+  }
+};
 // Fetch components based on selected vertical
 export const getComponents = async (verticalId) => {
   try {
     const response = await axios.get(`${BASE_URL}/components`, {
+      params: { verticalId },
+      headers: getAuthorizationHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching components:", error);
+    return [];
+  }
+};
+
+export const getPublicComponents = async (verticalId) => {
+  try {
+    const response = await axios.get(`${BASE_PUBLIC_URL}/components`, {
       params: { verticalId },
       headers: getAuthorizationHeader(),
     });

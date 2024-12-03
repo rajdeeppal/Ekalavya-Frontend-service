@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
-  TextField, Button, Box, Typography, Grid, Paper, MenuItem, CircularProgress
+  TextField, Button, Box, Typography, Grid, Paper, MenuItem, CircularProgress, FormControl, InputLabel, Select, FormHelperText
 } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { getPublicVerticals, getPublicComponents } from '../DataCenter/apiService';
 
 const RegisterUserForm = () => {
+  const [selectedVertical, setSelectedVertical] = useState('');
+  const [selectedComponent, setSelectedComponent] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [domain, setDomain] = useState('');
@@ -17,6 +20,10 @@ const RegisterUserForm = () => {
   const [showDomain, setShowDomain] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [verticals, setVerticals] = useState([]);
+  const [components, setComponents] = useState([
+
+  ]);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -31,6 +38,27 @@ const RegisterUserForm = () => {
     fetchRoles();
   }, []);
 
+  useEffect(() => {
+    async function fetchProjects() {
+      const data = await getPublicVerticals();
+      const updatedVerticals = Array.isArray(data) ? data : [];
+      setVerticals(updatedVerticals);
+      console.log(updatedVerticals); // Logs the updated value directly
+    }
+    fetchProjects();
+  }, []);
+
+  useEffect(() => {
+    async function fetchComponents() {
+      const id = verticals.find(item => item.verticalName === selectedVertical)?.id;
+      if (!selectedVertical) return;
+      const data = await getPublicComponents(id);
+      const updatedComponents = Array.isArray(data) ? data : [];
+      setComponents(updatedComponents);
+    }
+    fetchComponents();
+  }, [selectedVertical, verticals]);
+
   const handleRoleChange = (e) => {
     const selectedRole = e.target.value;
     setRequestedRole(selectedRole);
@@ -43,7 +71,8 @@ const RegisterUserForm = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const formData = { username, password, domain, emailId, requestedRole };
+    
+    const formData = { username, password, vertical : selectedVertical, component : selectedComponent, emailId, requestedRole };
 
     try {
       const response = await axios.post('http://localhost:61002/self-service/submitRoleRequest', JSON.stringify(formData), {
@@ -58,7 +87,8 @@ const RegisterUserForm = () => {
         // Clear fields after successful registration
         setUsername('');
         setPassword('');
-        setDomain('');
+        setSelectedVertical('');
+        setSelectedComponent('');
         setEmailId('');
         setRequestedRole('');
         setShowDomain(false);
@@ -77,10 +107,10 @@ const RegisterUserForm = () => {
   };
 
   return (
-    <Grid 
-      container 
-      component="main" 
-      sx={{ height: '100vh', justifyContent: 'center', alignItems: 'center' }} 
+    <Grid
+      container
+      component="main"
+      sx={{ height: '100vh', justifyContent: 'center', alignItems: 'center' }}
     >
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6}>
         <Box
@@ -102,7 +132,7 @@ const RegisterUserForm = () => {
           <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
             Register New User
           </Typography>
-          
+
           <Box component="form" noValidate onSubmit={handleRegister} sx={{ mt: 1 }}>
             <TextField
               margin="normal"
@@ -131,7 +161,7 @@ const RegisterUserForm = () => {
               error={!password && !!errorMessage}
               helperText={!password && !!errorMessage ? 'Password is required' : ''}
             />
-            
+
             <TextField
               margin="normal"
               required
@@ -155,19 +185,58 @@ const RegisterUserForm = () => {
             </TextField>
 
             {showDomain && (
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="domain"
-                label="Domain"
-                name="domain"
-                autoComplete="domain"
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                error={!domain && requestedRole === 'DOMAIN EXPERT'}
-                helperText={!domain && requestedRole === 'DOMAIN EXPERT' ? 'Domain is required' : ''}
-              />
+              <>
+                <FormControl
+                  fullWidth
+                  margin="normal"
+                  required
+                  error={!selectedVertical && requestedRole === 'DOMAIN EXPERT'}
+                >
+                  <InputLabel id="vertical-label">Vertical</InputLabel>
+                  <Select
+                    labelId="vertical-label"
+                    id="vertical"
+                    value={selectedVertical}
+                    onChange={(e) => setSelectedVertical(e.target.value)}
+                    autoComplete="vertical"
+                  >
+                    {verticals.map((vertical) => (
+                      <MenuItem key={vertical.id} value={vertical.verticalName}>
+                        {vertical.verticalName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {!selectedVertical && requestedRole === 'DOMAIN EXPERT' && (
+                    <FormHelperText>Vertical is required</FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl
+                  fullWidth
+                  margin="normal"
+                  required
+                  error={!selectedComponent && requestedRole === 'DOMAIN EXPERT'}
+                >
+                  <InputLabel id="component-label">Component</InputLabel>
+                  <Select
+                    labelId="component-label"
+                    id="component"
+                    value={selectedComponent}
+                    onChange={(e) => setSelectedComponent(e.target.value)}
+                    autoComplete="component"
+                  >
+                    {components.map((component) => (
+                      <MenuItem key={component.id} value={component.componentName}>
+                        {component.componentName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {!selectedComponent && requestedRole === 'DOMAIN EXPERT' && (
+                    <FormHelperText>Component is required</FormHelperText>
+                  )}
+                </FormControl>
+
+              </>
             )}
 
             <TextField
