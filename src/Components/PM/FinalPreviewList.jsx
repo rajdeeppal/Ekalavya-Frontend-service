@@ -124,19 +124,11 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
         <div style={{ padding: '20px' }} className='listContainer'>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom style={{ color: '#888' }}>
-                    Task List
+                    Preview List
                 </Typography>
                 <IconButton onClick={exportToExcel} >
                     <DownloadIcon />
                 </IconButton>
-                {/* <Button
-                    variant="contained"
-                    color="success"
-                    onClick={exportToExcel}
-                    style={{ marginBottom: '10px' }}
-                >
-                    Download Excel
-                </Button> */}
             </div>
             <TableContainer component={Paper}>
                 <Table aria-label="beneficiary table">
@@ -158,13 +150,13 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                         {beneficiaries.map((beneficiary, beneficiaryIndex) => (
                             <React.Fragment key={beneficiary.id}>
                                 <TableRow>
-                                    <TableCell>{beneficiary.verticalName}</TableCell>
+                                    <TableCell>{beneficiary.projectName}</TableCell>
                                     <TableCell>{beneficiary.beneficiaryName}</TableCell>
                                     <TableCell>{beneficiary.guardianName}</TableCell>
                                     <TableCell>{beneficiary.villageName}</TableCell>
                                     <TableCell>{beneficiary.mandalName}</TableCell>
                                     <TableCell>{beneficiary.districtName}</TableCell>
-                                    <TableCell>{beneficiary.state}</TableCell>
+                                    <TableCell>{beneficiary.stateName}</TableCell>
                                     <TableCell>{beneficiary.aadharNumber}</TableCell>
                                     <TableCell>{beneficiary.surveyNumber}</TableCell>
                                     <TableCell>
@@ -172,7 +164,8 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                             variant="contained"
                                             color="primary"
                                             onClick={() => toggleCollapse(beneficiaryIndex)}
-
+                                            size="small"
+                                            style={{ textTransform: "none" }} // Optional: Disable uppercase
                                         >
                                             View
                                         </Button>
@@ -211,10 +204,10 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                 <TableCell>Name of the Work</TableCell>
                                                                                                 <TableCell>Type of Unit</TableCell>
                                                                                                 <TableCell>Unit Rate</TableCell>
-                                                                                                <TableCell>No. of Units</TableCell>
+                                                                                                <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
-                                                                                                <TableCell>Beneficiary Contribution</TableCell>
-                                                                                                <TableCell>Grant Amount</TableCell>
+                                                                                                <TableCell>Beneficiary Contribution Balance</TableCell>
+                                                                                                <TableCell>Remain Amount</TableCell>
                                                                                                 <TableCell>Year of Sanction</TableCell>
                                                                                                 <TableCell>Actions</TableCell>
                                                                                             </TableRow>
@@ -226,16 +219,16 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                         <TableCell>{task.taskName}</TableCell>
                                                                                                         <TableCell>{task.typeOfUnit}</TableCell>
                                                                                                         <TableCell>{task.ratePerUnit}</TableCell>
-                                                                                                        <TableCell>{task.units}</TableCell>
+                                                                                                        <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
-                                                                                                        <TableCell>{task.beneficiaryContribution}</TableCell>
-                                                                                                        <TableCell>{task.grantAmount}</TableCell>
+                                                                                                        <TableCell>{task.beneficiaryContributionRemain}</TableCell>
+                                                                                                        <TableCell>{task.balanceRemaining}</TableCell>
                                                                                                         <TableCell>{task.yearOfSanction}</TableCell>
                                                                                                         <TableCell>
                                                                                                             <Button
                                                                                                                 variant="outlined"
                                                                                                                 color="primary"
-                                                                                                                onClick={() => toggleTaskDetails(taskIndex)}
+                                                                                                                onClick={() => toggleTaskDetails(task.id)}
 
                                                                                                             >
                                                                                                                 View
@@ -245,7 +238,7 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                     <TableRow>
                                                                                                         <TableCell colSpan={9} style={{ padding: 0 }}>
                                                                                                             <Collapse
-                                                                                                                in={taskDetailsOpen[taskIndex]}
+                                                                                                                in={taskDetailsOpen[task.id]}
                                                                                                                 timeout="auto"
                                                                                                                 unmountOnExit
                                                                                                             >
@@ -262,59 +255,44 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
                                                                                                                                     <TableCell>Domain Expert</TableCell>
-                                                                                                                                    <TableCell>Actions</TableCell>
                                                                                                                                 </TableRow>
                                                                                                                             </TableHead>
                                                                                                                             <TableBody>
-                                                                                                                                {(task.taskUpdates || []).map((row, rowIndex) => (
+                                                                                                                                {(task.taskUpdates || [])?.map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
+                                                                                                                                        <TableCell>{row.achievementUnit}</TableCell>
+                                                                                                                                        <TableCell>{row.currentBeneficiaryContribution}</TableCell>
+                                                                                                                                        <TableCell>{row.currentCost}</TableCell>
+                                                                                                                                        <TableCell>{row.payeeName}</TableCell>
+                                                                                                                                        <TableCell>{row.accountNumber}</TableCell>
+                                                                                                                                        <TableCell>{row.passbookDoc ? (<a
+                                                                                                                                            href={row.passbookDoc.downloadUrl}
+                                                                                                                                            download={row.passbookDoc.downloadUrl}
+                                                                                                                                            style={{
+                                                                                                                                                textDecoration: 'underline',
+                                                                                                                                                color: 'blue',
+                                                                                                                                            }}
+
+                                                                                                                                        >
+                                                                                                                                            {row.passbookDoc.fileName}
+                                                                                                                                        </a>
+                                                                                                                                        ) : (
+                                                                                                                                            <Typography>No Image</Typography>
+                                                                                                                                        )}</TableCell>
                                                                                                                                         <TableCell>
-                                                                                                                                            {
-                                                                                                                                                row.achievementUnit
-                                                                                                                                           }
-                                                                                                                                        </TableCell>
-                                                                                                                                        <TableCell>
-                                                                                                                                            
-                                                                                                                                                {row.currentCost
-                                                                                                                                            }
-                                                                                                                                        </TableCell>
-                                                                                                                                        <TableCell>
-                                                                                                                                            {
-                                                                                                                                                row.payeeName
-                                                                                                                                            }
-                                                                                                                                        </TableCell>
-                                                                                                                                        <TableCell>
-                                                                                                                                            { row.passbookDoc ? (
-                                                                                                                                                <a
-                                                                                                                                                    href={row.passbookDoc.downloadUrl}
-                                                                                                                                                    download={row.passbookDoc.fileName}
-                                                                                                                                                    style={{
-                                                                                                                                                        textDecoration: 'underline',
-                                                                                                                                                        color: 'blue',
-                                                                                                                                                    }}
-                                                                                                                                                >
-                                                                                                                                                    {row.passbookDoc.fileName}
-                                                                                                                                                </a>
-                                                                                                                                            ) : (
-                                                                                                                                                <Typography>No Image</Typography>
-                                                                                                                                            )}
-                                                                                                                                        </TableCell>
-                                                                                                                                        <TableCell>
-                                                                                                                                            {
-                                                                                                                                                row.otherDocument &&
-                                                                                                                                                row.otherDocument.files &&
-                                                                                                                                                row.otherDocument.files.length > 0 ? (
-                                                                                                                                                row.otherDocument.files.map((file, idx) => (
+                                                                                                                                            {row.otherDocs &&
+                                                                                                                                                row.otherDocs.length > 0 ? (
+                                                                                                                                                row.otherDocs.map((file, idx) => (
                                                                                                                                                     <div key={idx}>
                                                                                                                                                         <a
-                                                                                                                                                            href={file.fileURL}
-                                                                                                                                                            download={file.file.name}
+                                                                                                                                                            href={file.downloadUrl}
+                                                                                                                                                            download={file.downloadUrl}
                                                                                                                                                             style={{
                                                                                                                                                                 textDecoration: 'underline',
                                                                                                                                                                 color: 'blue',
                                                                                                                                                             }}
                                                                                                                                                         >
-                                                                                                                                                            {file.file.name}
+                                                                                                                                                            {file.fileName}
                                                                                                                                                         </a>
                                                                                                                                                     </div>
                                                                                                                                                 ))
@@ -322,13 +300,13 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                                 <Typography>No File Uploaded</Typography>
                                                                                                                                             )}
                                                                                                                                         </TableCell>
-                                                                                                                                       
+                                                                                                                                        <TableCell>{row.domainExpertEmpId}</TableCell>
                                                                                                                                     </TableRow>
                                                                                                                                 ))}
                                                                                                                             </TableBody>
                                                                                                                         </Table>
                                                                                                                     </TableContainer>
-                                                                                                                
+
                                                                                                                 </div>
                                                                                                             </Collapse>
                                                                                                         </TableCell>
@@ -346,7 +324,7 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                                         </Accordion>
                                                     </div>
                                                 ))}
-                                                
+
                                             </div>
                                         </Collapse>
                                     </TableCell>
@@ -356,7 +334,9 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                     </TableBody>
                 </Table>
             </TableContainer>
-        </div>
+
+
+        </div >
     );
 };
 
