@@ -469,11 +469,14 @@ export const domainDetails = async (taskId) => {
 export const approveDomainDetails = async (employeeId,taskId,remarks) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/ops/user/approve/${employeeId}/${taskId}`,remarks,
-      {
-        headers: getAuthorizationHeader(),
-      }
-    );
+      `http://localhost:61002/ops/user/approve/${employeeId}/${taskId}?remarks=${remarks}`,
+       null, // No request body
+            {
+              headers: {
+                ...getAuthorizationHeader() // Authorization headers
+              }
+            }
+          );
     return response.data;
   } catch (error) {
     console.error("Error fetching Projects by approveDomainDetails:", error);
@@ -484,9 +487,12 @@ export const approveDomainDetails = async (employeeId,taskId,remarks) => {
 export const rejectDomainDetails = async (employeeId,taskId,remarks) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/ops/user/rejection/${employeeId}/${taskId}`,remarks,
+      `http://localhost:61002/ops/user/rejection/${employeeId}/${taskId}?remarks=${remarks}`, // URL
+      null, // No request body
       {
-        headers: getAuthorizationHeader(),
+        headers: {
+          ...getAuthorizationHeader() // Authorization headers
+        }
       }
     );
     return response.data;

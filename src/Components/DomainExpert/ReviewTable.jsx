@@ -30,7 +30,7 @@ import { updatedBeneficiarySubTask,approveDomainDetails, rejectDomainDetails } f
 
 function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
     const { userId } = useAuth();
-    const [remarks, setRemarks] = useState([]);
+    const [remarks, setRemarks] = useState('');
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
