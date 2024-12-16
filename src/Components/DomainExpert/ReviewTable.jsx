@@ -21,12 +21,15 @@ import {
     ExpandMore as ExpandMoreIcon,
     Edit as EditIcon,
     Save as SaveIcon,
+    Reviews,
 } from '@mui/icons-material';
 import DownloadIcon from '@mui/icons-material/Download';
+import { useAuth } from '../PrivateRoute';
 import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask } from '../DataCenter/apiService';
+import { updatedBeneficiarySubTask,approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
 
 function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
+    const { userId } = useAuth();
     const [remarks, setRemarks] = useState([]);
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
@@ -51,8 +54,26 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
         }));
     };
 
-    const handleSave = () => {
-
+    const handleSave = async (action, userId, rowId) => {
+        if (action === 'Approve') {
+            try {
+                await approveDomainDetails(userId, rowId, remarks);
+                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", remarks);
+                alert("Tasks have been approved successfully");
+            } catch (error) {
+                console.error("Error approving tasks:", error);
+                alert("An error occurred while approving the tasks. Please try again.");
+            }
+        } else {
+            try {
+                await rejectDomainDetails(userId, rowId, remarks);
+                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", remarks);
+                alert("Tasks have been rejected successfully");
+            } catch (error) {
+                console.error("Error tasks:", error);
+                alert("An error occurred while rejecting the tasks. Please try again.");
+            }
+        }
     };
 
     const handleReview = () => {
@@ -82,7 +103,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {beneficiaries.beneficiaries.map((beneficiary, beneficiaryIndex) => (
+                        {beneficiaries?.map((beneficiary, beneficiaryIndex) => (
                             <React.Fragment key={beneficiary.id}>
                                 <TableRow>
                                     <TableCell>{beneficiary.projectName}</TableCell>
@@ -257,14 +278,14 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     color="success"
-                                                                                                                                                    onClick={() => { isReview ? handleSave('Approve') : handleReview('Approve') }}
+                                                                                                                                                    onClick={() => { isReview ? handleReview('Approve') : handleSave('Approve',userId,row.id) }}
                                                                                                                                                 >
                                                                                                                                                     Approve
                                                                                                                                                 </Button>
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     color="error"
-                                                                                                                                                    onClick={() => { isReview ? handleSave('Reject') : handleReview('Reject') }}
+                                                                                                                                                    onClick={() => { isReview ? handleReview('Reject') : handleSave('Reject',userId,row.id) }}
                                                                                                                                                 >
                                                                                                                                                     Reject
                                                                                                                                                 </Button>

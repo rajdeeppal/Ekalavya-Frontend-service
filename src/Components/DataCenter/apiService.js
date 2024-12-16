@@ -464,3 +464,34 @@ export const domainDetails = async (taskId) => {
     throw error;
   }
 };
+
+
+export const approveDomainDetails = async (employeeId,taskId,remarks) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:61002/ops/user/approve/${employeeId}/${taskId}`,remarks,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by approveDomainDetails:", error);
+    throw error;
+  }
+};
+
+export const rejectDomainDetails = async (employeeId,taskId,remarks) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:61002/ops/user/rejection/${employeeId}/${taskId}`,remarks,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by approveDomainDetails:", error);
+    throw error;
+  }
+};

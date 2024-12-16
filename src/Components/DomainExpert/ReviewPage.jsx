@@ -10,61 +10,61 @@ function ReviewPage() {
     const { userId } = useAuth();
     const [showTable, setShowTable] = useState(true);
     const [isReview,setIsReview] = useState(false);
-    const [beneficiaries, setBeneficiaries] = useState({
-      "beneficiaries": [
-          {
-              "mandalName": "Kolkata",
-              "components": [
-                  {
-                      "activities": [
-                          {
-                              "activityName": "Wholesale",
-                              "id": 1,
-                              "tasks": [
-                                  {
-                                      "balanceRemaining": 10,
-                                      "beneficiaryContribution": 100,
-                                      "unitRemain": 5,
-                                      "beneficiaryContributionRemain": 90,
-                                      "taskUpdates": [
-                                        {
-                                          "achievementUnit":5,
-                                          "currentBeneficiaryContribution":55,
-                                          "currentCost": 565,
-                                          "payeeName":"Rajdeep",
-                                          "accountNumber":5555565,
-                                          "domainExpertEmpId": 5565 ,
-                                        }
-                                      ],
-                                      "units": 20,
-                                      "grantAmount": 300,
-                                      "typeOfUnit": "KG",
-                                      "isSanction": false,
-                                      "taskName": "Embassy",
-                                      "id": 1,
-                                      "yearOfSanction": 2021,
-                                      "ratePerUnit": 20,
-                                      "totalCost": 400,
-                                      "isCompleted": "N"
-                                  }
-                              ]
-                          }
-                      ],
-                      "id": 1,
-                      "componentName": "AIB"
-                  }
-              ],
-              "districtName": "West Bardhaman",
-              "aadharNumber": 1323,
-              "guardianName": "Debjit",
-              "stateName": "West Bengal",
-              "beneficiaryName": "Rajdeep",
-              "id": 1,
-              "projectName": "Hello",
-              "villageName": "Kolkata"
-          }
-      ]
-});
+    const [beneficiaries, setBeneficiaries] = useState([]
+      // "beneficiaries": [
+      //     {
+      //         "mandalName": "Kolkata",
+      //         "components": [
+      //             {
+      //                 "activities": [
+      //                     {
+      //                         "activityName": "Wholesale",
+      //                         "id": 1,
+      //                         "tasks": [
+      //                             {
+      //                                 "balanceRemaining": 10,
+      //                                 "beneficiaryContribution": 100,
+      //                                 "unitRemain": 5,
+      //                                 "beneficiaryContributionRemain": 90,
+      //                                 "taskUpdates": [
+      //                                   {
+      //                                     "achievementUnit":5,
+      //                                     "currentBeneficiaryContribution":55,
+      //                                     "currentCost": 565,
+      //                                     "payeeName":"Rajdeep",
+      //                                     "accountNumber":5555565,
+      //                                     "domainExpertEmpId": 5565 ,
+      //                                   }
+      //                                 ],
+      //                                 "units": 20,
+      //                                 "grantAmount": 300,
+      //                                 "typeOfUnit": "KG",
+      //                                 "isSanction": false,
+      //                                 "taskName": "Embassy",
+      //                                 "id": 1,
+      //                                 "yearOfSanction": 2021,
+      //                                 "ratePerUnit": 20,
+      //                                 "totalCost": 400,
+      //                                 "isCompleted": "N"
+      //                             }
+      //                         ]
+      //                     }
+      //                 ],
+      //                 "id": 1,
+      //                 "componentName": "AIB"
+      //             }
+      //         ],
+      //         "districtName": "West Bardhaman",
+      //         "aadharNumber": 1323,
+      //         "guardianName": "Debjit",
+      //         "stateName": "West Bengal",
+      //         "beneficiaryName": "Rajdeep",
+      //         "id": 1,
+      //         "projectName": "Hello",
+      //         "villageName": "Kolkata"
+      //     }
+      // ]
+);
     const handleSearch = async (criteria) => {
         if (!criteria) return;
         try {
