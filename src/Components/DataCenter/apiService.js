@@ -315,6 +315,25 @@ export const updatedBeneficiarySubTask = async (rowId, object) => {
   }
 };
 
+export const updatedResubmitBeneficiarySubTask = async (rowId, object) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:61002/ops/pm/resubmit/${rowId}`,
+      object,
+      {
+        headers: {
+          ...getAuthorizationHeader(),
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching beneficiary:", error);
+    throw error;
+  }
+};
+
 export const getStateDetails = async () => {
   
     try {

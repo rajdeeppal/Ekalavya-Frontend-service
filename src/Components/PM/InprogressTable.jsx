@@ -29,7 +29,7 @@ import Avatar from '@mui/material/Avatar';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask, newBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask } from '../DataCenter/apiService';
+import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask } from '../DataCenter/apiService';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 
@@ -43,6 +43,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
     const [showViewConfirmation, setShowViewConfirmation] = useState(false);
     const [domainId, setDomainId] = useState([]);
     const [taskId, setTaskId] = useState('');
+    const [remark, setRemark] = useState('');
     const [comments, setComments] = useState([]);
     const [id, setId] = useState([]);
     const [isBulk, setIsBulk] = useState(false);
@@ -183,8 +184,8 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                     ...updatedTaskUpdates[rowIndex],
                                     [field]: value,
                                 };
-                                // Calculate `currentCost` if `achievementUnit` is updated
-                                if (field === 'currentBeneficiaryContribution') {
+                                
+                                if (field === 'currentBeneficiaryContribution' || field === 'achievementUnit') {
                                     const ratePerUnit = task.ratePerUnit || 0;
                                     const data = updatedRow.achievementUnit;
                                     const beneficiaryContribution = updatedRow.currentBeneficiaryContribution || 0;
@@ -192,7 +193,6 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                     updatedRow.currentCost = (data * ratePerUnit) - beneficiaryContribution;
                                 }
 
-                                // Update the specific row within taskUpdates
                                 updatedTaskUpdates[rowIndex] = updatedRow;
 
                                 return { ...task, taskUpdates: updatedTaskUpdates };
@@ -226,6 +226,9 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         let firstTask = false;
         if (Number(rowIndex) === 0) {
             firstTask = true;
+        } 
+        if(isReject) {
+            firstTask = false;
         }
         const changedData = task.taskUpdates[rowIndex];
 
@@ -236,6 +239,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
             benContribution: parseFloat(changedData.currentBeneficiaryContribution),
             achievementUnit: parseInt(changedData.achievementUnit, 10),
             currentCost: parseFloat(changedData.currentCost),
+            ...(isReject && { remark })
         }
         console.log(firstTask);
         console.log(rowIndex);
@@ -266,10 +270,17 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                 alert('Project saved successfully!');
 
             } else {
-                console.log(task.taskUpdates[rowIndex].passbookDoc);
-                console.log(formData);
-                await updatedBeneficiarySubTask(row, formData);
-                alert('Project saved successfully!');
+                if (isReject) {
+                    console.log(task.taskUpdates[rowIndex].passbookDoc);
+                    console.log(formData);
+                    await updatedResubmitBeneficiarySubTask(row, formData);
+                    alert('Project saved successfully!');
+                } else {
+                    console.log(task.taskUpdates[rowIndex].passbookDoc);
+                    console.log(formData);
+                    await updatedBeneficiarySubTask(row, formData);
+                    alert('Project saved successfully!');
+                }
             }
 
             setIsEdit(false);
@@ -769,7 +780,16 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                                                                                                                         </Select>
                                                                                                                                                     </FormControl>
                                                                                                                                                 </TableCell>
-
+                                                                                                                                                {isReject && <TableCell>
+                                                                                                                                                    <TextField
+                                                                                                                                                        variant="outlined"
+                                                                                                                                                        size="small"
+                                                                                                                                                        value={remark || ''}
+                                                                                                                                                        onChange={(e) =>
+                                                                                                                                                            setRemark(e.target.value)
+                                                                                                                                                        }
+                                                                                                                                                    />
+                                                                                                                                                </TableCell>}
                                                                                                                                                 <TableCell>
                                                                                                                                                     <IconButton
                                                                                                                                                         color={
@@ -849,13 +869,14 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                                                                                             </TableBody>
                                                                                                                         </Table>
                                                                                                                     </TableContainer>
-                                                                                                                    <Button
-                                                                                                                        variant="contained"
-                                                                                                                        color="primary"
-                                                                                                                        onClick={() => addNewRow(task.id)}
-                                                                                                                    >
-                                                                                                                        Add New Row
-                                                                                                                    </Button>
+                                                                                                                    {!isReject &&
+                                                                                                                        <Button
+                                                                                                                            variant="contained"
+                                                                                                                            color="primary"
+                                                                                                                            onClick={() => addNewRow(task.id)}
+                                                                                                                        >
+                                                                                                                            Add New Row
+                                                                                                                        </Button>}
                                                                                                                 </div>
                                                                                                             </Collapse>
                                                                                                         </TableCell>
