@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Grid, TableHead, TableRow, TableCell, TableBody, Container, FormControl, InputLabel, Select, MenuItem, Table, Collapse, TableContainer, Alert, IconButton } from '@mui/material';
+import { Box, Button, Grid, TableHead, TableRow, TableCell, TableBody, Container, FormControl, InputLabel, Select, MenuItem, Table, Collapse, TableContainer, Alert, IconButton, Typography } from '@mui/material';
 import Sidebar from '../DomainExpert/sidebar/Sidebar';
 import { useAuth } from '../PrivateRoute';
 import { getUserProjects } from '../DataCenter/apiService';
@@ -93,10 +93,9 @@ function ResolutionList() {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Project Name</TableCell>
-                                        <TableCell>Beneficiary Name</TableCell>
+                                        <TableCell>PM Name</TableCell>
                                         <TableCell>Upload Date</TableCell>
-                                        <TableCell>Document Id</TableCell>
-                                        <TableCell>Document Name</TableCell>
+                                        <TableCell>Documents</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -106,8 +105,25 @@ function ResolutionList() {
                                                 <TableCell>{beneficiary.projectName}</TableCell>
                                                 <TableCell>{beneficiary.userName}</TableCell>
                                                 <TableCell>{beneficiary.uploadTimestamp}</TableCell>
-                                                <TableCell>{beneficiary.documentId}</TableCell>
-                                                <TableCell>{beneficiary.documentFileName}</TableCell>
+                                                <TableCell>{beneficiary.resolutionDocDTOList &&
+                                                                                                                                                                                                    beneficiary.resolutionDocDTOList.length > 0 ? (
+                                                                                                                                                                                                    beneficiary.resolutionDocDTOList.map((file, idx) => (
+                                                                                                                                                                                                        <div key={idx}>
+                                                                                                                                                                                                            <a
+                                                                                                                                                                                                                href={file.downloadUrl}
+                                                                                                                                                                                                                download={file.downloadUrl}
+                                                                                                                                                                                                                style={{
+                                                                                                                                                                                                                    textDecoration: 'underline',
+                                                                                                                                                                                                                    color: 'blue',
+                                                                                                                                                                                                                }}
+                                                                                                                                                                                                            >
+                                                                                                                                                                                                                {file.documentFileName}
+                                                                                                                                                                                                            </a>
+                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                    ))
+                                                                                                                                                                                                ) : (
+                                                                                                                                                                                                    <Typography>No File Uploaded</Typography>
+                                                                                                                                                                                                )}</TableCell>
                                             </TableRow>
                                         </React.Fragment>
                                     ))}

@@ -240,27 +240,25 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                                                                                             )}
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>
-                                                                                                                                            {
-                                                                                                                                                row.otherDocument &&
-                                                                                                                                                    row.otherDocument.files &&
-                                                                                                                                                    row.otherDocument.files.length > 0 ? (
-                                                                                                                                                    row.otherDocument.files.map((file, idx) => (
-                                                                                                                                                        <div key={idx}>
-                                                                                                                                                            <a
-                                                                                                                                                                href={file.fileURL}
-                                                                                                                                                                download={file.file.name}
-                                                                                                                                                                style={{
-                                                                                                                                                                    textDecoration: 'underline',
-                                                                                                                                                                    color: 'blue',
-                                                                                                                                                                }}
-                                                                                                                                                            >
-                                                                                                                                                                {file.file.name}
-                                                                                                                                                            </a>
-                                                                                                                                                        </div>
-                                                                                                                                                    ))
-                                                                                                                                                ) : (
-                                                                                                                                                    <Typography>No File Uploaded</Typography>
-                                                                                                                                                )}
+                                                                                                                                            {row.otherDocs &&
+                                                                                                                                                row.otherDocs.length > 0 ? (
+                                                                                                                                                row.otherDocs.map((file, idx) => (
+                                                                                                                                                    <div key={idx}>
+                                                                                                                                                        <a
+                                                                                                                                                            href={file.downloadUrl}
+                                                                                                                                                            download={file.downloadUrl}
+                                                                                                                                                            style={{
+                                                                                                                                                                textDecoration: 'underline',
+                                                                                                                                                                color: 'blue',
+                                                                                                                                                            }}
+                                                                                                                                                        >
+                                                                                                                                                            {file.fileName}
+                                                                                                                                                        </a>
+                                                                                                                                                    </div>
+                                                                                                                                                ))
+                                                                                                                                            ) : (
+                                                                                                                                                <Typography>No File Uploaded</Typography>
+                                                                                                                                            )}
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>{row.domainExpertEmpId}</TableCell>
                                                                                                                                         {isReview &&
