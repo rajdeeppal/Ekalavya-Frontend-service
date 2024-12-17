@@ -28,7 +28,16 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
         if (ratePerUnit && noOfUnits) {
             updatedActivity.totalCost = parseFloat(ratePerUnit) * parseFloat(noOfUnits);
         }
-    }
+    } 
+
+    if (name === 'beneficiaryContribution' || name === 'totalCost' || name === 'noOfUnits') {
+      const beneficiaryContribution = name === 'beneficiaryContribution' ? value : updatedActivity.beneficiaryContribution;
+      const totalCost = name === 'totalCost' ? value : updatedActivity.totalCost;
+      // Calculate totalCost if both unitRate and noOfUnits are defined
+      if (beneficiaryContribution && totalCost) {
+          updatedActivity.grantAmount = parseFloat(totalCost) - parseFloat(beneficiaryContribution);
+      }
+  }
 
     setActivity(updatedActivity);
     // Clear the error for the changed field
@@ -165,10 +174,11 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           name="grantAmount"
           type="number"
           value={activity.grantAmount}
-          onChange={handleChange}
+          // onChange={handleChange}
           variant="outlined"
           fullWidth
           margin="normal"
+          readonly
         />
         {errors.grantAmount && (
           <Alert severity="error" sx={{ marginTop: 1 }}>

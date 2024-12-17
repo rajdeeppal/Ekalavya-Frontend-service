@@ -30,11 +30,43 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
 
   const handleActivityInputChange = (beneficiaryIndex, componentIndex, activityIndex, taskIndex, e) => {
     const { name, value } = e.target;
+
+    // Create a deep copy of the beneficiaries array to avoid mutation
     const updatedBeneficiaries = [...beneficiaries];
 
-    const activity = updatedBeneficiaries[beneficiaryIndex]?.components[componentIndex]?.activities[activityIndex];
-    if (activity && activity.tasks && activity.tasks[taskIndex]) {
-      activity.tasks[taskIndex][name] = value;
+    const task =
+      updatedBeneficiaries[beneficiaryIndex]?.components[componentIndex]?.activities[activityIndex]?.tasks[taskIndex];
+
+    if (task) {
+      // Update the specific field in the task
+      task[name] = value;
+
+      // Recalculate totalCost when ratePerUnit or noOfUnits change
+      if (name === 'ratePerUnit' || name === 'units') {
+        const ratePerUnit = name === 'ratePerUnit' ? parseFloat(value) || 0 : parseFloat(task.ratePerUnit) || 0;
+        const units = name === 'units' ? parseFloat(value) || 0 : parseFloat(task.units) || 0;
+
+        // Calculate totalCost
+        if (ratePerUnit && units) {
+          task.totalCost = ratePerUnit * units;
+        }
+
+      }
+
+      // Recalculate grantAmount when beneficiaryContribution or totalCost changes
+      if (name === 'beneficiaryContribution' || name === 'totalCost' || name === 'units') {
+        const beneficiaryContribution =
+          name === 'beneficiaryContribution' ? parseFloat(value) || 0 : parseFloat(task.beneficiaryContribution) || 0;
+        const totalCost = name === 'totalCost' ? parseFloat(value) || 0 : parseFloat(task.totalCost) || 0;
+
+        // Calculate grantAmount
+        
+          task.grantAmount = totalCost - beneficiaryContribution;
+        
+
+      }
+
+      // Update the state
       setBeneficiaries(updatedBeneficiaries);
     }
   };
@@ -67,6 +99,7 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
       console.log(taskId);
       const data = await updateActivityTask(taskId, criteria);
       setBeneficiaries(Array.isArray(data) ? data : []);
+      alert("Activites are submitted successfully");
     } catch (error) {
       console.error('Error fetching activities:', error);
     }
@@ -88,8 +121,8 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
   const handleConfirmSubmit = async () => {
     try {
       console.log(id)
-      const data=beneficiaries.find((beneficiary) => beneficiary.id === id)
-      console.log("submit",data);
+      const data = beneficiaries.find((beneficiary) => beneficiary.id === id)
+      console.log("submit", data);
       await submitDetails(data);
       alert("Beneficiary have been submitted successfully");
       setShowConfirmation(false);
@@ -100,9 +133,9 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
 
   const handleBulkConfirmSubmit = async () => {
     try {
-      console.log("bulk",beneficiaries);
-      const data={
-        "beneficiaries":beneficiaries
+      console.log("bulk", beneficiaries);
+      const data = {
+        "beneficiaries": beneficiaries
       }
       await bulkSubmitDetails(data);
       alert("Beneficiary have been submitted successfully");
@@ -253,9 +286,10 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
                                                     size="small"
                                                     name="totalCost"
                                                     value={task.totalCost || ''}
-                                                    onChange={(e) =>
-                                                      handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
-                                                    }
+                                                    // onChange={(e) =>
+                                                    //   handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
+                                                    // }
+                                                    readonly
                                                   />
                                                 </TableCell>
                                                 <TableCell>
@@ -275,9 +309,10 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
                                                     size="small"
                                                     name="grantAmount"
                                                     value={task.grantAmount || ''}
-                                                    onChange={(e) =>
-                                                      handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
-                                                    }
+                                                    // onChange={(e) =>
+                                                    //   handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
+                                                    // }
+                                                    readonly
                                                   />
                                                 </TableCell>
                                                 <TableCell>
