@@ -73,7 +73,7 @@ function RejectPage() {
         if (!criteria) return;
         try {
           console.log("ok");
-          const data = await getBeneficiary(userId,criteria,'sanction');
+          const data = await getBeneficiary(userId,criteria,'rejection');
           setBeneficiaries(Array.isArray(data) ? data : []);
           setShowTable(true)
           console.log(beneficiaries);
