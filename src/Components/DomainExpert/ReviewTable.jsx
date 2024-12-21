@@ -54,11 +54,45 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
         }));
     };
 
-    const handleSave = async (action, userId, rowId) => {
+    const handleInputChange = (taskIndex, rowIndex, field, value) => {
+        setBeneficiaries((prevBeneficiaries) => {
+            return prevBeneficiaries.map((beneficiary) => ({
+                ...beneficiary,
+                components: beneficiary.components.map((component) => ({
+                    ...component,
+                    activities: component.activities.map((activity) => ({
+                        ...activity,
+                        tasks: activity.tasks.map((task) => {
+                            if (task.id === taskIndex) {
+                                const updatedTaskUpdates = [...task.taskUpdates];
+                                const updatedRow = {
+                                    ...updatedTaskUpdates[rowIndex],
+                                    [field]: value,
+                                };
+                                console.log(field)
+
+                                updatedTaskUpdates[rowIndex] = updatedRow;
+
+                                return { ...task, taskUpdates: updatedTaskUpdates };
+                            }
+                            return task;
+                        })
+                    }))
+                }))
+            }));
+        });
+    };
+
+    const handleSave = async (action, userId, rowId, rowIndex) => {
+        const task = beneficiaries
+        .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
+        .find((t, i) => t.id === userId);
+        const changedData = task.taskUpdates[rowIndex];
+        console.log(changedData)
         if (action === 'Approve') {
             try {
-                await approveDomainDetails(userId, rowId, remarks);
-                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", remarks);
+                await approveDomainDetails(userId, rowId, changedData.remarks);
+                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
                 alert("Tasks have been approved successfully");
             } catch (error) {
                 console.error("Error approving tasks:", error);
@@ -66,8 +100,8 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
             }
         } else {
             try {
-                await rejectDomainDetails(userId, rowId, remarks);
-                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", remarks);
+                await rejectDomainDetails(userId, rowId, changedData.remarks);
+                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:",changedData.remarks);
                 alert("Tasks have been rejected successfully");
             } catch (error) {
                 console.error("Error tasks:", error);
@@ -267,8 +301,15 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                                                                                             variant="outlined"
                                                                                                                                             size="small"
                                                                                                                                             name="remarks"
-                                                                                                                                            value={remarks || ''}
-                                                                                                                                            onChange={(e) => setRemarks(e.target.value)}
+                                                                                                                                            value={row.remarks || ''}
+                                                                                                                                            onChange={(e) =>
+                                                                                                                                                handleInputChange(
+                                                                                                                                                    task.id,
+                                                                                                                                                    rowIndex,
+                                                                                                                                                    'remarks',
+                                                                                                                                                    e.target.value
+                                                                                                                                                )
+                                                                                                                                            }
 
                                                                                                                                         /></TableCell>
                                                                                                                                         <TableCell>
@@ -276,14 +317,14 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     color="success"
-                                                                                                                                                    onClick={() => { isReview ? handleReview('Approve') : handleSave('Approve',userId,row.id) }}
+                                                                                                                                                    onClick={() => { isReview ? handleReview('Approve') : handleSave('Approve',task.id,row.id, rowIndex) }}
                                                                                                                                                 >
                                                                                                                                                     Approve
                                                                                                                                                 </Button>
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     color="error"
-                                                                                                                                                    onClick={() => { isReview ? handleReview('Reject') : handleSave('Reject',userId,row.id) }}
+                                                                                                                                                    onClick={() => { isReview ? handleReview('Reject') : handleSave('Reject',task.id,row.id, rowIndex) }}
                                                                                                                                                 >
                                                                                                                                                     Reject
                                                                                                                                                 </Button>

@@ -41,6 +41,8 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
     const [isEdit, setIsEdit] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [showViewConfirmation, setShowViewConfirmation] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [deleteId, setDeleteId] = useState(false);
     const [domainId, setDomainId] = useState([]);
     const [taskId, setTaskId] = useState('');
     const [remark, setRemark] = useState('');
@@ -161,6 +163,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         setShowViewConfirmation(false);
     };
 
+    const handleCloseDeleteConfirmation = () => {
+        setShowDeleteConfirmation(false);
+    }
+
     const toggleTaskDetails = (taskIndex) => {
         setTaskDetailsOpen((prevState) => ({
             ...prevState,
@@ -184,7 +190,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                     ...updatedTaskUpdates[rowIndex],
                                     [field]: value,
                                 };
-                                
+
                                 if (field === 'currentBeneficiaryContribution' || field === 'achievementUnit') {
                                     const ratePerUnit = task.ratePerUnit || 0;
                                     const data = updatedRow.achievementUnit;
@@ -205,16 +211,51 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         });
     };
 
-    const handleDelete = async (index) => {
+    const handleInputReviewChange = (taskIndex, rowIndex, field, value) => {
+        setBeneficiaries((prevBeneficiaries) =>
+            prevBeneficiaries.map((beneficiary) => ({
+                ...beneficiary,
+                components: beneficiary.components.map((component) => ({
+                    ...component,
+                    activities: component.activities.map((activity) => ({
+                        ...activity,
+                        tasks: activity.tasks.map((task) => {
+                            if (task.id === taskIndex) {
+                                const updatedTaskUpdates = task.taskUpdates.map((row, index) =>
+                                    
+                                    index === rowIndex
+                                        ? { ...row, [field]: value } 
+                                        : row
+                                        
+                                );console.log(taskIndex)
+                                console.log(rowIndex)
+                                console.log(value)
+                                return { ...task, taskUpdates: updatedTaskUpdates };
+                            }
+                            return task;
+                        }),
+                    })),
+                })),
+            }))
+        );
+    };
+    
+
+    const handleDeleteConfirmSubmit = async () => {
         try {
-
-            await deletedBeneficiaryTask(index);
-
+            await deletedBeneficiaryTask(deleteId);
             alert('Beneficiary deleted successfully!');
+            setShowDeleteConfirmation(false);
         } catch (error) {
             console.error("Error deleting benficiary:", error);
             alert("An error occurred while deleting the task.");
         }
+    }
+
+    const handleDelete = async (index) => {
+        setShowDeleteConfirmation(true);
+        setDeleteId(index);
+
     }
 
     const handleSaveRow = async (taskIndex, rowIndex, row) => {
@@ -222,12 +263,12 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         const task = beneficiaries
             .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
             .find((t, i) => t.id === taskIndex);
-
+        console.log("row", row);
         let firstTask = false;
-        if (Number(rowIndex) === 0) {
+        if (Number(rowIndex) === 0 && row === undefined) {
             firstTask = true;
-        } 
-        if(isReject) {
+        }
+        if (isReject) {
             firstTask = false;
         }
         const changedData = task.taskUpdates[rowIndex];
@@ -239,8 +280,8 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
             benContribution: parseFloat(changedData.currentBeneficiaryContribution),
             achievementUnit: parseInt(changedData.achievementUnit, 10),
             currentCost: parseFloat(changedData.currentCost),
-            ...(isReject && { remark })
-        }
+            ...(isReject && { remark: changedData.remarks }),
+        };
         console.log(firstTask);
         console.log(rowIndex);
 
@@ -504,13 +545,13 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                             >
                                                 View
                                             </Button>
-                                            <IconButton
+                                            {!isReject && <IconButton
                                                 sx={{ color: "red" }}
                                                 onClick={() => handleDelete(beneficiary.id)}
                                                 size="small"
                                             >
                                                 <DeleteIcon />
-                                            </IconButton>
+                                            </IconButton>}
                                         </Box>
                                     </TableCell>
                                 </TableRow>
@@ -780,16 +821,23 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                                                                                                                         </Select>
                                                                                                                                                     </FormControl>
                                                                                                                                                 </TableCell>
-                                                                                                                                                {isReject && <TableCell>
-                                                                                                                                                    <TextField
-                                                                                                                                                        variant="outlined"
-                                                                                                                                                        size="small"
-                                                                                                                                                        value={remark || ''}
-                                                                                                                                                        onChange={(e) =>
-                                                                                                                                                            setRemark(e.target.value)
-                                                                                                                                                        }
-                                                                                                                                                    />
-                                                                                                                                                </TableCell>}
+                                                                                                                                                {isReject && (
+                                                                                                                                                    <TableCell>
+                                                                                                                                                        <TextField
+                                                                                                                                                            variant="outlined"
+                                                                                                                                                            size="small"
+                                                                                                                                                            value={row.remarks || ''}
+                                                                                                                                                            onChange={(e) =>
+                                                                                                                                                                handleInputChange(
+                                                                                                                                                                    task.id,
+                                                                                                                                                                    rowIndex,
+                                                                                                                                                                    'remarks',
+                                                                                                                                                                    e.target.value
+                                                                                                                                                                )
+                                                                                                                                                            }
+                                                                                                                                                        />
+                                                                                                                                                    </TableCell>
+                                                                                                                                                )}
                                                                                                                                                 <TableCell>
                                                                                                                                                     <IconButton
                                                                                                                                                         color={
@@ -1032,6 +1080,44 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                         >
                             Close
                         </button>
+                    </Box>
+                </Box>
+            </Modal>
+            <Modal
+                open={showDeleteConfirmation}
+                onClose={handleCloseDeleteConfirmation}
+                aria-labelledby="confirmation-modal"
+                aria-describedby="confirmation-modal-description"
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 500,
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 4,
+                        borderRadius: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                    }}
+                >
+                    <Typography id="confirmation-modal-title" variant="h6" component="h2">
+                        Delete Confirmation
+                    </Typography>
+                    <Typography id="confirmation-modal-description" sx={{ mt: 2 }}>
+                        Are you sure you want to delete the data?
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+                        <Button variant="contained" color="primary" onClick={handleDeleteConfirmSubmit}>
+                            Yes
+                        </Button>
+                        <Button variant="contained" color="secondary" onClick={handleCloseDeleteConfirmation}>
+                            No
+                        </Button>
                     </Box>
                 </Box>
             </Modal>
