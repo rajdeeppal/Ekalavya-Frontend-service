@@ -83,12 +83,12 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
         });
     };
 
-    const handleSave = async (action, userId, rowId, rowIndex) => {
+    const handleSave = async (action, taskId, rowId, rowIndex) => {
         const task = beneficiaries
         .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
-        .find((t, i) => t.id === userId);
+        .find((t, i) => t.id === taskId);
         const changedData = task.taskUpdates[rowIndex];
-        console.log(changedData)
+        console.log(taskId)
         if (action === 'Approve') {
             try {
                 await approveDomainDetails(userId, rowId, changedData.remarks);
