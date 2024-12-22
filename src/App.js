@@ -18,6 +18,11 @@ import ReviewPage from "./Components/DomainExpert/ReviewPage";
 import RejectPage from "./Components/DomainExpert/RejectPage";
 import "./App.css";
 import RejectIframe from "./Components/PM/RejectIframe";
+import CEOReviewPage from "./Components/CEO/CEOReviewPage";
+import TrusteeReviewPage from "./Components/Trustee/TrusteeReviewPage";
+import CEORejectPage from "./Components/CEO/CEORejectPage";
+import TrusteeRejectPage from "./Components/Trustee/TrusteeRejectPage";
+import PaymentPage from "./Components/CEO/PaymentPage";
 
 function App() {
   return (
@@ -122,6 +127,51 @@ function App() {
         element={
           <PrivateRoute>
             <RejectPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/CEO/inprogress-list"
+        element={
+          <PrivateRoute>
+            <CEOReviewPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/CEO/review-list"
+        element={
+          <PrivateRoute>
+            <CEORejectPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/CEO/payment-list"
+        element={
+          <PrivateRoute>
+            <PaymentPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Trustee/inprogress-list"
+        element={
+          <PrivateRoute>
+            <TrusteeReviewPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Trustee/review-list"
+        element={
+          <PrivateRoute>
+            <TrusteeRejectPage />
           </PrivateRoute>
         }
       />

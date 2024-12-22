@@ -47,43 +47,43 @@ function ResolutionList() {
                 }}
             >
                 <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', pb: 3 }}>
-                <Container sx={{ marginTop: 4 }}>
-                    <Grid container spacing={3} alignItems="center">
-                        <Grid item xs={12} sm={6} md={2.5}>
-                            <FormControl fullWidth margin="normal">
-                                <InputLabel>Project Name</InputLabel>
-                                <Select
-                                    name="projectName"
-                                    value={selectedProject}
-                                    onChange={(e) => {
-                                        setSelectedProject(e.target.value);
-                                    }}
-                                    required
-                                >
-                                    <MenuItem value="">Select Project</MenuItem>
-                                    {projects.map((project) => (
-                                        <MenuItem key={project.id} value={project.projectName}>
-                                            {project.projectName}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
+                    <Container sx={{ marginTop: 4 }}>
+                        <Grid container spacing={3} alignItems="center">
+                            <Grid item xs={12} sm={6} md={2.5}>
+                                <FormControl fullWidth margin="normal">
+                                    <InputLabel>Project Name</InputLabel>
+                                    <Select
+                                        name="projectName"
+                                        value={selectedProject}
+                                        onChange={(e) => {
+                                            setSelectedProject(e.target.value);
+                                        }}
+                                        required
+                                    >
+                                        <MenuItem value="">Select Project</MenuItem>
+                                        {projects.map((project) => (
+                                            <MenuItem key={project.id} value={project.projectName}>
+                                                {project.projectName}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-                        <Grid item xs={12} sm={6} md={2}>
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                color="primary"
-                                className="button"
-                                onClick={handleSearch}
-                                sx={{ height: '40px' }}  // Adjust height to match input fields
-                            >
-                                Upload
-                            </Button>
+                            <Grid item xs={12} sm={6} md={2}>
+                                <Button
+                                    variant="outlined"
+                                    fullWidth
+                                    color="primary"
+                                    className="button"
+                                    onClick={handleSearch}
+                                    sx={{ height: '40px' }}  // Adjust height to match input fields
+                                >
+                                    Upload
+                                </Button>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Container>
+                    </Container>
                 </Box>
 
                 {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
@@ -106,24 +106,24 @@ function ResolutionList() {
                                                 <TableCell>{beneficiary.userName}</TableCell>
                                                 <TableCell>{beneficiary.uploadTimestamp}</TableCell>
                                                 <TableCell>{beneficiary.resolutionDocDTOList &&
-                                                                                                                                                                                                    beneficiary.resolutionDocDTOList.length > 0 ? (
-                                                                                                                                                                                                    beneficiary.resolutionDocDTOList.map((file, idx) => (
-                                                                                                                                                                                                        <div key={idx}>
-                                                                                                                                                                                                            <a
-                                                                                                                                                                                                                href={file.downloadUrl}
-                                                                                                                                                                                                                download={file.downloadUrl}
-                                                                                                                                                                                                                style={{
-                                                                                                                                                                                                                    textDecoration: 'underline',
-                                                                                                                                                                                                                    color: 'blue',
-                                                                                                                                                                                                                }}
-                                                                                                                                                                                                            >
-                                                                                                                                                                                                                {file.documentFileName}
-                                                                                                                                                                                                            </a>
-                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                    ))
-                                                                                                                                                                                                ) : (
-                                                                                                                                                                                                    <Typography>No File Uploaded</Typography>
-                                                                                                                                                                                                )}</TableCell>
+                                                    beneficiary.resolutionDocDTOList.length > 0 ? (
+                                                    beneficiary.resolutionDocDTOList.map((file, idx) => (
+                                                        <div key={idx}>
+                                                            <a
+                                                                href={file.downloadUrl}
+                                                                download={file.downloadUrl}
+                                                                style={{
+                                                                    textDecoration: 'underline',
+                                                                    color: 'blue',
+                                                                }}
+                                                            >
+                                                                {file.documentFileName}
+                                                            </a>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <Typography>No File Uploaded</Typography>
+                                                )}</TableCell>
                                             </TableRow>
                                         </React.Fragment>
                                     ))}

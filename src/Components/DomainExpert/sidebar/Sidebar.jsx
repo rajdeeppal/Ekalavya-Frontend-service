@@ -37,21 +37,21 @@ const Sidebar = () => {
           <Link to="/inprogress-list" style={{ textDecoration: "none" }} >
             <li>
               <PendingIcon className="icon"  style={{ color: "black" }}/>
-              <span>InProgress Table</span>
+              <span>Approval Center</span>
             </li>
           </Link>
 
           <Link to="/review-list" style={{ textDecoration: "none" }} >
             <li>
               <RateReviewOutlinedIcon className="icon"  style={{ color: "black" }}/>
-              <span>ReviewList</span>
+              <span>Rejection center</span>
             </li>
           </Link>
 
           <Link to="/resolution-list" style={{ textDecoration: "none" }} >
             <li>
               <FormatListBulletedIcon className="icon"  style={{ color: "black" }}/>
-              <span>ResolutionList</span>
+              <span>Resolution View</span>
             </li>
           </Link>
          

@@ -26,7 +26,19 @@ const LoginRedirect = ({ token }) => {
           console.log("DOMAIN EXPERT User has logged in....");
           // setShowOtpModal(true); // Show OTP modal instead of navigating
           navigate('/resolution-list');
-        } else{
+        } else if (userRole === 'AO') {
+          console.log("DOMAIN EXPERT User has logged in....");
+          // setShowOtpModal(true); // Show OTP modal instead of navigating
+          navigate('/resolution-list');
+        }else if (userRole === 'TRUSTEE') {
+          console.log("DOMAIN EXPERT User has logged in....");
+          // setShowOtpModal(true); // Show OTP modal instead of navigating
+          navigate('/Trustee/inprogress-list');
+        }else if (userRole === 'CEO') {
+          console.log("DOMAIN EXPERT User has logged in....");
+          // setShowOtpModal(true); // Show OTP modal instead of navigating
+          navigate('/CEO/inprogress-list');
+        }else{
           console.log("Non Admin User has logged in....");
           navigate('/beneficiary');
         }

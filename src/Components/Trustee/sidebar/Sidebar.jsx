@@ -4,8 +4,11 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import StoreIcon from "@mui/icons-material/Store";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import { Link, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
+import PendingIcon from '@mui/icons-material/Pending';
 
 const Sidebar = () => {
 
@@ -30,41 +33,21 @@ const Sidebar = () => {
       <hr />
       <div className="center">
         <ul>
-         
-          <Link to="/beneficiary" style={{ textDecoration: "none" }}>
-            <li>
-              <PersonOutlineIcon className="icon"
-                style={{ color: "black" }}
-              />
-              <span>Sanction List</span>
-            </li>
-          </Link>
         
-          <Link to="/inprogress" style={{ textDecoration: "none" }} >
+          <Link to="/Trustee/inprogress-list" style={{ textDecoration: "none" }} >
             <li>
-              <StoreIcon className="icon"  style={{ color: "black" }}/>
-              <span>Inprogress List</span>
-            </li>
-          </Link>
-          <Link to="/finalpreview" style={{ textDecoration: "none" }} >
-            <li>
-              <StoreIcon className="icon"  style={{ color: "black" }}/>
-              <span>Final Preview</span>
-            </li>
-          </Link>
-          <Link to="/resolution" style={{ textDecoration: "none" }} >
-            <li>
-              <StoreIcon className="icon"  style={{ color: "black" }}/>
-              <span>Resolution Upload</span>
-            </li>
-          </Link>
-          <Link to="/rejectedList" style={{ textDecoration: "none" }} >
-            <li>
-              <StoreIcon className="icon"  style={{ color: "black" }}/>
-              <span>Rejection Center</span>
+              <PendingIcon className="icon"  style={{ color: "black" }}/>
+              <span>Approval Center</span>
             </li>
           </Link>
 
+          <Link to="/Trustee/review-list" style={{ textDecoration: "none" }} >
+            <li>
+              <RateReviewOutlinedIcon className="icon"  style={{ color: "black" }}/>
+              <span>Rejection center</span>
+            </li>
+          </Link>
+         
           <li onClick={handleProfileClick}> {/* Profile click handler */}
             <AccountCircleOutlinedIcon className="icon" style={{ color: "black" }}/>
             <span>Profile</span>
