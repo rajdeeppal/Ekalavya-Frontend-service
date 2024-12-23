@@ -4,13 +4,18 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-const DatePickerSearch = () => {
+const DatePickerSearch = ({ onSearch }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
   const handleSearch = () => {
     console.log('Start Date:', startDate ? startDate.format('YYYY-MM-DD') : 'Not selected');
     console.log('End Date:', endDate ? endDate.format('YYYY-MM-DD') : 'Not selected');
+    const data = {
+      startDate: startDate.format('YYYY-MM-DD'),
+      endDate: endDate.format('YYYY-MM-DD')
+    }
+    onSearch(data);
   };
 
   return (

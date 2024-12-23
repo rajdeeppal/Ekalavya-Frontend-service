@@ -15,7 +15,9 @@ import {
     TextField,
     IconButton,
     Typography,
-    Box
+    Box,
+    Modal,
+    Divider
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -23,17 +25,21 @@ import {
     Save as SaveIcon,
     Reviews,
 } from '@mui/icons-material';
+import Avatar from '@mui/material/Avatar';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useAuth } from '../PrivateRoute';
 import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask,approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import { updatedResubmitSubTask, approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
 
 function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
     const { userId } = useAuth();
     const [remarks, setRemarks] = useState('');
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
+    const [comments, setComments] = useState([]);
     const [editMode, setEditMode] = useState({});
+    const [showViewConfirmation, setShowViewConfirmation] = useState(false);
     const [newTask, setNewTask] = useState(true);
 
     const toggleEditMode = (taskIndex, rowIndex) => {
@@ -52,6 +58,10 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
             ...prevState,
             [taskIndex]: !prevState[taskIndex],
         }));
+    };
+
+    const handleCloseViewConfirmation = () => {
+        setShowViewConfirmation(false);
     };
 
     const handleInputChange = (taskIndex, rowIndex, field, value) => {
@@ -85,8 +95,8 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
 
     const handleSave = async (action, taskId, rowId, rowIndex) => {
         const task = beneficiaries
-        .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
-        .find((t, i) => t.id === taskId);
+            .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
+            .find((t, i) => t.id === taskId);
         const changedData = task.taskUpdates[rowIndex];
         console.log(taskId)
         if (action === 'Approve') {
@@ -101,7 +111,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
         } else {
             try {
                 await rejectDomainDetails(userId, rowId, changedData.remarks);
-                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:",changedData.remarks);
+                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
                 alert("Tasks have been rejected successfully");
             } catch (error) {
                 console.error("Error tasks:", error);
@@ -110,8 +120,26 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
         }
     };
 
-    const handleReview = () => {
+    const toggleViewMode = (comments) => {
+        setShowViewConfirmation(true);
+        setComments(comments);
+    };
 
+    const handleReview = async (action, taskId, rowId, rowIndex) => {
+        const task = beneficiaries
+            .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
+            .find((t, i) => t.id === taskId);
+        const changedData = task.taskUpdates[rowIndex];
+        console.log(taskId)
+
+        try {
+            await updatedResubmitSubTask(userId, rowId, changedData.remarks);
+            console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
+            alert("Tasks have been approved successfully");
+        } catch (error) {
+            console.error("Error approving tasks:", error);
+            alert("An error occurred while approving the tasks. Please try again.");
+        }
     };
     return (
         <div style={{ padding: '20px' }} className='listContainer'>
@@ -243,8 +271,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
                                                                                                                                     <TableCell>Domain Expert</TableCell>
-                                                                                                                                    {isReview &&
-                                                                                                                                        <TableCell>Rejection Reason</TableCell>}
+                                                                                                                                    <TableCell>Reviews</TableCell>
                                                                                                                                     <TableCell>Remarks</TableCell>
                                                                                                                                     <TableCell>Actions</TableCell>
                                                                                                                                 </TableRow>
@@ -295,8 +322,16 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                                                                                             )}
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>{row.domainExpertEmpId}</TableCell>
-                                                                                                                                        {isReview &&
-                                                                                                                                            <TableCell>{row.rejectionReason}</TableCell>}
+                                                                                                                                        <TableCell>
+                                                                                                                                            <IconButton
+                                                                                                                                                color={
+                                                                                                                                                    'primary'
+                                                                                                                                                }
+                                                                                                                                                onClick={() => toggleViewMode(row.comments)}
+                                                                                                                                            >
+                                                                                                                                                <RemoveRedEyeOutlinedIcon />
+                                                                                                                                            </IconButton>
+                                                                                                                                        </TableCell>
                                                                                                                                         <TableCell><TextField
                                                                                                                                             variant="outlined"
                                                                                                                                             size="small"
@@ -317,14 +352,14 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     color="success"
-                                                                                                                                                    onClick={() => { isReview ? handleReview('Approve') : handleSave('Approve',task.id,row.id, rowIndex) }}
+                                                                                                                                                    onClick={() => { isReview ? handleReview('Approve', task.id, row.id, rowIndex) : handleSave('Approve', task.id, row.id, rowIndex) }}
                                                                                                                                                 >
                                                                                                                                                     Approve
                                                                                                                                                 </Button>
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     color="error"
-                                                                                                                                                    onClick={() => { isReview ? handleReview('Reject') : handleSave('Reject',task.id,row.id, rowIndex) }}
+                                                                                                                                                    onClick={() => handleSave('Reject', task.id, row.id, rowIndex)}
                                                                                                                                                 >
                                                                                                                                                     Reject
                                                                                                                                                 </Button>
@@ -363,6 +398,95 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Modal
+                open={showViewConfirmation}
+                onClose={handleCloseViewConfirmation}
+                aria-labelledby="confirmation-modal"
+                aria-describedby="confirmation-modal-description"
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 500,
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 4,
+                        borderRadius: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                    }}
+                >
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{ mb: 2, textAlign: 'center', fontWeight: 'bold' }}
+                    >
+                        Comments
+                    </Typography>
+                    <div
+                        className="comment-section"
+                        style={{
+                            maxHeight: '300px',
+                            overflowY: 'auto',
+                            padding: '8px',
+                            border: '1px solid #e0e0e0',
+                            borderRadius: '8px',
+                            background: '#f9f9f9',
+                        }}
+                    >
+                        {comments.map((comment, id) => (
+                            <div
+                                key={id}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    marginBottom: '16px',
+                                }}
+                            >
+                                <Avatar
+                                    sx={{
+                                        bgcolor: comment.role === 'Admin' ? 'primary.main' : 'secondary.main',
+                                        mr: 2,
+                                    }}
+                                >
+                                    {comment.role.charAt(0)}
+                                </Avatar>
+                                <div>
+                                    <Typography
+                                        variant="subtitle1"
+                                        sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                                    >
+                                        {comment.role}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                        {comment.message}
+                                    </Typography>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <Divider sx={{ my: 2 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                        <button
+                            style={{
+                                padding: '8px 16px',
+                                backgroundColor: '#d32f2f',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                            onClick={handleCloseViewConfirmation}
+                        >
+                            Close
+                        </button>
+                    </Box>
+                </Box>
+            </Modal>
         </div>
     )
 }

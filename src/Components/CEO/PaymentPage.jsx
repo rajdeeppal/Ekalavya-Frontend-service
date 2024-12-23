@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal, Typography, Box } from '@mui/material';
 import Sidebar from '../CEO/sidebar/Sidebar';
 import DatePickerSearch from '../CEO/DatePickerSearch';
-import { getBeneficiary } from '../DataCenter/apiService';
+import { getPaymentDetails } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import PaymentTable from '../CEO/PaymentTable';
 
@@ -43,7 +43,7 @@ function PaymentPage() {
         if (!criteria) return;
         try {
           console.log("ok");
-          const data = await getBeneficiary(userId,criteria,'inprogress');
+          const data = await getPaymentDetails(criteria);
           setBeneficiaries(Array.isArray(data) ? data : []);
           setShowTable(true)
           console.log(beneficiaries);
