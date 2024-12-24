@@ -453,17 +453,17 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
                                         mr: 2,
                                     }}
                                 >
-                                    {comment.role.charAt(0)}
+                                    {comment.role ? comment.role.charAt(0) : 'U'}
                                 </Avatar>
                                 <div>
                                     <Typography
                                         variant="subtitle1"
                                         sx={{ fontWeight: 'bold', color: 'text.primary' }}
                                     >
-                                        {comment.role}
+                                        {comment.role || 'Unknown Role'}
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                        {comment.message}
+                                        {comment.message || 'No message provided.'}
                                     </Typography>
                                 </div>
                             </div>
