@@ -369,7 +369,7 @@ export const getPaymentDetails = async (data, category) => {
     headers: getAuthorizationHeader(),
   });
 
-  return response.data.beneficiaries;
+  return response.data;
 } catch (error) {
   console.error("Error fetching beneficiary:", error);
   throw error;
