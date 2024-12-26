@@ -11,33 +11,6 @@ function PaymentPage() {
     const [showTable, setShowTable] = useState(true);
     const [isReview,setIsReview] = useState(false);
     const [beneficiaries, setBeneficiaries] = useState([
-        {
-            "payeeName": "Shilpa",
-            "accountNumber": "10023",
-            "tasks": [
-                {
-                    "taskName": "t2",
-                    "totalAmount": 1340
-                },
-                            {
-                    "taskName": "t1",
-                    "totalAmount": 900
-                }
-            ],
-            "grandTotal": 2240,
-            "passbookDoc": [
-            {
-                "id": 1,
-                "fileName": "Screenshot 2023-08-27 233149.png",
-                "downloadUrl": "http://localhost:61002/download-document/1"
-            },
-            {
-                "id": 2,
-                "fileName": "Screenshot 2023-08-02 201712.png",
-                "downloadUrl": "http://localhost:61002/download-document/2"
-            }
-        ]
-        }
     ]);
     const handleSearch = async (criteria) => {
         if (!criteria) return;

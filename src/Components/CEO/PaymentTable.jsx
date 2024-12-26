@@ -140,9 +140,9 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                 </TableRow>
                                                             </TableHead>
                                                             <TableBody>
-                                                                {beneficiary.passbookDoc &&
-                                                                    beneficiary.passbookDoc.length > 0 ? (
-                                                                    beneficiary.passbookDoc.map((file, idx) => (
+                                                                {beneficiary.passbookDocs &&
+                                                                    beneficiary.passbookDocs.length > 0 ? (
+                                                                    beneficiary.passbookDocs.map((file, idx) => (
                                                                         <TableRow key={idx}>
                                                                             <TableCell>
                                                                                 <a
