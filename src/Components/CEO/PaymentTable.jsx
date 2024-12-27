@@ -216,9 +216,10 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                                 </TableRow>
                                                             </TableHead>
                                                             <TableBody>
-                                                                {beneficiary.passbookDocs && beneficiary.passbookDocs.length > 0 ? (
-                                                                    beneficiary.passbookDocs.map((file, idx) => (
-                                                                        <TableRow hover key={idx}>
+                                                                {beneficiary.passbookDocs &&
+                                                                    beneficiary.passbookDoc.length > 0 ? (
+                                                                    beneficiary.passbookDoc.map((file, idx) => (
+                                                                        <TableRow key={idx}>
                                                                             <TableCell>
                                                                                 <a
                                                                                     href={file.downloadUrl}
