@@ -23,6 +23,7 @@ import TrusteeReviewPage from "./Components/Trustee/TrusteeReviewPage";
 import CEORejectPage from "./Components/CEO/CEORejectPage";
 import TrusteeRejectPage from "./Components/Trustee/TrusteeRejectPage";
 import PaymentPage from "./Components/CEO/PaymentPage";
+import AOPaymentPage from "./Components/AO/AOPaymentPage";
 
 function App() {
   return (
@@ -172,6 +173,15 @@ function App() {
         element={
           <PrivateRoute>
             <TrusteeRejectPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/AO/payment-list"
+        element={
+          <PrivateRoute>
+            <AOPaymentPage />
           </PrivateRoute>
         }
       />
