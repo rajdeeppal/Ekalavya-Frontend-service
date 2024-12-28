@@ -196,7 +196,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                     const data = updatedRow.achievementUnit;
                                     const beneficiaryContribution = updatedRow.currentBeneficiaryContribution || 0;
 
-                                    updatedRow.currentCost = (data * ratePerUnit) - beneficiaryContribution;
+                                    updatedRow.currentCost = (data * ratePerUnit) ;
                                 }
 
                                 updatedTaskUpdates[rowIndex] = updatedRow;
