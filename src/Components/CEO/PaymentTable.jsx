@@ -155,17 +155,26 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
         };
 
         try {
-              await generatedVoucherDetails(voucherData);
-              setFormValues({
+            const data = await generatedVoucherDetails(voucherData);
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'PaymentVoucher.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            setFormValues({
                 bankName: '',
                 iFSCNo: '',
                 branchName: '',
             })
             setShowViewConfirmation(false);
-            } catch (error) {
-              console.error('Error fetching activities:', error);
-              
-            }
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+
+        }
 
         console.log('Generated Voucher Data:', voucherData);
         return voucherData;
