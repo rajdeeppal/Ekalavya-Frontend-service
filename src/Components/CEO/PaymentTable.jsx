@@ -156,13 +156,15 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
 
         try {
               await generatedVoucherDetails(voucherData);
-            } catch (error) {
-              console.error('Error fetching activities:', error);
               setFormValues({
                 bankName: '',
                 iFSCNo: '',
                 branchName: '',
             })
+            setShowViewConfirmation(false);
+            } catch (error) {
+              console.error('Error fetching activities:', error);
+              
             }
 
         console.log('Generated Voucher Data:', voucherData);
