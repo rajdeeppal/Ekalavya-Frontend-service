@@ -569,7 +569,8 @@ export const generatedVoucherDetails = async (object) => {
       `http://localhost:61002/ao/voucher/generate`, // URL
       object, // No request body
       {
-        headers: getAuthorizationHeader() 
+        headers: getAuthorizationHeader(),
+        responseType: 'blob',
       }
     );
     return response.data;
