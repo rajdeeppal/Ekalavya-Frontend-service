@@ -29,45 +29,57 @@ import * as XLSX from 'xlsx';
 import { updatedBeneficiarySubTask, approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
 
 function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
-    const { userId } = useAuth();
     const [open, setOpen] = useState({});
     const [selectedTasks, setSelectedTasks] = useState({});
-
 
     const toggleCollapse = (index) => {
         setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
     };
 
-    const handleCheckboxChange = (beneficiaryId, taskId, task) => {
+    const handleCheckboxChange = (beneficiaryId, componentId, activityId, taskId, task) => {
+        // First, update the selectedTasks state
         setSelectedTasks((prev) => {
             const updatedTasks = { ...prev };
 
-            // Initialize tasks for this beneficiary if not present
+            // Initialize the hierarchy if not present
             if (!updatedTasks[beneficiaryId]) {
                 updatedTasks[beneficiaryId] = {};
             }
+            if (!updatedTasks[beneficiaryId][componentId]) {
+                updatedTasks[beneficiaryId][componentId] = {};
+            }
+            if (!updatedTasks[beneficiaryId][componentId][activityId]) {
+                updatedTasks[beneficiaryId][componentId][activityId] = {};
+            }
 
             // Toggle the task selection
-            if (updatedTasks[beneficiaryId][taskId]) {
-                delete updatedTasks[beneficiaryId][taskId];
-                // Remove the beneficiary if no tasks are selected
-                if (Object.keys(updatedTasks[beneficiaryId]).length === 0) {
-                    delete updatedTasks[beneficiaryId];
+            const activityTasks = updatedTasks[beneficiaryId][componentId][activityId];
+            if (activityTasks[taskId]) {
+                delete activityTasks[taskId];
+
+                // Clean up the hierarchy if empty
+                if (Object.keys(activityTasks).length === 0) {
+                    delete updatedTasks[beneficiaryId][componentId][activityId];
+                    if (Object.keys(updatedTasks[beneficiaryId][componentId]).length === 0) {
+                        delete updatedTasks[beneficiaryId][componentId];
+                        if (Object.keys(updatedTasks[beneficiaryId]).length === 0) {
+                            delete updatedTasks[beneficiaryId];
+                        }
+                    }
                 }
             } else {
-                updatedTasks[beneficiaryId][taskId] = task;
+                activityTasks[taskId] = task;
             }
 
             return updatedTasks;
         });
-        console.log(selectedTasks)
-        console.log(beneficiaryId, taskId, task)
     };
+
 
 
     const handleGenerateVoucher = (bId) => {
         const beneficiary = beneficiaries.find((beneficiary) => beneficiary.id === bId);
-        
+    
         if (!beneficiary) {
             console.error('Beneficiary not found for the provided ID:', bId);
             return;
@@ -79,20 +91,52 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
             return;
         }
     
-
-        const totalGrant = Object.values(tasks).reduce(
-            (sum, task) => sum + task.totalAmount,
-            0
-        );
-        const taskNames = Object.values(tasks).map(task => task.taskName);
+        const components = Object.entries(tasks).map(([componentId, activities]) => {
+            return {
+                id: parseInt(componentId),
+                componentName: beneficiary.components.find((c) => c.id === parseInt(componentId))?.componentName || `c${componentId}`,
+                activities: Object.entries(activities).map(([activityId, taskGroup]) => {
+                    return {
+                        id: parseInt(activityId),
+                        activityName: beneficiary.components
+                            .find((c) => c.id === parseInt(componentId))
+                            ?.activities.find((a) => a.id === parseInt(activityId))?.activityName || `a${activityId}`,
+                        tasks: Object.entries(taskGroup).map(([taskId, task]) => {
+                            const matchedTask = beneficiary.components
+                                .find((c) => c.id === parseInt(componentId))
+                                ?.activities.find((a) => a.id === parseInt(activityId))
+                                ?.tasks.find((t) => t.id === parseInt(taskId));
+    
+                            return {
+                                id: task.id,
+                                taskName: matchedTask?.taskName || task.taskName,
+                                totalAmount: task.totalAmount,
+                                beneficiaryContribution: task.beneficiaryContribution,
+                            };
+                        }),
+                    };
+                }),
+            };
+        });
+    
+        const totalAmount = components.reduce((sum, component) => {
+            return sum + component.activities.reduce((activitySum, activity) => {
+                return activitySum + activity.tasks.reduce((taskSum, task) => taskSum + task.totalAmount, 0);
+            }, 0);
+        }, 0);
+    
         const voucherData = {
             payeeName: beneficiary.payeeName,
             accountNumber: beneficiary.accountNumber,
-            taskNames: taskNames,
-            amount: totalGrant
+            components: components,
+            amount: totalAmount,
         };
+    
         console.log('Generated Voucher Data:', voucherData);
+        return voucherData;
     };
+    
+
 
     return (
         <div style={{ padding: '20px', backgroundColor: '#f9f9f9', minHeight: '100vh' }} className="listContainer">
@@ -137,65 +181,86 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                                     </TableCell>
                                 </TableRow>
 
-                                {/* Task Details Collapsible Row */}
                                 <TableRow>
                                     <TableCell colSpan={10} style={{ padding: 0 }}>
                                         <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
-                                            <Accordion>
-                                                <AccordionSummary
-                                                    expandIcon={<ExpandMoreIcon />}
-                                                    aria-controls={`task-content-${beneficiary.id}`}
-                                                    id={`task-header-${beneficiary.id}`}
-                                                >
-                                                    <Typography>Tasks</Typography>
-                                                </AccordionSummary>
-                                                <AccordionDetails>
-                                                    <TableContainer component={Paper} elevation={2} sx={{ mb: 2 }}>
-                                                        <Table size="small" aria-label="tasks table">
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    {isReview && <TableCell>Checkbox</TableCell>}
-                                                                    <TableCell style={{ fontWeight: 'bold' }}>
-                                                                        Name of the Work
-                                                                    </TableCell>
-                                                                    <TableCell style={{ fontWeight: 'bold' }}>
-                                                                        Grant Amount
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {beneficiary.tasks?.map((task) => (
-                                                                    <TableRow hover key={task.id}>
-                                                                        {isReview && <TableCell>
-                                                                            <Checkbox
-                                                                                checked={
-                                                                                    !!selectedTasks[beneficiary.id]?.[task.id]
-                                                                                }
-                                                                                onChange={() =>
-                                                                                    handleCheckboxChange(beneficiary.id, task.id, task)
-                                                                                }
-                                                                            />
-                                                                        </TableCell>}
-                                                                        <TableCell>{task.taskName}</TableCell>
-                                                                        <TableCell>
-                                                                            {new Intl.NumberFormat('en-IN', {
-                                                                                style: 'currency',
-                                                                                currency: 'INR',
-                                                                                maximumFractionDigits: 2,
-                                                                            }).format(task.totalAmount)}
-                                                                        </TableCell>
-                                                                    </TableRow>
+                                            <div style={{ padding: '10px' }}>
+                                                {beneficiary.components?.map((component) => (
+                                                    <div key={component.id}>
+                                                        <Accordion>
+                                                            <AccordionSummary
+                                                                expandIcon={<ExpandMoreIcon />}
+                                                                aria-controls={`component-content-${component.id}`}
+                                                                id={`component-header-${component.id}`}
+                                                            >
+                                                                <Typography>{component.componentName}</Typography>
+                                                            </AccordionSummary>
+                                                            <AccordionDetails>
+                                                                {component.activities?.map((activity) => (
+                                                                    <div key={activity.id}>
+                                                                        <Accordion>
+                                                                            <AccordionSummary
+                                                                                expandIcon={<ExpandMoreIcon />}
+                                                                                aria-controls={`activity-content-${activity.id}`}
+                                                                                id={`activity-header-${activity.id}`}
+                                                                            >
+                                                                                <Typography>{activity.activityName}</Typography>
+                                                                            </AccordionSummary>
+                                                                            <AccordionDetails>
+                                                                                <TableContainer component={Paper} sx={{ mb: 2 }}>
+                                                                                    <Table size="small" aria-label="tasks table">
+                                                                                        <TableHead>
+                                                                                            <TableRow>
+                                                                                                {isReview && <TableCell style={{ fontWeight: 'bold' }}>Checkbox</TableCell>}
+                                                                                                <TableCell style={{ fontWeight: 'bold' }}>Name of the Work</TableCell>
+                                                                                                <TableCell style={{ fontWeight: 'bold' }}>Total Cost</TableCell>
+                                                                                                <TableCell style={{ fontWeight: 'bold' }}>Beneficiary Contribution Balance</TableCell>
+                                                                                            </TableRow>
+                                                                                        </TableHead>
+                                                                                        <TableBody>
+                                                                                            {activity.tasks?.map((task, taskIndex) => (
+                                                                                                <React.Fragment key={task.id}>
+                                                                                                    <TableRow>
+                                                                                                        {isReview && <TableCell>
+                                                                                                            <Checkbox
+                                                                                                                checked={
+                                                                                                                    !!selectedTasks[beneficiary.id]?.[component.id]?.[activity.id]?.[task.id]
+                                                                                                                }
+                                                                                                                onChange={() =>
+                                                                                                                    handleCheckboxChange(beneficiary.id, component.id, activity.id, task.id, task)
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </TableCell>}
+                                                                                                        <TableCell>{task.taskName}</TableCell>
+                                                                                                        <TableCell>{new Intl.NumberFormat('en-IN', {
+                                                                                                            style: 'currency',
+                                                                                                            currency: 'INR',
+                                                                                                            maximumFractionDigits: 2,
+                                                                                                        }).format(task.totalAmount)}</TableCell>
+                                                                                                        <TableCell>{new Intl.NumberFormat('en-IN', {
+                                                                                                            style: 'currency',
+                                                                                                            currency: 'INR',
+                                                                                                            maximumFractionDigits: 2,
+                                                                                                        }).format(task.beneficiaryContribution)}</TableCell>
+                                                                                                    </TableRow>
+                                                                                                </React.Fragment>
+                                                                                            ))}
+                                                                                        </TableBody>
+                                                                                    </Table>
+                                                                                </TableContainer>
+                                                                            </AccordionDetails>
+                                                                        </Accordion>
+                                                                    </div>
                                                                 ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                </AccordionDetails>
-                                            </Accordion>
+                                                            </AccordionDetails>
+                                                        </Accordion>
+                                                    </div>
+                                                ))}
+
+                                            </div>
                                         </Collapse>
                                     </TableCell>
                                 </TableRow>
-
-                                {/* Passbook Document Collapsible Row */}
                                 <TableRow>
                                     <TableCell colSpan={10} style={{ padding: 0 }}>
                                         <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
@@ -217,8 +282,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                             </TableHead>
                                                             <TableBody>
                                                                 {beneficiary.passbookDocs &&
-                                                                    beneficiary.passbookDoc.length > 0 ? (
-                                                                    beneficiary.passbookDoc.map((file, idx) => (
+                                                                    beneficiary.passbookDocs.length > 0 ? (
+                                                                    beneficiary.passbookDocs.map((file, idx) => (
                                                                         <TableRow key={idx}>
                                                                             <TableCell>
                                                                                 <a
