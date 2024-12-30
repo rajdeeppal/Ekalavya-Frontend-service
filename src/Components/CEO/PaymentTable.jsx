@@ -15,7 +15,9 @@ import {
     TextField,
     IconButton,
     Typography,
-    Checkbox
+    Checkbox,
+    Modal,
+    Box
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -23,14 +25,19 @@ import {
     Save as SaveIcon,
     Reviews,
 } from '@mui/icons-material';
-import DownloadIcon from '@mui/icons-material/Download';
-import { useAuth } from '../PrivateRoute';
-import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask, approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
+import { generatedVoucherDetails } from '../DataCenter/apiService';
 
 function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
     const [open, setOpen] = useState({});
     const [selectedTasks, setSelectedTasks] = useState({});
+    const [formValues, setFormValues] = useState({
+        bankName: '',
+        iFSCNo: '',
+        branchName: '',
+    });
+    const [errors, setErrors] = useState('');
+    const [benId, setBenId] = useState('');
+    const [showViewConfirmation, setShowViewConfirmation] = useState(false);
 
     const toggleCollapse = (index) => {
         setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
@@ -76,21 +83,33 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
     };
 
 
+    const validateForm = () => {
+        // Check if all fields are filled
+        let formErrors = {};
+        if (!formValues.bankName) formErrors.bankName = 'Bank name is required';
+        if (!formValues.iFSCNo) formErrors.iFSCNo = 'IFSC No is required';
+        if (!formValues.branchName) formErrors.branchName = 'Branch name is required';
 
-    const handleGenerateVoucher = (bId) => {
+        setErrors(formErrors);
+        return Object.keys(formErrors).length === 0;
+    };
+
+    const handleGenerateVoucher = async (bId) => {
         const beneficiary = beneficiaries.find((beneficiary) => beneficiary.id === bId);
-    
+
+        if (!validateForm()) return;
+
         if (!beneficiary) {
-            console.error('Beneficiary not found for the provided ID:', bId);
+            alert('Beneficiary not found for the provided ID:', bId);
             return;
         }
-    
+
         const tasks = selectedTasks[bId];
         if (!tasks || Object.keys(tasks).length === 0) {
-            console.error('No tasks selected for the beneficiary:', bId);
+            alert('No tasks selected for the beneficiary:', bId);
             return;
         }
-    
+
         const components = Object.entries(tasks).map(([componentId, activities]) => {
             return {
                 id: parseInt(componentId),
@@ -106,7 +125,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                                 .find((c) => c.id === parseInt(componentId))
                                 ?.activities.find((a) => a.id === parseInt(activityId))
                                 ?.tasks.find((t) => t.id === parseInt(taskId));
-    
+
                             return {
                                 id: task.id,
                                 taskName: matchedTask?.taskName || task.taskName,
@@ -118,25 +137,59 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                 }),
             };
         });
-    
+
         const totalAmount = components.reduce((sum, component) => {
             return sum + component.activities.reduce((activitySum, activity) => {
                 return activitySum + activity.tasks.reduce((taskSum, task) => taskSum + task.totalAmount, 0);
             }, 0);
         }, 0);
-    
+
         const voucherData = {
             payeeName: beneficiary.payeeName,
             accountNumber: beneficiary.accountNumber,
             components: components,
             amount: totalAmount,
+            bankName: formValues.bankName,
+            ifscCode: formValues.iFSCNo,
+            branchName: formValues.branchName
         };
-    
+
+        try {
+              await generatedVoucherDetails(voucherData);
+            } catch (error) {
+              console.error('Error fetching activities:', error);
+              setFormValues({
+                bankName: '',
+                iFSCNo: '',
+                branchName: '',
+            })
+            }
+
         console.log('Generated Voucher Data:', voucherData);
         return voucherData;
     };
-    
 
+
+
+    const handleCloseViewConfirmation = () => {
+        setShowViewConfirmation(false);
+    };
+
+    const handleSubmit = (id) => {
+        setBenId(id)
+        setShowViewConfirmation(true);
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        // Update form values
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            [name]: value,
+        }));
+
+    };
 
     return (
         <div style={{ padding: '20px', backgroundColor: '#f9f9f9', minHeight: '100vh' }} className="listContainer">
@@ -315,7 +368,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                 <Button
                                                     variant="outlined"
                                                     color="primary"
-                                                    onClick={() => handleGenerateVoucher(beneficiary.id)}
+                                                    onClick={() => handleSubmit(beneficiary.id)}
                                                     style={{ marginTop: '10px' }}
                                                 >
                                                     Generate Voucher
@@ -336,6 +389,64 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Modal
+                open={showViewConfirmation}
+                onClose={handleCloseViewConfirmation}
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 400,
+                        bgcolor: 'background.paper',
+                        borderRadius: 1,
+                        boxShadow: 24,
+                        p: 4,
+                    }}
+                >
+                    <TextField
+                        fullWidth
+                        label="Bank Name"
+                        name="bankName"
+                        placeholder="Bank Name"
+                        onChange={handleChange}
+                        margin="normal"
+                        required
+                        error={!!errors.bankName}
+                        helperText={errors.bankName}
+                    />
+
+                    <TextField
+                        fullWidth
+                        label="IFSC No."
+                        name="iFSCNo"
+                        placeholder="IFSC No"
+                        onChange={handleChange}
+                        margin="normal"
+                        required
+                        error={!!errors.iFSCNo}
+                        helperText={errors.iFSCNo}
+                    />
+
+                    <TextField
+                        fullWidth
+                        label="Branch Name"
+                        name="branchName"
+                        placeholder="Branch Name"
+                        onChange={handleChange}
+                        margin="normal"
+                        required
+                        error={!!errors.branchName}
+                        helperText={errors.branchName}
+                    />
+
+                    <Button variant="contained" color="primary" onClick={() => handleGenerateVoucher(benId)} sx={{ mt: 2 }} >
+                        Submit
+                    </Button>
+                </Box>
+            </Modal>
         </div>
 
 

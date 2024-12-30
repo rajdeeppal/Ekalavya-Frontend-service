@@ -562,3 +562,19 @@ export const rejectDomainDetails = async (employeeId,taskId,remarks) => {
     throw error;
   }
 };
+
+export const generatedVoucherDetails = async (object) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:61002/ao/voucher/generate`, // URL
+      object, // No request body
+      {
+        headers: getAuthorizationHeader() 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by generatedVoucherDetails:", error);
+    throw error;
+  }
+};
