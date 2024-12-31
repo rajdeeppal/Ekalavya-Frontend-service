@@ -41,7 +41,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
   const [unitRate, setUnitRate] = useState('');
   const [states, setStates] = useState([]);
   const [district, setDistrict] = useState([]);
-  const [errors, setErrors] = useState({}); // State to track input validation errors
+  const [errors, setErrors] = useState({}); 
   const [aadharDetails, setAadharDetails] = useState({});
 
   useEffect(() => {

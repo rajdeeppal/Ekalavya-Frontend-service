@@ -26,6 +26,7 @@ import {
     Reviews,
 } from '@mui/icons-material';
 import { generatedVoucherDetails } from '../DataCenter/apiService';
+import AOPaymentTable from '../AO/AOPaymentTable';
 
 function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
     const [open, setOpen] = useState({});
@@ -38,6 +39,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
     const [errors, setErrors] = useState('');
     const [benId, setBenId] = useState('');
     const [showViewConfirmation, setShowViewConfirmation] = useState(false);
+    const [showViewPaymentConfirmation, setShowViewPaymentConfirmation] = useState(false);
 
     const toggleCollapse = (index) => {
         setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
@@ -156,7 +158,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
 
         try {
             const blob = await generatedVoucherDetails(voucherData);
-           // const blob = new Blob([data], { type: 'application/pdf' });
+            // const blob = new Blob([data], { type: 'application/pdf' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
@@ -186,9 +188,17 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
         setShowViewConfirmation(false);
     };
 
+    const handleCloseViewPaymentConfirmation = () => {
+        setShowViewPaymentConfirmation(false);
+    };
+
     const handleSubmit = (id) => {
         setBenId(id)
         setShowViewConfirmation(true);
+    };
+
+    const handlePaymentSubmit = () => {
+        setShowViewPaymentConfirmation(true);
     };
 
     const handleChange = (e) => {
@@ -388,6 +398,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                                                     variant="outlined"
                                                     color="primary"
                                                     style={{ marginTop: '10px' }}
+                                                    onClick={() => handlePaymentSubmit()}
                                                 >
                                                     Payment Details
                                                 </Button>
@@ -456,6 +467,30 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                     <Button variant="contained" color="primary" onClick={() => handleGenerateVoucher(benId)} sx={{ mt: 2 }} >
                         Submit
                     </Button>
+                </Box>
+            </Modal>
+
+            <Modal
+                open={showViewPaymentConfirmation}
+                onClose={handleCloseViewPaymentConfirmation}
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 500,
+                        bgcolor: 'background.paper',
+                        borderRadius: 1,
+                        boxShadow: 24,
+                        p: 4,
+                    }}
+                >
+                    <Typography variant="h6" component="h2" gutterBottom>
+                        Payment Form
+                    </Typography>
+                    <AOPaymentTable/>
                 </Box>
             </Modal>
         </div>

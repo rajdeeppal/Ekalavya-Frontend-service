@@ -579,3 +579,34 @@ export const generatedVoucherDetails = async (object) => {
     throw error;
   }
 };
+
+export const getVoucherDetails = async (voucher_id) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/ao/voucher/search/${voucher_id}`,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};
+
+export const generatedPaymentDetails = async (object) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:61002/ao/payments/process`, // URL
+      object, // No request body
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by generatedPaymentDetails:", error);
+    throw error;
+  }
+};
