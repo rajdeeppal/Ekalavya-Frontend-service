@@ -25,7 +25,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
 import { updatedBeneficiarySubTask } from '../DataCenter/apiService';
 
-const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
+const FinalReviewList = ({ beneficiaries, setBeneficiaries, isReview }) => {
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
@@ -254,7 +254,9 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
-                                                                                                                                    <TableCell>Domain Expert</TableCell>
+                                                                                                                                    {!isReview &&<TableCell>Domain Expert</TableCell>}
+                                                                                                                                    {isReview &&<TableCell>Pending With</TableCell>}
+                                                                                                                                    {isReview &&<TableCell>Payment Status</TableCell>}
                                                                                                                                 </TableRow>
                                                                                                                             </TableHead>
                                                                                                                             <TableBody>
@@ -300,7 +302,9 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries }) => {
                                                                                                                                                 <Typography>No File Uploaded</Typography>
                                                                                                                                             )}
                                                                                                                                         </TableCell>
-                                                                                                                                        <TableCell>{row.domainExpertEmpId}</TableCell>
+                                                                                                                                       {!isReview && <TableCell>{row.domainExpertEmpId}</TableCell>}
+                                                                                                                                       {isReview && <TableCell>{row.pendingWith}</TableCell>}
+                                                                                                                                       {isReview && <TableCell>{row.paymentStatus}</TableCell>}
                                                                                                                                     </TableRow>
                                                                                                                                 ))}
                                                                                                                             </TableBody>

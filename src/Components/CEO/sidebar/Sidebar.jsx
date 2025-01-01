@@ -48,6 +48,13 @@ const Sidebar = () => {
             </li>
           </Link>
 
+          <Link to="/CEO/dashboard-list" style={{ textDecoration: "none" }} >
+            <li>
+              <RateReviewOutlinedIcon className="icon"  style={{ color: "black" }}/>
+              <span>Dashboard</span>
+            </li>
+          </Link>
+
           <Link to="/CEO/payment-list" style={{ textDecoration: "none" }} >
             <li>
               <RateReviewOutlinedIcon className="icon"  style={{ color: "black" }}/>

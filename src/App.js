@@ -24,6 +24,7 @@ import CEORejectPage from "./Components/CEO/CEORejectPage";
 import TrusteeRejectPage from "./Components/Trustee/TrusteeRejectPage";
 import PaymentPage from "./Components/CEO/PaymentPage";
 import AOPaymentPage from "./Components/AO/AOPaymentPage";
+import CEODashboard from "./Components/CEO/CEODashboard";
 
 function App() {
   return (
@@ -182,6 +183,15 @@ function App() {
         element={
           <PrivateRoute>
             <AOPaymentPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/CEO/dashboard-list"
+        element={
+          <PrivateRoute>
+            <CEODashboard />
           </PrivateRoute>
         }
       />
