@@ -3,7 +3,7 @@ import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, 
 import { getVoucherDetails, generatedPaymentDetails } from '../DataCenter/apiService';
 
 
-function AOPaymentTable() {
+function AOPaymentTable({setShowViewPaymentConfirmation}) {
     const [formValues, setFormValues] = useState({
         voucherId: '',
         payeeName: '',
@@ -16,8 +16,8 @@ function AOPaymentTable() {
         paymentStatus:''
     });
     const [errors, setErrors] = useState({});
-    const modes = ['SUCCESS', 'FAILED', 'ONHOLD'];
-    const status = ["Online", "Cheque", "Cash"];
+    const status = ['SUCCESS', 'FAILED', 'ONHOLD'];
+    const modes = ["Online", "Cheque", "Cash"];
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormValues({ ...formValues, [name]: value });
@@ -62,6 +62,7 @@ function AOPaymentTable() {
         }
         try {
               await generatedPaymentDetails(criteria);
+              setShowViewPaymentConfirmation(false);
             } catch (error) {
               console.error('Error fetching activities:', error);
             }

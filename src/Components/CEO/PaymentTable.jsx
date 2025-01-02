@@ -490,7 +490,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                     <Typography variant="h6" component="h2" gutterBottom>
                         Payment Form
                     </Typography>
-                    <AOPaymentTable/>
+                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation}/>
                 </Box>
             </Modal>
         </div>

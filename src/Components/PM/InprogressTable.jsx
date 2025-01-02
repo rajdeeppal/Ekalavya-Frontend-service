@@ -63,10 +63,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         fetchDomain();
     }, [taskId])
 
-    const toggleEditMode = (taskIndex, rowIndex) => {
+    const toggleEditMode = (beneficiaryIndex, componentIndex, activityIndex, taskIndex, rowIndex) => {
         setEditMode((prevEditMode) => ({
             ...prevEditMode,
-            [`${rowIndex}`]: !prevEditMode[`${rowIndex}`],
+            [`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}-${rowIndex}`]: !prevEditMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}-${rowIndex}`],
         }));
         setTaskId(taskIndex);
         console.log(taskIndex);
@@ -559,7 +559,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                     <TableCell colSpan={10} style={{ padding: 0 }}>
                                         <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
                                             <div style={{ padding: '10px' }}>
-                                                {beneficiary.components?.map((component) => (
+                                                {beneficiary.components?.map((component,componentIndex) => (
                                                     <div key={component.id}>
                                                         <Accordion>
                                                             <AccordionSummary
@@ -570,7 +570,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                                 <Typography>{component.componentName}</Typography>
                                                             </AccordionSummary>
                                                             <AccordionDetails>
-                                                                {component.activities?.map((activity) => (
+                                                                {component.activities?.map((activity,activityIndex) => (
                                                                     <div key={activity.id}>
                                                                         <Accordion>
                                                                             <AccordionSummary
@@ -646,7 +646,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                                                                                             <TableBody>
                                                                                                                                 {(task.taskUpdates || [])?.map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
-                                                                                                                                        {editMode[`${rowIndex}`] ? (
+                                                                                                                                        {editMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}-${rowIndex}`] ? (
                                                                                                                                             <>
                                                                                                                                                 <TableCell>
                                                                                                                                                     <TextField
@@ -906,7 +906,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                                                                                                                     color={
                                                                                                                                                         'primary'
                                                                                                                                                     }
-                                                                                                                                                    onClick={() => toggleEditMode(task.id, rowIndex)}
+                                                                                                                                                    onClick={() => toggleEditMode(beneficiaryIndex,
+                                                                                                                                                        componentIndex,
+                                                                                                                                                        activityIndex,
+                                                                                                                                                        taskIndex)}
                                                                                                                                                 >
                                                                                                                                                     <EditIcon />
                                                                                                                                                 </IconButton></TableCell>
