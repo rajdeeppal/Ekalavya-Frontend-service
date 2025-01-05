@@ -3,7 +3,7 @@ import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, 
 import { getVoucherDetails, generatedPaymentDetails } from '../DataCenter/apiService';
 
 
-function AOPaymentTable({setShowViewPaymentConfirmation}) {
+function AOPaymentTable({ setShowViewPaymentConfirmation }) {
     const [formValues, setFormValues] = useState({
         voucherId: '',
         payeeName: '',
@@ -13,8 +13,9 @@ function AOPaymentTable({setShowViewPaymentConfirmation}) {
         bankInfo: '',
         transactionId: '',
         paymentMode: '',
-        paymentStatus:''
+        paymentStatus: ''
     });
+    const [showForm, setShowFrom] = useState(false);
     const [errors, setErrors] = useState({});
     const status = ['SUCCESS', 'FAILED', 'ONHOLD'];
     const modes = ["Online", "Cheque", "Cash"];
@@ -29,10 +30,10 @@ function AOPaymentTable({setShowViewPaymentConfirmation}) {
             setErrors((prevErrors) => ({ ...prevErrors, voucherId: 'Voucher Id is required' }));
             return;
         }
-
+        setShowFrom(true);
         try {
             const data = await getVoucherDetails(value);
-
+            
             setFormValues({
                 ...formValues,
                 voucherId: data.voucherId,
@@ -48,7 +49,7 @@ function AOPaymentTable({setShowViewPaymentConfirmation}) {
         }
     };
 
-    const handleSave = async () => { 
+    const handleSave = async () => {
         const criteria = {
             voucherId: formValues.voucherId,
             payeeName: formValues.payeeName,
@@ -61,11 +62,12 @@ function AOPaymentTable({setShowViewPaymentConfirmation}) {
             paymentStatus: formValues.paymentStatus,
         }
         try {
-              await generatedPaymentDetails(criteria);
-              setShowViewPaymentConfirmation(false);
-            } catch (error) {
-              console.error('Error fetching activities:', error);
-            }
+            await generatedPaymentDetails(criteria);
+            setShowFrom(false);
+            setShowViewPaymentConfirmation(false);
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+        }
     }
 
     return (
@@ -92,128 +94,132 @@ function AOPaymentTable({setShowViewPaymentConfirmation}) {
                         Find
                     </Button>
                 </Box>
+                {showForm &&
+                    <Box>
+                        <TextField
+                            fullWidth
+                            label="payeeName"
+                            name="payeeName"
+                            placeholder="payeeName"
+                            value={formValues.payeeName}
+                            margin="normal"
+                            required
+                            error={!!errors.payeeName}
+                            helperText={errors.payeeName}
+                            readonly
+                        />
 
-                <TextField
-                    fullWidth
-                    label="payeeName"
-                    name="payeeName"
-                    placeholder="payeeName"
-                    value={formValues.payeeName}
-                    margin="normal"
-                    required
-                    error={!!errors.payeeName}
-                    helperText={errors.payeeName}
-                />
+                        <TextField
+                            fullWidth
+                            label="accountNumber"
+                            name="accountNumber"
+                            placeholder="accountNumber"
+                            value={formValues.accountNumber}
+                            margin="normal"
+                            required
+                            error={!!errors.accountNumber}
+                            helperText={errors.accountNumber}
+                            readonly
+                        />
 
-                <TextField
-                    fullWidth
-                    label="accountNumber"
-                    name="accountNumber"
-                    placeholder="accountNumber"
-                    value={formValues.accountNumber}
-                    onChange={handleChange}
-                    margin="normal"
-                    required
-                    error={!!errors.accountNumber}
-                    helperText={errors.accountNumber}
-                />
+                        <TextField
+                            fullWidth
+                            label="amount"
+                            name="amount"
+                            placeholder="amount"
+                            value={formValues.amount}
+                            margin="normal"
+                            required
+                            error={!!errors.amount}
+                            helperText={errors.amount}
+                            readonly
+                        />
 
-                <TextField
-                    fullWidth
-                    label="amount"
-                    name="amount"
-                    placeholder="amount"
-                    value={formValues.amount}
-                    onChange={handleChange}
-                    margin="normal"
-                    required
-                    error={!!errors.amount}
-                    helperText={errors.amount}
-                />
+                        <TextField
+                            fullWidth
+                            label="transactionId"
+                            name="transactionId"
+                            placeholder="transactionId"
+                            onChange={handleChange}
+                            margin="normal"
+                            required
+                            error={!!errors.transactionId}
+                            helperText={errors.transactionId}
+                        />
 
-                <TextField
-                    fullWidth
-                    label="transactionId"
-                    name="transactionId"
-                    placeholder="transactionId"
-                    onChange={handleChange}
-                    margin="normal"
-                    required
-                    error={!!errors.transactionId}
-                    helperText={errors.transactionId}
-                />
+                        <TextField
+                            fullWidth
+                            label="taskNames"
+                            name="taskNames"
+                            placeholder="taskNames"
+                            value={formValues.taskNames}
+                            margin="normal"
+                            required
+                            error={!!errors.taskNames}
+                            helperText={errors.taskNames}
+                            readonly
+                        />
 
-                <TextField
-                    fullWidth
-                    label="taskNames"
-                    name="taskNames"
-                    placeholder="taskNames"
-                    value={formValues.taskNames}
-                    onChange={handleChange}
-                    margin="normal"
-                    required
-                    error={!!errors.taskNames}
-                    helperText={errors.taskNames}
-                />
+                        <TextField
+                            fullWidth
+                            label="bankInfo"
+                            name="bankInfo"
+                            placeholder="bankInfo"
+                            value={formValues.bankInfo}
+                            margin="normal"
+                            required
+                            error={!!errors.bankInfo}
+                            helperText={errors.bankInfo}
+                            readonly
+                        />
 
-                <TextField
-                    fullWidth
-                    label="bankInfo"
-                    name="bankInfo"
-                    placeholder="bankInfo"
-                    value={formValues.bankInfo}
-                    onChange={handleChange}
-                    margin="normal"
-                    required
-                    error={!!errors.bankInfo}
-                    helperText={errors.bankInfo}
-                />
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel>Payment Status</InputLabel>
+                            <Select
+                                name="paymentStatus"
+                                value={formValues.paymentStatus}
+                                onChange={
+                                    handleChange
+                                }
+                                required
+                            >
+                                <MenuItem value="">Select Payment status</MenuItem>
+                                {status.map((status, id) => (
+                                    <MenuItem key={id} value={status} >
+                                        {status}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
-                <FormControl fullWidth margin="normal">
-                    <InputLabel>Payment Status</InputLabel>
-                    <Select
-                        name="paymentStatus"
-                        value={formValues.paymentStatus}
-                        onChange={
-                            handleChange
-                        }
-                        required
-                    >
-                        <MenuItem value="">Select Payment status</MenuItem>
-                        {status.map((status, id) => (
-                            <MenuItem key={id} value={status} >
-                                {status}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-                <FormControl fullWidth margin="normal">
-                    <InputLabel>Payment Mode</InputLabel>
-                    <Select
-                        name="paymentMode"
-                        value={formValues.paymentMode}
-                        onChange={
-                            handleChange
-                        }
-                        required
-                    >
-                        <MenuItem value="">Select Payment mode</MenuItem>
-                        {modes.map((mode, id) => (
-                            <MenuItem key={id} value={mode} >
-                                {mode}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSave}
-                    sx={{ marginTop: 2 }}
-                >
-                    Save
-                </Button>
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel>Payment Mode</InputLabel>
+                            <Select
+                                name="paymentMode"
+                                value={formValues.paymentMode}
+                                onChange={
+                                    handleChange
+                                }
+                                required
+                            >
+                                <MenuItem value="">Select Payment mode</MenuItem>
+                                {modes.map((mode, id) => (
+                                    <MenuItem key={id} value={mode} >
+                                        {mode}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSave}
+                            sx={{ marginTop: 2 }}
+                        >
+                            Save
+                        </Button>
+                    </Box>
+                }
             </Box>
         </Container>
     )
