@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal, Typography, Box } from '@mui/material';
 import Sidebar from '../AO/sidebar/Sidebar';
 import DatePickerSearch from '../CEO/DatePickerSearch';
-import { getPaymentDetails } from '../DataCenter/apiService';
+import { getUpdatedPaymentDetails } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import PaymentTable from '../CEO/PaymentTable';
 
@@ -130,7 +130,7 @@ function AODashboard() {
         if (!criteria) return;
         try {
             console.log("ok");
-            const data = await getPaymentDetails(criteria);
+            const data = await getUpdatedPaymentDetails(criteria);
             setBeneficiaries(Array.isArray(data) ? data : []);
             setShowTable(true)
             console.log(beneficiaries);

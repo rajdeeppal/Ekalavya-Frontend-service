@@ -25,6 +25,7 @@ import TrusteeRejectPage from "./Components/Trustee/TrusteeRejectPage";
 import PaymentPage from "./Components/CEO/PaymentPage";
 import AOPaymentPage from "./Components/AO/AOPaymentPage";
 import CEODashboard from "./Components/CEO/CEODashboard";
+import AODashboardTable from "./Components/AO/AODashboardTable";
 
 function App() {
   return (
@@ -183,6 +184,15 @@ function App() {
         element={
           <PrivateRoute>
             <AOPaymentPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/AO/dashboard/payment-list"
+        element={
+          <PrivateRoute>
+            <AODashboardTable />
           </PrivateRoute>
         }
       />

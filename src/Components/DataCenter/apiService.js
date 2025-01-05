@@ -376,6 +376,33 @@ export const getPaymentDetails = async (data, category) => {
 }
 };
 
+export const getUpdatedPaymentDetails = async (data) => {
+  try {
+    const { startDate, endDate } = data;
+    
+    // Start building the query parameters
+    let url = `http://localhost:61002/ao/statement/view`;
+    const params = new URLSearchParams();
+
+    // Add parameters if they are provided
+    if (endDate) params.append("endDate", endDate);
+    if (startDate) params.append("startDate", startDate);
+
+  // Construct the final URL
+  url = `${url}?${params.toString()}`;
+
+  // Send the request with authorization headers
+  const response = await axios.get(url, {
+    headers: getAuthorizationHeader(),
+  });
+
+  return response.data;
+} catch (error) {
+  console.error("Error fetching beneficiary:", error);
+  throw error;
+}
+};
+
 export const getStateDetails = async () => {
   
     try {
