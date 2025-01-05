@@ -54,7 +54,7 @@ const Dashboard = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ marginTop: 4 }}>
+    <Container maxWidth="lg" sx={{ marginTop: 4, backgroundColor: "#f5f5f5" }}>
       {/* First Row: Statistics */}
       <Grid container spacing={3}>
         {/* OUR ON-GOING PROJECTS */}
@@ -63,15 +63,16 @@ const Dashboard = () => {
             sx={{
               padding: 3,
               textAlign: "center",
-              backgroundColor: "#f3f4f6",
-              boxShadow: 2,
+              backgroundColor: "#ffffff",
+              boxShadow: 5,
               borderRadius: 2,
+              background: "linear-gradient(135deg, #4caf50 0%, #81c784 100%)",
             }}
           >
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: "#ffffff" }}>
               OUR ON-GOING PROJECTS
             </Typography>
-            <Typography variant="h4" color="primary">
+            <Typography variant="h4" sx={{ color: "#ffffff" }}>
               {projectsCount}
             </Typography>
           </Card>
@@ -83,15 +84,16 @@ const Dashboard = () => {
             sx={{
               padding: 3,
               textAlign: "center",
-              backgroundColor: "#f3f4f6",
-              boxShadow: 2,
+              backgroundColor: "#ffffff",
+              boxShadow: 5,
               borderRadius: 2,
+              background: "linear-gradient(135deg, #3f51b5 0%, #7986cb 100%)",
             }}
           >
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: "#ffffff" }}>
               FAMILY BENEFITED
             </Typography>
-            <Typography variant="h4" color="secondary">
+            <Typography variant="h4" sx={{ color: "#ffffff" }}>
               {familiesCount}
             </Typography>
           </Card>
@@ -99,7 +101,7 @@ const Dashboard = () => {
       </Grid>
 
       {/* Second Row: Projects Progress */}
-      <Typography variant="h5" sx={{ marginTop: 4, marginBottom: 2 }}>
+      <Typography variant="h5" sx={{ marginTop: 4, marginBottom: 2, color: "#333" }}>
         Project Progress
       </Typography>
       <Grid container spacing={3}>
@@ -115,6 +117,7 @@ const Dashboard = () => {
                 backgroundColor: "#ffffff",
                 boxShadow: 3,
                 borderRadius: 2,
+                background: "linear-gradient(135deg, #f3f4f6 0%, #e0e0e0 100%)",
               }}
             >
               {/* Left Side: Project Name */}
