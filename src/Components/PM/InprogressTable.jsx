@@ -63,10 +63,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         fetchDomain();
     }, [taskId])
 
-    const toggleEditMode = (beneficiaryIndex, componentIndex, activityIndex, taskIndex, rowIndex) => {
+    const toggleEditMode = (taskIndex, rowIndex) => {
         setEditMode((prevEditMode) => ({
             ...prevEditMode,
-            [`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}-${rowIndex}`]: !prevEditMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}-${rowIndex}`],
+            [`${taskIndex}-${rowIndex}`]: !prevEditMode[`${taskIndex}-${rowIndex}`],
         }));
         setTaskId(taskIndex);
         console.log(taskIndex);
@@ -906,10 +906,8 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                                                                                                                     color={
                                                                                                                                                         'primary'
                                                                                                                                                     }
-                                                                                                                                                    onClick={() => toggleEditMode(beneficiaryIndex,
-                                                                                                                                                        componentIndex,
-                                                                                                                                                        activityIndex,
-                                                                                                                                                        taskIndex)}
+                                                                                                                                                    onClick={() => toggleEditMode(
+                                                                                                                                                        task.id,rowIndex)}
                                                                                                                                                 >
                                                                                                                                                     <EditIcon />
                                                                                                                                                 </IconButton></TableCell>
