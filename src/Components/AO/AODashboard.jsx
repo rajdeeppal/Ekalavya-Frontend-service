@@ -42,7 +42,7 @@ function AODashboard() {
                 {
                     "id": 3,
                     "fileName": "Screenshot 2023-08-27 233102.png",
-                    "downloadUrl": "http://3.111.84.98:61002/download-document/3"
+                    "downloadUrl": "http://localhost:61002/download-document/3"
                 }
             ]
         },
@@ -106,22 +106,22 @@ function AODashboard() {
                 {
                     "id": 1,
                     "fileName": "Screenshot 2023-08-02 201712.png",
-                    "downloadUrl": "http://3.111.84.98:61002/download-document/1"
+                    "downloadUrl": "http://localhost:61002/download-document/1"
                 },
                 {
                     "id": 2,
                     "fileName": "Screenshot 2023-08-02 201502.png",
-                    "downloadUrl": "http://3.111.84.98:61002/download-document/2"
+                    "downloadUrl": "http://localhost:61002/download-document/2"
                 },
                 {
                     "id": 4,
                     "fileName": "Screenshot 2023-08-27 231539.png",
-                    "downloadUrl": "http://3.111.84.98:61002/download-document/4"
+                    "downloadUrl": "http://localhost:61002/download-document/4"
                 },
                 {
                     "id": 5,
                     "fileName": "Screenshot 2023-08-02 203841.png",
-                    "downloadUrl": "http://3.111.84.98:61002/download-document/5"
+                    "downloadUrl": "http://localhost:61002/download-document/5"
                 }
             ]
         }
