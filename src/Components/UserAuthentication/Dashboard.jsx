@@ -32,6 +32,24 @@ const Dashboard = () => {
       });
   }, []);
 
+  const getProgressColor = (progress) => {
+    if (progress <= 30) {
+      return "#e57373"; // Red for low progress
+    } else if (progress <= 70) {
+      return "#ffeb3b"; // Yellow for medium progress
+    } else {
+      return "#66bb6a"; // Green for high progress
+    }
+  };
+
+  const getTextColor = (progress) => {
+    if (progress <= 30 || progress > 70) {
+      return "#ffffff"; // White text for low and high progress
+    } else {
+      return "#000000"; // Black text for yellow (medium progress)
+    }
+  };
+
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ textAlign: "center", mt: 10 }}>
@@ -117,7 +135,7 @@ const Dashboard = () => {
                 backgroundColor: "#ffffff",
                 boxShadow: 3,
                 borderRadius: 2,
-                background: "linear-gradient(135deg, #f3f4f6 0%, #e0e0e0 100%)",
+                backgroundColor: getProgressColor(project.progressPercentage),
               }}
             >
               {/* Left Side: Project Name */}
@@ -134,9 +152,9 @@ const Dashboard = () => {
                   value={project.progressPercentage || 0}
                   text={`${project.progressPercentage?.toFixed(0) || 0}%`}
                   styles={buildStyles({
-                    pathColor: "#3f51b5",
-                    textColor: "#3f51b5",
-                    trailColor: "#e0e0e0",
+                    pathColor: "#ffffff", // White color for the progress bar path
+                    textColor: getTextColor(project.progressPercentage), // Dynamic text color
+                    trailColor: "#e0e0e0", // Light grey for the trail
                   })}
                 />
               </div>
