@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import FinalPreview from "./Components/PM/FinalPreview";
 import Resolution from "./Components/PM/Resolution";
 import LoginForm from "./Components/UserAuthentication/LoginForm";
+import Dashboard from "./Components/UserAuthentication/Dashboard";
 import PendingRequests from "./Components/Admin/PendingRequests";
 import RoleManagement from "./Components/Admin/RoleManagement";
 import TaskIframe from "./Components/Admin/TaskIframe";
@@ -31,6 +32,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LoginForm />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/register" element={<RegisterUserForm />} />
 
       <Route path="/otpValidation" element={<EmailOtpVerification />} />

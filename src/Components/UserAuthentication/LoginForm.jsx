@@ -46,6 +46,10 @@ const LoginForm = () => {
     navigate('/register');
   };
 
+  const handleDashboard = () => {
+    navigate('/dashboard');
+  };
+
   return (
     <Grid container component="main" sx={{ height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
@@ -128,14 +132,28 @@ const LoginForm = () => {
                   {isLoading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Login'}
                 </Button>
               </Box>
-              <Button
-                fullWidth
-                variant="outlined"
-                sx={{ mt: 2, borderColor: '#1976d2', color: '#1976d2', '&:hover': { borderColor: '#115293' } }}
-                onClick={handleRegister}
-              >
-                Register
-              </Button>
+              <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    sx={{ borderColor: '#1976d2', color: '#1976d2', '&:hover': { borderColor: '#115293' } }}
+                    onClick={handleRegister}
+                  >
+                    Register
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    sx={{ borderColor: '#1976d2', color: '#1976d2', '&:hover': { borderColor: '#115293' } }}
+                    onClick={handleDashboard}
+                  >
+                    Dashboard
+                  </Button>
+                </Grid>
+              </Grid>
               {token && <LoginRedirect token={token} />}
             </Box>
           </Box>
