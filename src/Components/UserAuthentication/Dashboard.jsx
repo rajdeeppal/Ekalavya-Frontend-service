@@ -14,9 +14,9 @@ const Dashboard = () => {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      axios.get("http://localhost:61002/dashboard/project/count"),
-      axios.get("http://localhost:61002/dashboard/beneficiary/count"),
-      axios.get("http://localhost:61002/dashboard/project/progress"),
+      axios.get("http://3.111.84.98:61002/dashboard/project/count"),
+      axios.get("http://3.111.84.98:61002/dashboard/beneficiary/count"),
+      axios.get("http://3.111.84.98:61002/dashboard/project/progress"),
     ])
       .then(([projectCountRes, familyCountRes, projectProgressRes]) => {
         setProjectsCount(projectCountRes.data);
