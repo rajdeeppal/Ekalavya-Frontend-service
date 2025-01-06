@@ -8,16 +8,33 @@ import {
     TableRow,
     Paper,
     Typography,
+    IconButton
 } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
+import { useAuth } from '../PrivateRoute';
+import { exportPaymentDetails } from '../DataCenter/apiService';
 
-
-const AODashboardTable = ({ beneficiaries }) => {
+const AODashboardTable = ({ beneficiaries ,date, setDate}) => {
+    const { userId } = useAuth();
+    const exportToExcel = async () => {
+        try {
+            console.log("ok");
+            const data = await exportPaymentDetails(userId, date);
+            alert(data);
+            console.log(beneficiaries);
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+        }
+    }
     return (
         <div style={{ padding: '20px', backgroundColor: '#f9f9f9', minHeight: '100vh' }} className="listContainer">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <Typography variant="h4" gutterBottom style={{ color: '#555' }}>
                     Payment Details
                 </Typography>
+                <IconButton onClick={exportToExcel} >
+                    <DownloadIcon />
+                </IconButton>
             </div>
             <TableContainer component={Paper} elevation={3} style={{ borderRadius: '8px', overflow: 'hidden' }}>
                 <Table aria-label="beneficiary table">

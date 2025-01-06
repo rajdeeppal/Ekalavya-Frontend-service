@@ -14,11 +14,13 @@ function AODashboard() {
     const [beneficiaries, setBeneficiaries] = useState([
         
     ]);
+    const [date, setDate] = useState(true);
     const handleSearch = async (criteria) => {
         if (!criteria) return;
         try {
             console.log("ok");
             const data = await getUpdatedPaymentDetails(criteria);
+            setDate(criteria);
             setBeneficiaries(Array.isArray(data) ? data : []);
             setShowTable(true)
             console.log(beneficiaries);
@@ -40,11 +42,11 @@ function AODashboard() {
             >
 
                 <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper' }}>
-                    <DatePickerSearch onSearch={handleSearch} />
+                    <DatePickerSearch onSearch={handleSearch} setIsReview={setIsReview}/>
                 </Box>
 
                 {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-                    <AODashboardTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} />
+                    <AODashboardTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} date={date} setDate={setDate} />
                 </Box>}
             </Box>
         </Box>
