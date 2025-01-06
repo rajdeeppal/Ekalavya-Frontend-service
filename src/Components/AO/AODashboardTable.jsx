@@ -33,7 +33,7 @@ const AODashboardTable = ({ beneficiaries }) => {
                     <TableBody>
                         {beneficiaries?.map((beneficiary, beneficiaryIndex) => (
                             <TableRow hover key={beneficiaryIndex}>
-                                <TableCell>{beneficiary.paymentTimestamp.format('YYYY-MM-DD')}</TableCell>
+                                <TableCell>{beneficiary.paymentTimestamp}</TableCell>
                                 <TableCell>{beneficiary.payeeName}</TableCell>
                                 <TableCell>{beneficiary.payeeAccountInfo}</TableCell>
                                 <TableCell>{beneficiary.headOfAccount}</TableCell>

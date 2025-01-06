@@ -160,6 +160,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
             const blob = await generatedVoucherDetails(voucherData);
             // const blob = new Blob([data], { type: 'application/pdf' });
             const url = window.URL.createObjectURL(blob);
+            console.log(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;

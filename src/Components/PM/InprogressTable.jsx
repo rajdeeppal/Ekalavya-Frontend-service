@@ -646,7 +646,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                                                                                                                             <TableBody>
                                                                                                                                 {(task.taskUpdates || [])?.map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
-                                                                                                                                        {editMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}-${rowIndex}`] ? (
+                                                                                                                                        {editMode[`${task.id}-${rowIndex}`] ? (
                                                                                                                                             <>
                                                                                                                                                 <TableCell>
                                                                                                                                                     <TextField
