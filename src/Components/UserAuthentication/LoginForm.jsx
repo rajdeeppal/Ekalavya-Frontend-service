@@ -17,7 +17,7 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:61002/auth/login', {
+      const response = await fetch('http://3.111.84.98:61002/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,6 +44,10 @@ const LoginForm = () => {
 
   const handleRegister = () => {
     navigate('/register');
+  };
+
+  const handleDashboard = () => {
+    navigate('/dashboard');
   };
 
   return (
@@ -128,14 +132,28 @@ const LoginForm = () => {
                   {isLoading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Login'}
                 </Button>
               </Box>
-              <Button
-                fullWidth
-                variant="outlined"
-                sx={{ mt: 2, borderColor: '#1976d2', color: '#1976d2', '&:hover': { borderColor: '#115293' } }}
-                onClick={handleRegister}
-              >
-                Register
-              </Button>
+              <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    sx={{ borderColor: '#1976d2', color: '#1976d2', '&:hover': { borderColor: '#115293' } }}
+                    onClick={handleRegister}
+                  >
+                    Register
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    sx={{ borderColor: '#1976d2', color: '#1976d2', '&:hover': { borderColor: '#115293' } }}
+                    onClick={handleDashboard}
+                  >
+                    Dashboard
+                  </Button>
+                </Grid>
+              </Grid>
               {token && <LoginRedirect token={token} />}
             </Box>
           </Box>
