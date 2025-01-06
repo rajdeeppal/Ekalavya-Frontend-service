@@ -53,7 +53,7 @@ const AODashboardTable = ({ beneficiaries ,date, setDate}) => {
                                 <TableCell>{beneficiary.paymentTimestamp}</TableCell>
                                 <TableCell>{beneficiary.payeeName}</TableCell>
                                 <TableCell>{beneficiary.payeeAccountInfo}</TableCell>
-                                <TableCell>{beneficiary.headOfAccount}</TableCell>
+                                <TableCell>{beneficiary.headOfAcount}</TableCell>
                                 <TableCell>{beneficiary.amount}</TableCell>
                             </TableRow>
                         ))}
