@@ -7,26 +7,8 @@ import {
     TableHead,
     TableRow,
     Paper,
-    Button,
-    Collapse,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    TextField,
-    IconButton,
     Typography,
-    Checkbox,
-    Modal,
-    Box
 } from '@mui/material';
-import {
-    ExpandMore as ExpandMoreIcon,
-    Edit as EditIcon,
-    Save as SaveIcon,
-    Reviews,
-} from '@mui/icons-material';
-import { generatedVoucherDetails } from '../DataCenter/apiService';
-import AOPaymentTable from '../AO/AOPaymentTable';
 
 
 const AODashboardTable = ({ beneficiaries }) => {
@@ -41,16 +23,16 @@ const AODashboardTable = ({ beneficiaries }) => {
                 <Table aria-label="beneficiary table">
                     <TableHead style={{ backgroundColor: '#f0f0f0' }}>
                         <TableRow>
-                            <TableCell style={{ fontWeight: 'bold' }}>Payment Date</TableCell>
+                            <TableCell style={{ fontWeight: 'bold' }}>Date/Time</TableCell>
                             <TableCell style={{ fontWeight: 'bold' }}>Payee Name</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }}>Payee Acoount Info</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }}>Head of Account</TableCell>
+                            <TableCell style={{ fontWeight: 'bold' }}>Payee Account Details</TableCell>
+                            <TableCell style={{ fontWeight: 'bold' }}>Account Head</TableCell>
                             <TableCell style={{ fontWeight: 'bold' }}>Total Amount</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {beneficiaries?.map((beneficiary, beneficiaryIndex) => (
-                            <TableRow hover>
+                            <TableRow hover key={beneficiaryIndex}>
                                 <TableCell>{beneficiary.paymentTimestamp.format('YYYY-MM-DD')}</TableCell>
                                 <TableCell>{beneficiary.payeeName}</TableCell>
                                 <TableCell>{beneficiary.payeeAccountInfo}</TableCell>

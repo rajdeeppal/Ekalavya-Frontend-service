@@ -41,6 +41,13 @@ const Sidebar = () => {
             </li>
           </Link>
 
+          <Link to="/AO/dashboard/payment-list" style={{ textDecoration: "none" }} >
+            <li>
+              <RateReviewOutlinedIcon className="icon"  style={{ color: "black" }}/>
+              <span>Payment Dashboard</span>
+            </li>
+          </Link>
+
           <li onClick={handleProfileClick}> {/* Profile click handler */}
             <AccountCircleOutlinedIcon className="icon" style={{ color: "black" }}/>
             <span>Profile</span>
