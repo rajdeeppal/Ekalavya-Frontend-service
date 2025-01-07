@@ -107,12 +107,14 @@ const FinalPreview = () => {
         //     ]
         // }
     ]);
+    const [value,setValue]=useState(true);
     const [showTable, setShowTable] = useState(true);
     const handleSearch = async (criteria) => {
         if (!criteria) return;
         try {
           console.log("ok");
           const data = await getBeneficiary(userId,criteria,'preview');
+          setValue(criteria);
           setBeneficiaries(Array.isArray(data) ? data : []);
           setShowTable(true)
           console.log(beneficiaries);
@@ -137,7 +139,7 @@ const FinalPreview = () => {
                     <SearchBar onSearch={handleSearch} />
                 </Box>
                 {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-                <FinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} />
+                <FinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} value={value}/>
                 </Box>}
             </Box>
         </Box>

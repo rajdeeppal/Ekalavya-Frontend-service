@@ -23,9 +23,11 @@ import {
 } from '@mui/icons-material';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
+import { exportFinalPreviewDetails } from '../DataCenter/apiService';
 
-const FinalReviewList = ({ beneficiaries, setBeneficiaries, isReview }) => {
+const FinalReviewList = ({ beneficiaries, value, isReview }) => {
+    const { userId } = useAuth();
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
@@ -49,74 +51,16 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries, isReview }) => {
         }));
     };
 
-    const exportToExcel = () => {
-        const formattedData = [];
-
-        beneficiaries.forEach((beneficiary) => {
-            beneficiary.components.forEach((component) => {
-                component.activities.forEach((activity) => {
-                    activity.tasks.forEach((task, taskIndex) => {
-                        formattedData.push({
-                            Vertical:
-                                taskIndex === 0 &&
-                                    component === beneficiary.components[0] &&
-                                    activity === component.activities[0]
-                                    ? beneficiary.verticalName
-                                    : '',
-                            'Type of Project':
-                                taskIndex === 0 && activity === component.activities[0]
-                                    ? beneficiary.projectType
-                                    : '',
-                            'Name of the Project':
-                                taskIndex === 0 && component === beneficiary.components[0]
-                                    ? beneficiary.projectName
-                                    : '',
-                            Component: taskIndex === 0 ? component.componentName : '',
-                            Activity: taskIndex === 0 ? activity.activityName : '',
-                            Tasks: task.taskName,
-                            'Type of Unit': task.typeOfUnit,
-                            'Unit Rate': task.ratePerUnit,
-                            'No. of Units': task.units,
-                            'Total Cost Rs.': task.totalCost,
-                            'Beneficiary Contribution Rs.': task.beneficiaryContribution,
-                            'Grant Amount (Rs.)': task.grantAmount,
-                            'Year of Sanction': task.yearOfSanction,
-                        });
-
-                        if (task.taskUpdates) {
-                            task.taskUpdates.forEach((row) => {
-                                formattedData.push({
-                                    Vertical: '',
-                                    'Type of Project': '',
-                                    'Name of the Project': '',
-                                    Component: '',
-                                    Activity: '',
-                                    Tasks: '',
-                                    'Type of Unit': '',
-                                    'Unit Rate': '',
-                                    'No. of Units': '',
-                                    'Total Cost Rs.': '',
-                                    'Beneficiary Contribution Rs.': '',
-                                    'Grant Amount (Rs.)': '',
-                                    'Year of Sanction': '',
-                                    'Unit Achievement': row.achievementUnit,
-                                    'Remaining Balance': row.remainingBalance,
-                                    Duration: row.duration,
-                                    'Payee Name': row.payeeName,
-                                    'Passbook Copy': row.passbookCopy,
-                                });
-                            });
-                        }
-                    });
-                });
-            });
-        });
-
-        const worksheet = XLSX.utils.json_to_sheet(formattedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Beneficiaries');
-
-        XLSX.writeFile(workbook, 'Beneficiaries.xlsx');
+    const exportToExcel = async () => {
+        try {
+            console.log("ok");
+            const data = await exportFinalPreviewDetails(userId, value);
+            alert(data);
+            console.log(beneficiaries);
+            console.log(beneficiaries);
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+        }
     };
 
 
@@ -254,9 +198,9 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries, isReview }) => {
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
-                                                                                                                                    {!isReview &&<TableCell>Domain Expert</TableCell>}
-                                                                                                                                    {isReview &&<TableCell>Pending With</TableCell>}
-                                                                                                                                    {isReview &&<TableCell>Payment Status</TableCell>}
+                                                                                                                                    {!isReview && <TableCell>Domain Expert</TableCell>}
+                                                                                                                                    {isReview && <TableCell>Pending With</TableCell>}
+                                                                                                                                    {isReview && <TableCell>Payment Status</TableCell>}
                                                                                                                                 </TableRow>
                                                                                                                             </TableHead>
                                                                                                                             <TableBody>
@@ -302,9 +246,9 @@ const FinalReviewList = ({ beneficiaries, setBeneficiaries, isReview }) => {
                                                                                                                                                 <Typography>No File Uploaded</Typography>
                                                                                                                                             )}
                                                                                                                                         </TableCell>
-                                                                                                                                       {!isReview && <TableCell>{row.domainExpertEmpId}</TableCell>}
-                                                                                                                                       {isReview && <TableCell>{row.pendingWith}</TableCell>}
-                                                                                                                                       {isReview && <TableCell>{row.paymentStatus}</TableCell>}
+                                                                                                                                        {!isReview && <TableCell>{row.domainExpertEmpId}</TableCell>}
+                                                                                                                                        {isReview && <TableCell>{row.pendingWith}</TableCell>}
+                                                                                                                                        {isReview && <TableCell>{row.paymentStatus}</TableCell>}
                                                                                                                                     </TableRow>
                                                                                                                                 ))}
                                                                                                                             </TableBody>

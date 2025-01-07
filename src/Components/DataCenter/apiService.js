@@ -107,18 +107,6 @@ export const getComponentsByProject = async (projectId) => {
   }
 };
 
-export const getComponentsDetails = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/restrict/components`, {
-      headers: getAuthorizationHeader(),
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching components:", error);
-    return [];
-  }
-};
-
 // Fetch activities based on selected component
 export const getActivities = async (componentId) => {
   try {
@@ -751,6 +739,35 @@ export const exportComponentDetails = async (userId, data) => {
     if (districtName) params.append("districtName", districtName);
     if (endDate) params.append("endDate", endDate);
     if (startDate) params.append("startDate", startDate);
+
+  // Construct the final URL
+  url = `${url}?${params.toString()}`;
+
+  // Send the request with authorization headers
+  const response = await axios.get(url, {
+    headers: getAuthorizationHeader(),
+  });
+
+  return response.data;
+} catch (error) {
+  console.error("Error fetching beneficiary:", error);
+  throw error;
+}
+};
+
+export const exportFinalPreviewDetails = async (userId, data) => {
+  try {
+    const { stateName, districtName, projectName, componentName } = data;
+    
+    // Start building the query parameters
+    let url = `http://localhost:61002/download/beneficiary/excel/${userId}`;
+    const params = new URLSearchParams();
+
+    // Add parameters if they are provided
+    if (projectName) params.append("projectName", projectName);
+    if (componentName) params.append("componentName", componentName);
+    if (stateName) params.append("stateName", stateName);
+    if (districtName) params.append("districtName", districtName);
 
   // Construct the final URL
   url = `${url}?${params.toString()}`;
