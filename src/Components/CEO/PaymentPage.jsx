@@ -11,11 +11,13 @@ function PaymentPage() {
     const [showTable, setShowTable] = useState(true);
     const [isReview, setIsReview] = useState(false);
     const [beneficiaries, setBeneficiaries] = useState([]);
+    const [date, setDate] = useState(true);
     const handleSearch = async (criteria) => {
         if (!criteria) return;
         try {
           console.log("ok");
           const data = await getPaymentDetails(criteria);
+          setDate(criteria);
           setBeneficiaries(Array.isArray(data) ? data : []);
           setShowTable(true)
           console.log(beneficiaries);
@@ -42,7 +44,7 @@ function PaymentPage() {
         </Box>
 
         {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-          <PaymentTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} />
+          <PaymentTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} date={date} setDate={setDate}/>
         </Box>}
       </Box>
     </Box>

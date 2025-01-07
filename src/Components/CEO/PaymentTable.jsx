@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -17,7 +17,7 @@ import {
     Typography,
     Checkbox,
     Modal,
-    Box
+    Box, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -25,10 +25,13 @@ import {
     Save as SaveIcon,
     Reviews,
 } from '@mui/icons-material';
-import { generatedVoucherDetails } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
+import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails } from '../DataCenter/apiService';
 import AOPaymentTable from '../AO/AOPaymentTable';
+import DownloadIcon from '@mui/icons-material/Download';
 
-function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
+function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date }) {
+    const { userId } = useAuth();
     const [open, setOpen] = useState({});
     const [selectedTasks, setSelectedTasks] = useState({});
     const [formValues, setFormValues] = useState({
@@ -40,6 +43,16 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
     const [benId, setBenId] = useState('');
     const [showViewConfirmation, setShowViewConfirmation] = useState(false);
     const [showViewPaymentConfirmation, setShowViewPaymentConfirmation] = useState(false);
+    const [selectedComponent, setSelectedComponent] = useState('');
+    const [components, setComponents] = useState([]);
+
+    useEffect(() => {
+        async function fetchComponents() {
+            const data = await getRestrictedComponents();
+            setComponents(Array.isArray(data) ? data : []);
+        }
+        fetchComponents();
+    }, []);
 
     const toggleCollapse = (index) => {
         setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
@@ -213,13 +226,69 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
 
     };
 
+    const exportToExcel = async () => {
+        try {
+            console.log("ok");
+            const data = await exportCEOPaymentDetails(userId, date, selectedComponent);
+            alert(data);
+            console.log(beneficiaries);
+            console.log(beneficiaries);
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+        }
+    }
+
     return (
         <div style={{ padding: '20px', backgroundColor: '#f9f9f9', minHeight: '100vh' }} className="listContainer">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <Typography variant="h4" gutterBottom style={{ color: '#555' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap', // Ensures proper alignment on smaller screens
+                    gap: 2, // Adds spacing between items
+                    marginBottom: 3, // Equivalent to 20px
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    gutterBottom
+                    sx={{ color: '#555', flex: '1 1 auto' }} // Allows it to resize in smaller screens
+                >
                     Payment List
                 </Typography>
-            </div>
+
+                <FormControl
+                    sx={{
+                        minWidth: 200, // Ensures the dropdown doesn't shrink too much
+                        flex: '0 0 auto', // Allows resizing with space
+                    }}
+                >
+                    <InputLabel>Component Name</InputLabel>
+                    <Select
+                        value={selectedComponent}
+                        onChange={(e) => setSelectedComponent(e.target.value)}
+                    >
+                        <MenuItem value="">Select Component</MenuItem>
+                        {components.map((component) => (
+                            <MenuItem key={component.id} value={component.componentName}>
+                                {component.componentName}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                <IconButton
+                    onClick={exportToExcel}
+                    sx={{
+                        color: 'primary.main', // Matches the primary theme color
+                        flex: '0 0 auto', // Prevents resizing
+                    }}
+                    aria-label="Download Excel"
+                >
+                    <DownloadIcon />
+                </IconButton>
+            </Box>
             <TableContainer component={Paper} elevation={3} style={{ borderRadius: '8px', overflow: 'hidden' }}>
                 <Table aria-label="beneficiary table">
                     <TableHead style={{ backgroundColor: '#f0f0f0' }}>
@@ -491,7 +560,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview }) {
                     <Typography variant="h6" component="h2" gutterBottom>
                         Payment Form
                     </Typography>
-                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation}/>
+                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} />
                 </Box>
             </Modal>
         </div>
