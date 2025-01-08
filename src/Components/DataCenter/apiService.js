@@ -615,10 +615,10 @@ export const getVoucherDetails = async (voucher_id) => {
         headers: getAuthorizationHeader(),
       }
     );
-    return response.data;
+    return response; // Return the full response object
   } catch (error) {
-    console.error("Error fetching Projects by USERID:", error);
-    throw error;
+    console.error("Error fetching voucher details:", error);
+    throw error; // Re-throw the error so it can be caught in the frontend
   }
 };
 
