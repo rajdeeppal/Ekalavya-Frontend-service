@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
+import React, { useState } from 'react';
+import {
+    Box,
+    Container,
+    Button,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Alert,
+} from '@mui/material';
 import { getVoucherDetails, generatedPaymentDetails } from '../DataCenter/apiService';
-
 
 function AOPaymentTable({ setShowViewPaymentConfirmation }) {
     const [formValues, setFormValues] = useState({
@@ -13,41 +22,55 @@ function AOPaymentTable({ setShowViewPaymentConfirmation }) {
         bankInfo: '',
         transactionId: '',
         paymentMode: '',
-        paymentStatus: ''
+        paymentStatus: '',
     });
     const [showForm, setShowFrom] = useState(false);
     const [errors, setErrors] = useState({});
+    const [backendMessage, setBackendMessage] = useState('');
     const status = ['SUCCESS', 'FAILED', 'ONHOLD'];
-    const modes = ["Online", "Cheque", "Cash"];
+    const modes = ['Online', 'Cheque', 'Cash'];
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormValues({ ...formValues, [name]: value });
         setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
-    }
-
-    const handleSearch = async (value) => {
-        if (!value) {
-            setErrors((prevErrors) => ({ ...prevErrors, voucherId: 'Voucher Id is required' }));
-            return;
-        }
-        setShowFrom(true);
-        try {
-            const data = await getVoucherDetails(value);
-            
-            setFormValues({
-                ...formValues,
-                voucherId: data.voucherId,
-                payeeName: data.payeeName,
-                accountNumber: data.accountNumber,
-                amount: data.amount,
-                taskNames: data.taskNames,
-                bankInfo: data.bankInfo,
-            });
-
-        } catch (error) {
-            console.error('Error fetching Aadhaar details:', error);
-        }
     };
+
+const handleSearch = async (value) => {
+  if (!value) {
+    setErrors((prevErrors) => ({ ...prevErrors, voucherId: 'Voucher ID is required' }));
+    return;
+  }
+
+  try {
+    const response = await getVoucherDetails(value);
+
+    if (response.status === 200) {
+      const data = response.data;
+
+      // Populate the form with the received data
+      setFormValues({
+        ...formValues,
+        voucherId: data.voucherId,
+        payeeName: data.payeeName,
+        accountNumber: data.accountNumber,
+        amount: data.amount,
+        taskNames: data.taskNames,
+        bankInfo: data.bankInfo,
+      });
+
+      setShowFrom(true); // Show the form
+      setBackendMessage(data.lastPaymentNote || ''); // Set backend message
+    }
+  } catch (error) {
+    // Handle errors, including non-200 responses
+    console.error('Error fetching voucher details:', error);
+
+    const errorMessage = error.response?.data || 'Failed to fetch voucher details. Please try again later.';
+    setShowFrom(false);
+    setBackendMessage(errorMessage); // Display error message
+  }
+};
 
     const handleSave = async () => {
         const criteria = {
@@ -60,25 +83,34 @@ function AOPaymentTable({ setShowViewPaymentConfirmation }) {
             paymentMode: formValues.paymentMode,
             transactionId: formValues.transactionId,
             paymentStatus: formValues.paymentStatus,
-        }
+        };
+
         try {
             await generatedPaymentDetails(criteria);
             setShowFrom(false);
             setShowViewPaymentConfirmation(false);
         } catch (error) {
-            console.error('Error fetching activities:', error);
+            console.error('Error saving payment details:', error);
         }
-    }
+    };
 
     return (
         <Container sx={{ maxHeight: '80vh', overflowY: 'auto', p: 2 }}>
             <Box>
+                {/* Display Warning or Info Message */}
+                {backendMessage && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        {backendMessage}
+                    </Alert>
+                )}
+
+                {/* Voucher ID Input */}
                 <Box display="flex" alignItems="center" gap={1} mt={2}>
                     <TextField
                         fullWidth
-                        label="voucherId"
+                        label="Voucher ID"
                         name="voucherId"
-                        placeholder="voucherId"
+                        placeholder="Enter Voucher ID"
                         value={formValues.voucherId}
                         onChange={handleChange}
                         margin="normal"
@@ -89,57 +121,59 @@ function AOPaymentTable({ setShowViewPaymentConfirmation }) {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => handleSearch(formValues.voucherId)} // Call your search function here
+                        onClick={() => handleSearch(formValues.voucherId)} // Call the search function
                     >
                         Find
                     </Button>
                 </Box>
-                {showForm &&
+
+                {/* Conditionally Render Form */}
+                {showForm && (
                     <Box>
                         <TextField
                             fullWidth
-                            label="payeeName"
+                            label="Payee Name"
                             name="payeeName"
-                            placeholder="payeeName"
+                            placeholder="Payee Name"
                             value={formValues.payeeName}
                             margin="normal"
                             required
                             error={!!errors.payeeName}
                             helperText={errors.payeeName}
-                            readonly
+                            InputProps={{ readOnly: true }}
                         />
 
                         <TextField
                             fullWidth
-                            label="accountNumber"
+                            label="Account Number"
                             name="accountNumber"
-                            placeholder="accountNumber"
+                            placeholder="Account Number"
                             value={formValues.accountNumber}
                             margin="normal"
                             required
                             error={!!errors.accountNumber}
                             helperText={errors.accountNumber}
-                            readonly
+                            InputProps={{ readOnly: true }}
                         />
 
                         <TextField
                             fullWidth
-                            label="amount"
+                            label="Amount"
                             name="amount"
-                            placeholder="amount"
+                            placeholder="Amount"
                             value={formValues.amount}
                             margin="normal"
                             required
                             error={!!errors.amount}
                             helperText={errors.amount}
-                            readonly
+                            InputProps={{ readOnly: true }}
                         />
 
                         <TextField
                             fullWidth
-                            label="transactionId"
+                            label="Transaction ID"
                             name="transactionId"
-                            placeholder="transactionId"
+                            placeholder="Transaction ID"
                             onChange={handleChange}
                             margin="normal"
                             required
@@ -149,28 +183,28 @@ function AOPaymentTable({ setShowViewPaymentConfirmation }) {
 
                         <TextField
                             fullWidth
-                            label="taskNames"
+                            label="Task Names"
                             name="taskNames"
-                            placeholder="taskNames"
-                            value={formValues.taskNames}
+                            placeholder="Task Names"
+                            value={formValues.taskNames.join(', ')}
                             margin="normal"
                             required
                             error={!!errors.taskNames}
                             helperText={errors.taskNames}
-                            readonly
+                            InputProps={{ readOnly: true }}
                         />
 
                         <TextField
                             fullWidth
-                            label="bankInfo"
+                            label="Bank Info"
                             name="bankInfo"
-                            placeholder="bankInfo"
+                            placeholder="Bank Info"
                             value={formValues.bankInfo}
                             margin="normal"
                             required
                             error={!!errors.bankInfo}
                             helperText={errors.bankInfo}
-                            readonly
+                            InputProps={{ readOnly: true }}
                         />
 
                         <FormControl fullWidth margin="normal">
@@ -178,14 +212,12 @@ function AOPaymentTable({ setShowViewPaymentConfirmation }) {
                             <Select
                                 name="paymentStatus"
                                 value={formValues.paymentStatus}
-                                onChange={
-                                    handleChange
-                                }
+                                onChange={handleChange}
                                 required
                             >
-                                <MenuItem value="">Select Payment status</MenuItem>
+                                <MenuItem value="">Select Payment Status</MenuItem>
                                 {status.map((status, id) => (
-                                    <MenuItem key={id} value={status} >
+                                    <MenuItem key={id} value={status}>
                                         {status}
                                     </MenuItem>
                                 ))}
@@ -197,19 +229,18 @@ function AOPaymentTable({ setShowViewPaymentConfirmation }) {
                             <Select
                                 name="paymentMode"
                                 value={formValues.paymentMode}
-                                onChange={
-                                    handleChange
-                                }
+                                onChange={handleChange}
                                 required
                             >
-                                <MenuItem value="">Select Payment mode</MenuItem>
+                                <MenuItem value="">Select Payment Mode</MenuItem>
                                 {modes.map((mode, id) => (
-                                    <MenuItem key={id} value={mode} >
+                                    <MenuItem key={id} value={mode}>
                                         {mode}
                                     </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
+
                         <Button
                             variant="contained"
                             color="primary"
@@ -219,11 +250,10 @@ function AOPaymentTable({ setShowViewPaymentConfirmation }) {
                             Save
                         </Button>
                     </Box>
-                }
+                )}
             </Box>
         </Container>
-    )
+    );
 }
-
 
 export default AOPaymentTable;
