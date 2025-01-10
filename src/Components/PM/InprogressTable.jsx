@@ -326,8 +326,8 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
 
             setIsEdit(false);
         } catch (error) {
-            const errorMessage = error.response?.data || 'An error occurred while updating the task.';
             console.error("Error submitting task update:", error);
+            alert("An error occurred while updating the task.");
         }
 
     };
