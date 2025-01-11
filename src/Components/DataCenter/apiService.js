@@ -622,6 +622,22 @@ export const getVoucherDetails = async (voucher_id) => {
   }
 };
 
+export const getProfileDetails = async (userId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/user/profile/${userId}`,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};
+
+
 export const generatedPaymentDetails = async (object) => {
   try {
     const response = await axios.post(

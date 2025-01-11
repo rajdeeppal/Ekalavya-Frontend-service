@@ -33,7 +33,7 @@ import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBenefi
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 
-const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
+const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSucess }) => {
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
@@ -308,6 +308,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                 await newBeneficiarySubTask(task.id, formData);
                 setNewTask(false);
                 firstTask = false;
+                setIsSucess(true);
                 alert('Project saved successfully!');
 
             } else {
@@ -315,11 +316,13 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                     console.log(task.taskUpdates[rowIndex].passbookDoc);
                     console.log(formData);
                     await updatedResubmitBeneficiarySubTask(row, formData);
+                    setIsSucess(true);
                     alert('Project saved successfully!');
                 } else {
                     console.log(task.taskUpdates[rowIndex].passbookDoc);
                     console.log(formData);
                     await updatedBeneficiarySubTask(row, formData);
+                    setIsSucess(true);
                     alert('Project saved successfully!');
                 }
             }
@@ -327,6 +330,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
             setIsEdit(false);
         } catch (error) {
             console.error("Error submitting task update:", error);
+            setIsSucess(true);
             alert("An error occurred while updating the task.");
         }
 
@@ -372,75 +376,6 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
         });
     };
 
-    const exportToExcel = () => {
-        const formattedData = [];
-
-        beneficiaries.forEach((beneficiary) => {
-            beneficiary.components.forEach((component) => {
-                component.activities.forEach((activity) => {
-                    activity.tasks.forEach((task, taskIndex) => {
-                        formattedData.push({
-                            Vertical:
-                                taskIndex === 0 &&
-                                    component === beneficiary.components[0] &&
-                                    activity === component.activities[0]
-                                    ? beneficiary.verticalName
-                                    : '',
-                            'Type of Project':
-                                taskIndex === 0 && activity === component.activities[0]
-                                    ? beneficiary.projectType
-                                    : '',
-                            'Name of the Project':
-                                taskIndex === 0 && component === beneficiary.components[0]
-                                    ? beneficiary.projectName
-                                    : '',
-                            Component: taskIndex === 0 ? component.componentName : '',
-                            Activity: taskIndex === 0 ? activity.activityName : '',
-                            Tasks: task.taskName,
-                            'Type of Unit': task.typeOfUnit,
-                            'Unit Rate': task.ratePerUnit,
-                            'No. of Units': task.units,
-                            'Total Cost Rs.': task.totalCost,
-                            'Beneficiary Contribution Rs.': task.beneficiaryContribution,
-                            'Grant Amount (Rs.)': task.grantAmount,
-                            'Year of Sanction': task.yearOfSanction,
-                        });
-
-                        if (task.taskUpdates) {
-                            task.taskUpdates.forEach((row) => {
-                                formattedData.push({
-                                    Vertical: '',
-                                    'Type of Project': '',
-                                    'Name of the Project': '',
-                                    Component: '',
-                                    Activity: '',
-                                    Tasks: '',
-                                    'Type of Unit': '',
-                                    'Unit Rate': '',
-                                    'No. of Units': '',
-                                    'Total Cost Rs.': '',
-                                    'Beneficiary Contribution Rs.': '',
-                                    'Grant Amount (Rs.)': '',
-                                    'Year of Sanction': '',
-                                    'Unit Achievement': row.achievementUnit,
-                                    'Remaining Balance': row.remainingBalance,
-                                    Duration: row.duration,
-                                    'Payee Name': row.payeeName,
-                                    'Passbook Copy': row.passbookDoc,
-                                });
-                            });
-                        }
-                    });
-                });
-            });
-        });
-
-        const worksheet = XLSX.utils.json_to_sheet(formattedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Beneficiaries');
-
-        XLSX.writeFile(workbook, 'Beneficiaries.xlsx');
-    };
 
     const handleFileChange = (taskIndex, rowIndex, fileType, e) => {
         const files = e.target.files;
@@ -501,9 +436,6 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject }) => {
                 <Typography variant="h4" gutterBottom style={{ color: '#888' }}>
                     Task List
                 </Typography>
-                <IconButton onClick={exportToExcel} >
-                    <DownloadIcon />
-                </IconButton>
             </div>
             <TableContainer component={Paper}>
                 <Table aria-label="beneficiary table">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Table, Collapse, TableContainer, Accordion, AccordionSummary, AccordionDetails, TextField, Modal, Box, Typography, TableHead, TableBody, TableCell, TableRow, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
@@ -6,13 +6,16 @@ import Paper from "@mui/material/Paper";
 import DownloadIcon from '@mui/icons-material/Download';
 import { updateActivityTask, submitDetails, bulkSubmitDetails } from '../DataCenter/apiService';
 
-const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
+const BeneficiaryTable = ({ beneficiaries, setBeneficiaries, setIsSucess }) => {
   const [open, setOpen] = useState({});
   const [editActivityMode, setEditActivityMode] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showEdit, setShowEdit] = useState(true);
   const [isBulk, setIsBulk] = useState(false);
   const [id, setId] = useState('');
+
+
+
 
   const toggleCollapse = (index) => {
     setOpen((prevState) => ({ ...prevState, [index]: !prevState[index] }));
@@ -98,9 +101,11 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
       const taskId = task.id;
       console.log(taskId);
       const data = await updateActivityTask(taskId, criteria);
-      setBeneficiaries(Array.isArray(data) ? data : []);
+      // setBeneficiaries(Array.isArray(data) ? data : []);
+      setIsSucess(true)
       alert("Activites are submitted successfully");
     } catch (error) {
+      setIsSucess(true);
       console.error('Error fetching activities:', error);
     }
   };
@@ -124,9 +129,11 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
       const data = beneficiaries.find((beneficiary) => beneficiary.id === id)
       console.log("submit", data);
       await submitDetails(data);
+      setIsSucess(true);
       alert("Beneficiary have been submitted successfully");
       setShowConfirmation(false);
     } catch (error) {
+      setIsSucess(true);
       console.error('Error fetching activities:', error);
     }
   };
@@ -138,9 +145,11 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
         "beneficiaries": beneficiaries
       }
       await bulkSubmitDetails(data);
+      setIsSucess(true);
       alert("Beneficiary have been submitted successfully");
       setShowConfirmation(false);
     } catch (error) {
+      setIsSucess(true);
       console.error('Error fetching activities:', error);
     }
   };
@@ -149,47 +158,11 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries }) => {
     setShowConfirmation(false);
   };
 
-  const exportToExcel = () => {
-    const formattedData = [];
-
-    beneficiaries.forEach((beneficiary) => {
-      beneficiary.components.forEach((component) => {
-        component.activities.forEach((activity) => {
-          activity.tasks.forEach((task, taskIndex) => {
-            formattedData.push({
-              Vertical: taskIndex === 0 && component === beneficiary.components[0] && activity === component.activities[0] ? beneficiary.verticalName : '',
-              'Type of Project': taskIndex === 0 && activity === component.activities[0] ? beneficiary.projectType : '',
-              'Name of the Project': taskIndex === 0 && component === beneficiary.components[0] ? beneficiary.projectName : '',
-              Component: taskIndex === 0 ? component.componentName : '',
-              Activity: taskIndex === 0 ? activity.activityName : '',
-              Tasks: task.taskName,
-              'Type of Unit': task.typeOfUnit,
-              'Unit Rate': task.ratePerUnit,
-              'No. of Units': task.units,
-              'Total Cost Rs.': task.totalCost,
-              'Beneficiary Contribution Rs.': task.beneficiaryContribution,
-              'Grant Amount (Rs.)': task.grantAmount,
-              'Year of Sanction': task.yearOfSanction,
-            });
-          });
-        });
-      });
-    });
-
-    const worksheet = XLSX.utils.json_to_sheet(formattedData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Beneficiaries');
-    XLSX.writeFile(workbook, 'Beneficiaries.xlsx');
-  };
 
   return (
     <div style={{ padding: '20px' }} className='listContainer'>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h4" gutterBottom style={{ color: '#888' }}>Beneficiary List</Typography>
-
-        <IconButton onClick={exportToExcel}>
-          <DownloadIcon />
-        </IconButton>
       </div>
       <TableContainer component={Paper} className="table">
         <Table sx={{ minWidth: 650 }} aria-label="beneficiary table">

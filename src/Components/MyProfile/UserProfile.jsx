@@ -1,9 +1,28 @@
-import React from 'react';
+import React, { useEffect,useState } from 'react';
 import { Avatar, Box, Typography, Grid, Card, Button, Divider, IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useAuth } from '../PrivateRoute';
+import { getProfileDetails } from '../DataCenter/apiService';
 
 const UserProfile = () => {
+  const { userId } = useAuth();
+  const [profile,setProfile]=useState([]);
+
+  useEffect(() => {
+    async function fetchTasks() {
+      try {
+        console.log("ok");
+        const data = await getProfileDetails(userId);
+        setProfile(data);
+        console.log(profile);
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+      }
+    }
+    fetchTasks();
+  }, []);
+
   const user = {
     profilePicture: 'https://via.placeholder.com/150', // Replace with actual profile picture URL
     username: 'JohnDoe',
@@ -34,27 +53,27 @@ const UserProfile = () => {
         <Grid container spacing={4} alignItems="center">
           <Grid item xs={12} sm={4}>
             <Avatar
-              alt={user.username}
-              src={user.profilePicture}
+              alt={profile.userName}
               sx={{
                 width: { xs: 120, sm: 150 },
                 height: { xs: 120, sm: 150 },
                 margin: 'auto',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // Subtle shadow for profile picture
               }}
-            />
+            >
+            </Avatar>
           </Grid>
 
           <Grid item xs={12} sm={8}>
             <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
               <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 1 }}>
-                {user.username}
+                {profile.userName}
               </Typography>
               <Typography variant="body2" sx={{ color: 'gray', mb: 1 }}>
-                Employee ID: {user.empId}
+                Role: {profile.role}
               </Typography>
               <Typography variant="body2" sx={{ color: 'gray', mb: 1 }}>
-                Email: {user.email}
+                Email: {profile.emailId}
               </Typography>
 
               <Divider sx={{ my: 2 }} />

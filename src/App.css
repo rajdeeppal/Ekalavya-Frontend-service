@@ -22,3 +22,87 @@
  .homeContainer {
   flex: 6 1;
 }
+.css-113d811-MuiFormLabel-root-MuiInputLabel-root.Mui-focused {
+  color: #1976d2;
+  background: #fff!important;
+
+}
+.css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
+  padding: 10.5px 14px!important;  }
+.css-19qnlrw-MuiFormLabel-root-MuiInputLabel-root{
+  font-size: 0.8rem!important;
+  transform: translate(13px, 14px) scale(1)!important;
+}
+.css-sc8y68-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root{
+  border-radius: 8px!important;
+}
+.css-113d811-MuiFormLabel-root-MuiInputLabel-root{
+  background: #fff!important;
+}
+.css-1exr4zk{
+  -webkit-transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 9px 17.5px!important;
+  border-radius: 8px!important;
+
+}
+.css-1abvrni-MuiButtonBase-root-MuiButton-root{
+  cursor: pointer;
+  border-radius: 17px!important;
+  font-size: 13px!important;
+  padding: 19px 20px!important;
+  font-weight: 600!important;
+}
+/* .sidebar .center ul li a:hover , .sidebar .center ul li a:active{
+  background-color: #ece8ff!important;
+  border-radius: 10px 0px 0px 10px!important;
+} */
+
+
+.css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
+  font-size: 13px;
+}
+.css-1abvrni-MuiButtonBase-root-MuiButton-root{
+  line-height: 0!important;
+}
+.css-1fcgnc7{
+  justify-content: flex-end;
+  margin-right: 23px;
+}
+.css-16wblaj-MuiInputBase-input-MuiOutlinedInput-input{
+  padding: 10.5px 14px!important; 
+
+}
+.css-1blp12k-MuiInputBase-root-MuiOutlinedInput-root{
+  border-radius: 8px!important;
+}
+
+
+.css-11imgg{
+  padding: 20px!important;
+}
+
+.css-1it4a80-MuiTypography-root{
+  font-size: 1.125rem!important;
+}
+.css-1orzuox-MuiTableCell-root{
+  font-size: 14px!important;
+  font-weight: bold!important;
+  /* min-width: 250px!important; */
+}
+.css-1rju2q6-MuiButtonBase-root-MuiMenuItem-root{
+  font-size: 14px!important;
+}
+.css-1rju2q6-MuiButtonBase-root-MuiMenuItem-root.Mui-selected{
+  font-size: 14px!important;
+  font-weight: 700!important;
+}
+
+.css-1dc80h3-MuiTableCell-root{
+  font-size: 14px!important;
+  /* font-weight: 700!important; */
+}
+
+.css-rizt0-MuiTypography-root{
+  font-size: 14px!important;
+}

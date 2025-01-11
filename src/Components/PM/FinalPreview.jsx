@@ -124,7 +124,7 @@ const FinalPreview = () => {
       };
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
             <Sidebar />
             <Box
                 component="main"
@@ -138,7 +138,7 @@ const FinalPreview = () => {
                 <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', pb: 3 }}>
                     <SearchBar onSearch={handleSearch} />
                 </Box>
-                {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
+                {showTable && <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
                 <FinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} value={value}/>
                 </Box>}
             </Box>

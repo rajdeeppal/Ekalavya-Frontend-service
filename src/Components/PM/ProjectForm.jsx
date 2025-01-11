@@ -87,7 +87,7 @@ const ProjectForm = ({ addProject }) => {
         {errors.selectedVertical && <Alert severity="error">{errors.selectedVertical}</Alert>}
       </FormControl>
 
-      <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ mt: 2 }}>
+      <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ mt: 2 }} style={{width:"100%",borderRadius:"15px"}}>
         Submit
       </Button>
     </Box>

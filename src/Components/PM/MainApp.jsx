@@ -12,7 +12,7 @@ import { useAuth } from '../PrivateRoute';
 
 const MainApp = () => {
   const { userId } = useAuth();
-  
+  const [isSuccess,setIsSucess]=useState(false);
   const [projects, setProjects] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([
     {
@@ -82,18 +82,15 @@ const MainApp = () => {
     }
   ]);
   const [showTable, setShowTable] = useState(false);
+  const [value,setValue]=useState(false);
 
-  // useEffect(() => {
-  //   async function fetchBeneficiary() {
-  //     try {
-  //       const data = await getBeneficiary();
-  //       setBeneficiaries(Array.isArray(data) ? data : []);
-  //     } catch (error) {
-  //       console.error('Error fetching Beneficiary:', error);
-  //     }
-  //   }
-  //   fetchBeneficiary();
-  // }, [])
+  useEffect(() => {
+    console.log("isSuccess:", isSuccess);
+    if (isSuccess) {
+      console.log("Calling handleSearch...");
+      handleSearch(value);
+    }
+  }, [isSuccess]);
 
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
@@ -117,17 +114,20 @@ const MainApp = () => {
       setBeneficiaries(Array.isArray(data) ? data : []);
       setShowTable(true);
       console.log(beneficiaries);
+      setValue(criteria);
+      console.log(isSuccess);
     } catch (error) {
+      setShowTable(false);
+      alert(error);
       console.error('Error fetching activities:', error);
     }
   };
 
   return (
-    <div className="home">
-   <Grid container spacing={2}>
+    // <div className="home" style={{backgroundColor:"#F0F5F9"}}>
+   <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
       <Sidebar />
-      <div className="homeContainer">
-      {/* <Navbar/> */}
+      
       <Box
         component="main"
         sx={{
@@ -198,13 +198,13 @@ const MainApp = () => {
           </Box>
         </Modal>
 
-        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-          <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} handleSearch={handleSearch}/>
+        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
+          <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} setIsSucess={setIsSucess}/>
         </Box>}
       </Box>
-      </div>
-      </Grid >
-      </div>
+     
+    </Box >
+    
   );
 };
 

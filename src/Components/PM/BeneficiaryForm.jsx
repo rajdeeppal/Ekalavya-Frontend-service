@@ -137,7 +137,8 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
         mandalName: data.mandalName,
         stateName: data.stateName,
         aadharNumber: data.aadharNumber,
-        districtName:  data.districtName 
+        districtName:  data.districtName,
+        surveyNumber: data.surveyNumber
       });
   
     } catch (error) {
@@ -399,6 +400,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           label="Survey No."
           name="surveyNumber"
           placeholder="Survey No"
+          value={beneficiary.surveyNumber}
           onChange={handleChange}
           margin="normal"
           required
