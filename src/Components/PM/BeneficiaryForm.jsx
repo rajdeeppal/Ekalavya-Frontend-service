@@ -230,7 +230,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
       districtName: beneficiary.districtName,
       stateName: beneficiary.stateName,
       aadharNumber: parseInt(beneficiary.aadharNumber, 10),
-      surveyNumber: parseInt(beneficiary.surveyNumber, 10),
+      surveyNumber: beneficiary.surveyNumber,
       componentName: selectedComponent,
       activityName: selectedActivity,
       taskName: selectedTask,

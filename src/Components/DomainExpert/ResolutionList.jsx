@@ -79,7 +79,7 @@ function ResolutionList() {
                                     onClick={handleSearch}
                                     sx={{ height: '40px' }}  // Adjust height to match input fields
                                 >
-                                    Upload
+                                    View
                                 </Button>
                             </Grid>
                         </Grid>
