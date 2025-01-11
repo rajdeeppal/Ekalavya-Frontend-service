@@ -32,7 +32,7 @@ import * as XLSX from 'xlsx';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import { updatedResubmitSubTask, approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
 
-function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
+function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess }) {
     const { userId } = useAuth();
     const [remarks, setRemarks] = useState('');
     const [open, setOpen] = useState({});
@@ -102,19 +102,23 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
         if (action === 'Approve') {
             try {
                 await approveDomainDetails(userId, rowId, changedData.remarks);
+                setIsSucess(true);
                 console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
                 alert("Tasks have been approved successfully");
             } catch (error) {
                 console.error("Error approving tasks:", error);
+                setIsSucess(true);
                 alert("An error occurred while approving the tasks. Please try again.");
             }
         } else {
             try {
                 await rejectDomainDetails(userId, rowId, changedData.remarks);
+                setIsSucess(true);
                 console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
                 alert("Tasks have been rejected successfully");
             } catch (error) {
                 console.error("Error tasks:", error);
+                setIsSucess(true);
                 alert("An error occurred while rejecting the tasks. Please try again.");
             }
         }
@@ -135,9 +139,11 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview }) {
         try {
             await updatedResubmitSubTask(userId, rowId, changedData.remarks);
             console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
+            setIsSucess(true);
             alert("Tasks have been approved successfully");
         } catch (error) {
             console.error("Error approving tasks:", error);
+            setIsSucess(true);
             alert("An error occurred while approving the tasks. Please try again.");
         }
     };

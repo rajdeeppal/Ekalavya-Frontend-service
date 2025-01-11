@@ -30,7 +30,7 @@ import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetai
 import AOPaymentTable from '../AO/AOPaymentTable';
 import DownloadIcon from '@mui/icons-material/Download';
 
-function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date }) {
+function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date,setIsSucess }) {
     const { userId } = useAuth();
     const [open, setOpen] = useState({});
     const [selectedTasks, setSelectedTasks] = useState({});
@@ -560,7 +560,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date }) {
                     <Typography variant="h6" component="h2" gutterBottom>
                         Payment Form
                     </Typography>
-                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} />
+                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} setIsSucess={setIsSucess}/>
                 </Box>
             </Modal>
         </div>

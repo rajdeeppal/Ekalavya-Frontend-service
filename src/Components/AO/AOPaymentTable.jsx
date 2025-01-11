@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { getVoucherDetails, generatedPaymentDetails } from '../DataCenter/apiService';
 
-function AOPaymentTable({ setShowViewPaymentConfirmation }) {
+function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess }) {
     const [formValues, setFormValues] = useState({
         voucherId: '',
         payeeName: '',
@@ -88,8 +88,11 @@ const handleSearch = async (value) => {
         try {
             await generatedPaymentDetails(criteria);
             setShowFrom(false);
+            setIsSucess(true);
             setShowViewPaymentConfirmation(false);
         } catch (error) {
+            setIsSucess(true);
+            alert(error);
             console.error('Error saving payment details:', error);
         }
     };

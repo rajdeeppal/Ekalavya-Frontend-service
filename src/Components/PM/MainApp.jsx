@@ -114,6 +114,7 @@ const MainApp = () => {
       setBeneficiaries(Array.isArray(data) ? data : []);
       setShowTable(true);
       console.log(beneficiaries);
+      setIsSucess(false);
       setValue(criteria);
       console.log(isSuccess);
     } catch (error) {
