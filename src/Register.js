@@ -35,7 +35,7 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      fetch('http://3.111.84.98:61002/self-service/submitRoleRequest', {
+      fetch('http://13.233.255.117:61002/self-service/submitRoleRequest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
