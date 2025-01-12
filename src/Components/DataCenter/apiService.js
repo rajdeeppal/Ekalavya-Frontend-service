@@ -625,7 +625,7 @@ export const getVoucherDetails = async (voucher_id) => {
 export const getProfileDetails = async (userId) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/user/profile/${userId}`,
+      `http://3.111.84.98:61002/user/profile/${userId}`,
       {
         headers: getAuthorizationHeader(),
       }
