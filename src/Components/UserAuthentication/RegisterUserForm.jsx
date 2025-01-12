@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  TextField, Button, Box, Typography, Grid, Paper, MenuItem, CircularProgress, FormControl, InputLabel, Select, FormHelperText
+  TextField, Button, Box, Typography, Grid, Paper, MenuItem, CircularProgress, FormControl, InputLabel, Select, FormHelperText, Container, Alert
 } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -95,7 +95,8 @@ const RegisterUserForm = () => {
         navigate('/');
       }
     } catch (error) {
-      setErrorMessage('Error registering user. Please try again.');
+        const errorMessage = error.response?.data || 'Error registering user. Please try again.';
+      setErrorMessage(errorMessage);
       setSuccessMessage('');
     } finally {
       setLoading(false);
@@ -259,12 +260,16 @@ const RegisterUserForm = () => {
                 {successMessage}
               </Typography>
             )}
-
-            {errorMessage && (
+                {errorMessage && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        {errorMessage}
+                    </Alert>
+                )}
+{/*             {errorMessage && (
               <Typography color="error" variant="body2" sx={{ mt: 2 }}>
                 {errorMessage}
               </Typography>
-            )}
+            )} */}
 
             <Button
               type="submit"
