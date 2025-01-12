@@ -23,7 +23,7 @@ const EmailOtpVerification = ({ username }) => {
     setLoading(true); // Start loading spinner
 
     try {
-      const response = await axios.post('http://13.233.255.117:61002/admin/sendOtp', { username });
+      const response = await axios.post('http://13.233.104.38:61002/admin/sendOtp', { username });
       setIsOtpSent(true);
       setMessage('OTP has been sent to your email.');
     } catch (error) {
@@ -38,7 +38,7 @@ const EmailOtpVerification = ({ username }) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://13.233.255.117:61002/admin/validateOtp', { username, otp });
+      const response = await axios.post('http://13.233.104.38:61002/admin/validateOtp', { username, otp });
       if (response.data === 'Otp Validated Successfully!') {
         setMessage('OTP verified successfully!');
         navigate('/adminDashboard');

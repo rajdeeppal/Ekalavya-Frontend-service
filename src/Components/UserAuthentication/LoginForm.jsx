@@ -17,7 +17,7 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://13.233.255.117:61002/auth/login', {
+      const response = await fetch('http://13.233.104.38:61002/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

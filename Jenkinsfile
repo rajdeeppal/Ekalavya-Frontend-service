@@ -5,7 +5,7 @@ pipeline {
         SSH_KEY = credentials('ec2-ssh-key')
         IMAGE_NAME = 'iamdebjit3107/ekalavya-frontend'
         EC2_USER = 'ubuntu'
-        EC2_HOST = '13.233.255.117'
+        EC2_HOST = '13.233.104.38'
     }
     
     stages {
