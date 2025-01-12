@@ -9,7 +9,7 @@ import AODashboardTable from './AODashboardTable';
 
 function AODashboard() {
     const { userId } = useAuth();
-    const [showTable, setShowTable] = useState(true);
+    const [showTable, setShowTable] = useState(false);
     const [isReview, setIsReview] = useState(true);
     const [beneficiaries, setBeneficiaries] = useState([
         
@@ -29,7 +29,7 @@ function AODashboard() {
         }
     };
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
             <Sidebar />
             <Box
                 component="main"

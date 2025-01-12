@@ -9,6 +9,9 @@ import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
 import PendingIcon from '@mui/icons-material/Pending';
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
+import PaymentsIcon from '@mui/icons-material/Payments';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 const Sidebar = () => {
 
@@ -61,7 +64,7 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
+              <PlaylistRemoveIcon className="icon" style={{ color: "black" }} />
               <span>Rejection center</span>
             </NavLink>
           </li>
@@ -78,7 +81,7 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
+              <DashboardIcon className="icon" style={{ color: "black" }} />
               <span>Dashboard</span>
             </NavLink>
           </li>
@@ -95,7 +98,7 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })}>
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
+              <PaymentsIcon className="icon" style={{ color: "black" }} />
               <span>Payment Report</span>
             </NavLink>
           </li>
@@ -112,7 +115,7 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
+              <AssessmentIcon className="icon" style={{ color: "black" }} />
               <span>Report Tab</span>
             </NavLink>
           </li>

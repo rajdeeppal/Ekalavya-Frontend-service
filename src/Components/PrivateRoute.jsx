@@ -2,14 +2,22 @@ import React, { createContext, useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
-const AuthContext = createContext();
+const defaultAuthContext = {
+  isTokenExpired: false,
+  token: null,
+  userId: null,
+  userRole: null,
+  hasAccess: () => false,
+};
+
+const AuthContext = createContext(defaultAuthContext);
 
 // Custom hook to use AuthContext
 export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-export const PrivateRoute = ({ children }) => {
+export const PrivateRoute = ({ children, requiredRoles }) => {
   const token = localStorage.getItem('jwtToken');
 
   // Function to check if token is expired
@@ -26,6 +34,12 @@ export const PrivateRoute = ({ children }) => {
     }
   };
 
+  const userRole = jwtDecode(token) ? jwtDecode(token).role[0]?.authority : null;
+  const hasAccess = (requiredRoles) => {
+    if (!userRole) return false;
+    return requiredRoles.includes(userRole);
+  };
+
   // If token is not present or expired, redirect to the homepage
   if (!token) {
     window.alert('You are not logged in. Redirecting to the login page.');
@@ -37,11 +51,18 @@ export const PrivateRoute = ({ children }) => {
     return <Navigate to="/" />;
   }
 
+  if (!hasAccess(requiredRoles)) {
+    window.alert('You do not have permission to access this page.');
+    return <Navigate to="/" replace />;
+  }
+
   const userId = jwtDecode(token).sub; // Decode the token after ensuring it's not null or expired
 
   const value = {
     token,
     userId,
+    userRole,
+    hasAccess,
     isTokenExpired,
   };
 

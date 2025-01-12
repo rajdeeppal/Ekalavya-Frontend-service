@@ -43,7 +43,7 @@ function TrusteeRejectPage() {
     }
   };
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
       <Sidebar />
       <div className="homeContainer">
         {/* <Navbar /> */}

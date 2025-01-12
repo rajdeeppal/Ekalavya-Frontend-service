@@ -108,7 +108,7 @@ const FinalPreview = () => {
         // }
     ]);
     const [value,setValue]=useState(true);
-    const [showTable, setShowTable] = useState(true);
+    const [showTable, setShowTable] = useState(false);
     const handleSearch = async (criteria) => {
         if (!criteria) return;
         try {

@@ -8,7 +8,7 @@ import ReviewTable from '../DomainExpert/ReviewTable';
 
 function CEOReviewPage() {
   const { userId } = useAuth();
-  const [showTable, setShowTable] = useState(true);
+  const [showTable, setShowTable] = useState(false);
   const [isReview, setIsReview] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [isSuccess, setIsSucess] = useState(false);
@@ -40,7 +40,7 @@ function CEOReviewPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
       <Sidebar />
       <Box
         component="main"

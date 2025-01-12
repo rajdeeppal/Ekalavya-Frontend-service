@@ -8,7 +8,7 @@ import ReviewTable from '../DomainExpert/ReviewTable';
 
 function TrusteeReviewPage() {
   const { userId } = useAuth();
-  const [showTable, setShowTable] = useState(true);
+  const [showTable, setShowTable] = useState(false);
   const [isReview, setIsReview] = useState(false);
   const [isSuccess, setIsSucess] = useState(false);
   const [value, setValue] = useState(false);
@@ -41,7 +41,7 @@ function TrusteeReviewPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
       <Sidebar />
       <Box
         component="main"

@@ -62,7 +62,7 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
+              <DashboardIcon className="icon" style={{ color: "black" }} />
               <span>Payment Dashboard</span>
             </NavLink>
           </li>

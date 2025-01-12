@@ -8,7 +8,7 @@ import PaymentTable from '../CEO/PaymentTable';
 
 function AOPaymentPage() {
   const { userId } = useAuth();
-  const [showTable, setShowTable] = useState(true);
+  const [showTable, setShowTable] = useState(false);
   const [isReview, setIsReview] = useState(true);
   const [isSuccess, setIsSucess] = useState(false);
   const [value, setValue] = useState(false);
@@ -41,7 +41,7 @@ function AOPaymentPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
       <Sidebar />
       <Box
         component="main"

@@ -444,36 +444,38 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess })
                             background: '#f9f9f9',
                         }}
                     >
-                        {comments.map((comment, id) => (
-                            <div
-                                key={id}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'flex-start',
-                                    marginBottom: '16px',
-                                }}
-                            >
-                                <Avatar
-                                    sx={{
-                                        bgcolor: comment.role === 'Admin' ? 'primary.main' : 'secondary.main',
-                                        mr: 2,
+                        {comments !== null ? <>
+                            {comments?.map((comment, id) => (
+                                <div
+                                    key={id}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        marginBottom: '16px',
                                     }}
                                 >
-                                    {comment.role ? comment.role.charAt(0) : 'U'}
-                                </Avatar>
-                                <div>
-                                    <Typography
-                                        variant="subtitle1"
-                                        sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                                    <Avatar
+                                        sx={{
+                                            bgcolor: comment.role === 'Admin' ? 'primary.main' : 'secondary.main',
+                                            mr: 2,
+                                        }}
                                     >
-                                        {comment.role || 'Unknown Role'}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                        {comment.message || 'No message provided.'}
-                                    </Typography>
+                                        {comment.role.charAt(0)}
+                                    </Avatar>
+                                    <div>
+                                        <Typography
+                                            variant="subtitle1"
+                                            sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                                        >
+                                            {comment.role}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                            {comment.message}
+                                        </Typography>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </>:<>No Remarks found</>}
                     </div>
                     <Divider sx={{ my: 2 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>

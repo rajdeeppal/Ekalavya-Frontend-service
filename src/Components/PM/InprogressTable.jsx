@@ -148,9 +148,12 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
             });
             console.log("submit", filteredData);
             await submitInProgressDetails(filteredData);
+            setIsSucess(true);
             alert("Beneficiary have been submitted successfully");
             setShowConfirmation(false);
         } catch (error) {
+            setIsSucess(true);
+            alert(error);
             console.error('Error fetching activities:', error);
         }
     };
@@ -196,7 +199,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                     const data = updatedRow.achievementUnit;
                                     const beneficiaryContribution = updatedRow.currentBeneficiaryContribution || 0;
 
-                                    updatedRow.currentCost = (data * ratePerUnit) ;
+                                    updatedRow.currentCost = (data * ratePerUnit);
                                 }
 
                                 updatedTaskUpdates[rowIndex] = updatedRow;
@@ -222,12 +225,12 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                         tasks: activity.tasks.map((task) => {
                             if (task.id === taskIndex) {
                                 const updatedTaskUpdates = task.taskUpdates.map((row, index) =>
-                                    
+
                                     index === rowIndex
-                                        ? { ...row, [field]: value } 
+                                        ? { ...row, [field]: value }
                                         : row
-                                        
-                                );console.log(taskIndex)
+
+                                ); console.log(taskIndex)
                                 console.log(rowIndex)
                                 console.log(value)
                                 return { ...task, taskUpdates: updatedTaskUpdates };
@@ -239,7 +242,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
             }))
         );
     };
-    
+
 
     const handleDeleteConfirmSubmit = async () => {
         try {
@@ -491,7 +494,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                     <TableCell colSpan={10} style={{ padding: 0 }}>
                                         <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
                                             <div style={{ padding: '10px' }}>
-                                                {beneficiary.components?.map((component,componentIndex) => (
+                                                {beneficiary.components?.map((component, componentIndex) => (
                                                     <div key={component.id}>
                                                         <Accordion>
                                                             <AccordionSummary
@@ -502,7 +505,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                                                 <Typography>{component.componentName}</Typography>
                                                             </AccordionSummary>
                                                             <AccordionDetails>
-                                                                {component.activities?.map((activity,activityIndex) => (
+                                                                {component.activities?.map((activity, activityIndex) => (
                                                                     <div key={activity.id}>
                                                                         <Accordion>
                                                                             <AccordionSummary
@@ -839,7 +842,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                                                                                                                                         'primary'
                                                                                                                                                     }
                                                                                                                                                     onClick={() => toggleEditMode(
-                                                                                                                                                        task.id,rowIndex)}
+                                                                                                                                                        task.id, rowIndex)}
                                                                                                                                                 >
                                                                                                                                                     <EditIcon />
                                                                                                                                                 </IconButton></TableCell>
@@ -967,36 +970,38 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                             background: '#f9f9f9',
                         }}
                     >
-                        {comments.map((comment, id) => (
-                            <div
-                                key={id}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'flex-start',
-                                    marginBottom: '16px',
-                                }}
-                            >
-                                <Avatar
-                                    sx={{
-                                        bgcolor: comment.role === 'Admin' ? 'primary.main' : 'secondary.main',
-                                        mr: 2,
+                        {comments !== null ? <>
+                            {comments?.map((comment, id) => (
+                                <div
+                                    key={id}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        marginBottom: '16px',
                                     }}
                                 >
-                                    {comment.role.charAt(0)}
-                                </Avatar>
-                                <div>
-                                    <Typography
-                                        variant="subtitle1"
-                                        sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                                    <Avatar
+                                        sx={{
+                                            bgcolor: comment.role === 'Admin' ? 'primary.main' : 'secondary.main',
+                                            mr: 2,
+                                        }}
                                     >
-                                        {comment.role}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                        {comment.message}
-                                    </Typography>
+                                        {comment.role.charAt(0)}
+                                    </Avatar>
+                                    <div>
+                                        <Typography
+                                            variant="subtitle1"
+                                            sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                                        >
+                                            {comment.role}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                            {comment.message}
+                                        </Typography>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </>:<>No Remarks found</>}
                     </div>
                     <Divider sx={{ my: 2 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>

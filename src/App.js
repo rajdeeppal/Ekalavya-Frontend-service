@@ -41,7 +41,7 @@ function App() {
       <Route
         path="/adminDashboard"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['EADMIN']}>
             <AdminDashboard />
           </PrivateRoute>
         }
@@ -49,7 +49,7 @@ function App() {
       <Route
         path="/pendingRequests"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['EADMIN']}>
             <PendingRequests />
           </PrivateRoute>
         }
@@ -57,7 +57,7 @@ function App() {
       <Route
         path="/rolemanagement"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['EADMIN']}>
             <RoleManagement />
           </PrivateRoute>
         }
@@ -65,7 +65,7 @@ function App() {
       <Route
         path="/createBeneficiary"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['EADMIN']}>
             <TaskIframe />
           </PrivateRoute>
         }
@@ -73,7 +73,7 @@ function App() {
       <Route
         path="/beneficiary"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['PM']}>
             <MainApp />
           </PrivateRoute>
         }
@@ -81,7 +81,7 @@ function App() {
       <Route
         path="/myprofile"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','CEO','TRUSTEE']}>
             <UserProfile />
           </PrivateRoute>
         }
@@ -89,7 +89,7 @@ function App() {
       <Route
         path="/inprogress"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['PM']}>
             <ProgressIframe />
           </PrivateRoute>
         }
@@ -97,7 +97,7 @@ function App() {
       <Route
         path="/finalpreview"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['PM']}>
             <FinalPreview />
           </PrivateRoute>
         }
@@ -105,7 +105,7 @@ function App() {
       <Route
         path="/resolution"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['PM']}>
             <Resolution />
           </PrivateRoute>
         }
@@ -113,7 +113,7 @@ function App() {
       <Route
         path="/resolution-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['DOMAIN EXPERT']}>
             <ResolutionList />
           </PrivateRoute>
         }
@@ -122,7 +122,7 @@ function App() {
       <Route
         path="/inprogress-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['DOMAIN EXPERT']}>
             <ReviewPage />
           </PrivateRoute>
         }
@@ -131,7 +131,7 @@ function App() {
       <Route
         path="/review-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['DOMAIN EXPERT']}>
             <RejectPage />
           </PrivateRoute>
         }
@@ -140,7 +140,7 @@ function App() {
       <Route
         path="/CEO/inprogress-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['CEO']}>
             <CEOReviewPage />
           </PrivateRoute>
         }
@@ -149,7 +149,7 @@ function App() {
       <Route
         path="/CEO/review-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['CEO']}>
             <CEORejectPage />
           </PrivateRoute>
         }
@@ -158,7 +158,7 @@ function App() {
       <Route
         path="/CEO/report-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['CEO']}>
             <ReportPage />
           </PrivateRoute>
         }
@@ -167,7 +167,7 @@ function App() {
       <Route
         path="/CEO/payment-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['CEO']}>
             <PaymentPage />
           </PrivateRoute>
         }
@@ -176,7 +176,7 @@ function App() {
       <Route
         path="/Trustee/inprogress-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['TRUSTEE']}>
             <TrusteeReviewPage />
           </PrivateRoute>
         }
@@ -185,7 +185,7 @@ function App() {
       <Route
         path="/Trustee/review-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['TRUSTEE']}>
             <TrusteeRejectPage />
           </PrivateRoute>
         }
@@ -194,7 +194,7 @@ function App() {
       <Route
         path="/AO/payment-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['AO']}>
             <AOPaymentPage />
           </PrivateRoute>
         }
@@ -203,7 +203,7 @@ function App() {
       <Route
         path="/AO/dashboard/payment-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['AO']}>
             <AODashboard />
           </PrivateRoute>
         }
@@ -212,7 +212,7 @@ function App() {
       <Route
         path="/CEO/dashboard-list"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['CEO']}>
             <CEODashboard />
           </PrivateRoute>
         }
@@ -221,7 +221,7 @@ function App() {
       <Route
         path="/rejectedList"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredRoles={['PM']}>
             <RejectIframe />
           </PrivateRoute>
         }
