@@ -95,9 +95,17 @@ const RegisterUserForm = () => {
         navigate('/');
       }
     } catch (error) {
-        const errorMessage = error.response?.data || 'Error registering user. Please try again.';
-      setErrorMessage(errorMessage);
-      setSuccessMessage('');
+    const backendErrors = error.response?.data || 'Error registering user. Please try again.';
+            if (typeof backendErrors === 'object' && backendErrors !== null) {
+                const formattedErrors = Object.entries(backendErrors)
+                    .map(([field, message]) => `${field}: ${message}`)
+                    .join('\n');
+
+                setErrorMessage(formattedErrors);
+            } else {
+                setErrorMessage(backendErrors);
+            }
+            setSuccessMessage('');
     } finally {
       setLoading(false);
     }
