@@ -338,8 +338,11 @@ export const updatedResubmitSubTask = async (userId,rowId,remarks) => {
   try {
     const response = await axios.post(
       `http://3.111.84.98:61002/ops/user/resubmit/${userId}/${rowId}?remarks=${remarks}`,
+      null, // No request body
       {
-        headers: getAuthorizationHeader()
+        headers: {
+          ...getAuthorizationHeader() // Authorization headers
+        }
       }
     );
     return response.data;
