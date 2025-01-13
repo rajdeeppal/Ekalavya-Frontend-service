@@ -119,7 +119,8 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess })
             } catch (error) {
                 console.error("Error tasks:", error);
                 setIsSucess(true);
-                alert("An error occurred while rejecting the tasks. Please try again.");
+                const backendErrors = error.response?.data || 'An error occurred while rejecting the tasks. Please try again.';
+                alert(backendErrors);
             }
         }
     };
@@ -144,7 +145,8 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess })
         } catch (error) {
             console.error("Error approving tasks:", error);
             setIsSucess(true);
-            alert("An error occurred while approving the tasks. Please try again.");
+            const backendErrors = error.response?.data || 'An error occurred while approving the tasks. Please try again.';
+            alert(backendErrors);
         }
     };
     return (
