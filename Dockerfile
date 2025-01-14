@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy the package.json and package-lock.json files
 COPY . .
 
-RUN npm install pm2
+RUN npm install -g pm2
 
 EXPOSE 3000
 
