@@ -5,7 +5,7 @@ FROM node:18-alpine AS build
 WORKDIR /app
 
 # Copy the package.json and package-lock.json files
-COPY build/ .
+COPY . .
 
 RUN "sudo npm install pm2"
 
