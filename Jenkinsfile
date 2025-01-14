@@ -2,10 +2,10 @@ pipeline {
     agent any
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') 
-        SSH_KEY = credentials('ec2-ssh-key')
+        SSH_KEY = credentials('frontend-ec2-ssh')
         IMAGE_NAME = 'iamdebjit3107/ekalavya-frontend'
         EC2_USER = 'ubuntu'
-        EC2_HOST = '3.111.84.98'
+        EC2_HOST = '13.232.188.255'
     }
     
     stages {
