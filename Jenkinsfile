@@ -16,6 +16,18 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                sh "npm install"
+            }
+        }
+
+        stage('Production Build') {
+            steps {
+                sh "npm run build"
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 sh "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} ."
@@ -41,7 +53,7 @@ pipeline {
                 "docker pull ${env.IMAGE_NAME}:${env.BUILD_ID} && \
                 docker stop ekalavya-frontend-app || true && \
                 docker rm ekalavya-frontend-app || true && \
-                docker run --restart unless-stopped -d --name ekalavya-frontend-app -p 80:80 ${env.IMAGE_NAME}:${env.BUILD_ID}"
+                docker run --restart unless-stopped -d --name ekalavya-frontend-app -p 3000:3000 ${env.IMAGE_NAME}:${env.BUILD_ID}"
                     """
             }
         }
