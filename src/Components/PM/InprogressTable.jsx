@@ -271,9 +271,16 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
         if (Number(rowIndex) === 0 && row === undefined) {
             firstTask = true;
         }
+
+        if ( row !== undefined) {
+            setNewTask(false);
+        }
+        console.log(firstTask)
         if (isReject) {
             firstTask = false;
         }
+
+        console.log(firstTask)
         const changedData = task.taskUpdates[rowIndex];
 
         const taskUpdateDTO = {
