@@ -191,27 +191,27 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         };
 
         console.log(totalAmount)
-        // try {
-        //     const blob = await generatedVoucherDetails(voucherData);
-        //     const url = window.URL.createObjectURL(blob);
-        //     const a = document.createElement('a');
-        //     a.style.display = 'none';
-        //     a.href = url;
-        //     a.download = 'PaymentVoucher.pdf';
-        //     document.body.appendChild(a);
-        //     a.click();
-        //     window.URL.revokeObjectURL(url);
+        try {
+            const blob = await generatedVoucherDetails(voucherData);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'PaymentVoucher.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
 
-        //     // Reset form values
-        //     setFormValues({
-        //         bankName: '',
-        //         iFSCNo: '',
-        //         branchName: '',
-        //     });
-        //     setShowViewConfirmation(false);
-        // } catch (error) {
-        //     console.error('Error generating voucher:', error);
-        // }
+            // Reset form values
+            setFormValues({
+                bankName: '',
+                iFSCNo: '',
+                branchName: '',
+            });
+            setShowViewConfirmation(false);
+        } catch (error) {
+            console.error('Error generating voucher:', error);
+        }
 
         console.log('Generated Voucher Data:', voucherData);
         return voucherData;
