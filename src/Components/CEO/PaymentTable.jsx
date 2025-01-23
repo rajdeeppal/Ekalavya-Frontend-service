@@ -391,7 +391,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                                                                                 {isReview && <TableCell style={{ fontWeight: 'bold' }}>Checkbox</TableCell>}
                                                                                                                 <TableCell style={{ fontWeight: 'bold' }}>Name of the Work</TableCell>
                                                                                                                 <TableCell style={{ fontWeight: 'bold' }}>Total Cost</TableCell>
-                                                                                                                <TableCell style={{ fontWeight: 'bold' }}>Beneficiary Contribution Balance</TableCell>
+                                                                                                                <TableCell style={{ fontWeight: 'bold' }}>Beneficiary Contribution</TableCell>
                                                                                                             </TableRow>
                                                                                                         </TableHead>
                                                                                                         <TableBody>
