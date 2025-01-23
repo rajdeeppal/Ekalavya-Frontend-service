@@ -250,8 +250,9 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
             alert('Beneficiary deleted successfully!');
             setShowDeleteConfirmation(false);
         } catch (error) {
-            console.error("Error deleting benficiary:", error);
-            alert("An error occurred while deleting the task.");
+            const backendErrors = error.response?.data || 'Error registering user. Please try again.';
+            console.error(backendErrors);
+            alert(backendErrors);
         }
     }
 

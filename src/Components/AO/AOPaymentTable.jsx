@@ -19,6 +19,7 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess }) {
         accountNumber: '',
         amount: '',
         taskNames: [],
+        projectTaskMappings: [],
         bankInfo: '',
         transactionId: '',
         paymentMode: '',
@@ -56,6 +57,7 @@ const handleSearch = async (value) => {
         accountNumber: data.accountNumber,
         amount: data.amount,
         taskNames: data.taskNames,
+        projectTaskMappings: data.projectTaskMappings,
         bankInfo: data.bankInfo,
       });
 
@@ -79,6 +81,7 @@ const handleSearch = async (value) => {
             accountNumber: formValues.accountNumber,
             amount: formValues.amount,
             taskNames: formValues.taskNames,
+            projectTaskMappings: formValues.projectTaskMappings,
             bankInfo: formValues.bankInfo,
             paymentMode: formValues.paymentMode,
             transactionId: formValues.transactionId,
