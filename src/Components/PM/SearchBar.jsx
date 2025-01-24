@@ -171,7 +171,7 @@ const SearchBar = ({ onSearch }) => {
             color="primary"
             className="button"
             onClick={handleSearch}
-            disabled={selectedProject.trim().length === 0}
+            disabled={selectedProject.trim().length === 0 || selectedDistrict.trim().length === 0|| selectedState.trim().length === 0}
             sx={{ height: '40px' }}  // Adjust height to match input fields
           >
             Search
