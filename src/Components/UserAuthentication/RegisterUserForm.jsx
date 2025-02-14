@@ -28,7 +28,7 @@ const RegisterUserForm = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await axios.get('http://3.111.84.98:61002/roleAudit');
+        const response = await axios.get('http://3.111.113.121:61002/roleAudit');
         setRoles(response.data);
       } catch (error) {
         console.error('Error fetching roles:', error);
@@ -75,7 +75,7 @@ const RegisterUserForm = () => {
     const formData = { username, password, vertical : selectedVertical, component : selectedComponent, emailId, requestedRole };
 
     try {
-      const response = await axios.post('http://3.111.84.98:61002/self-service/submitRoleRequest', JSON.stringify(formData), {
+      const response = await axios.post('http://3.111.113.121:61002/self-service/submitRoleRequest', JSON.stringify(formData), {
         headers: {
           'Content-Type': 'application/json',
         }
