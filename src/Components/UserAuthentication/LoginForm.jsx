@@ -17,7 +17,7 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://3.111.84.98:61002/api/auth/login', {
+      const response = await fetch('https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -14,9 +14,9 @@ const Dashboard = () => {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      axios.get("https://3.111.84.98:61002/api/dashboard/project/count"),
-      axios.get("https://3.111.84.98:61002/api/dashboard/beneficiary/count"),
-      axios.get("https://3.111.84.98:61002/api/dashboard/project/progress"),
+      axios.get("https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/dashboard/project/count"),
+      axios.get("https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/dashboard/beneficiary/count"),
+      axios.get("https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/dashboard/project/progress"),
     ])
       .then(([projectCountRes, familyCountRes, projectProgressRes]) => {
         setProjectsCount(projectCountRes.data);
