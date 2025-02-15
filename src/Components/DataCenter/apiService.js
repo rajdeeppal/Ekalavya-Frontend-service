@@ -1,11 +1,11 @@
 import axios from "axios";
 // import { jwtDecode } from 'jwt-decode';
-const BASE_URL = "http://3.111.113.121:61002/admin"; // Update with your actual API URL http://3.111.113.121:61002/admin
-const PM_BASE_URL = "http://3.111.113.121:61002/user/pm";
-const BASE_PUBLIC_URL = "http://3.111.113.121:61002/self-service";
+const BASE_URL = "http://3.111.113.121:61002/api/admin"; // Update with your actual API URL http://3.111.113.121:61002/api/admin
+const PM_BASE_URL = "http://3.111.113.121:61002/api/user/pm";
+const BASE_PUBLIC_URL = "http://3.111.113.121:61002/api/self-service";
 
-const BENEFICIARY_BASE_URL = "http://3.111.113.121:61002/beneficiary";
-const SUBMIT_BASE_URL = "http://3.111.113.121:61002/ops/pm";
+const BENEFICIARY_BASE_URL = "http://3.111.113.121:61002/api/beneficiary";
+const SUBMIT_BASE_URL = "http://3.111.113.121:61002/api/ops/pm";
 
 const getToken = () => localStorage.getItem("jwtToken");
 const getAuthorizationHeader = () => {
@@ -223,7 +223,7 @@ export const getBeneficiary = async (userId, data, category) => {
       const { stateName, districtName, projectName, componentName } = data;
       
       // Start building the query parameters
-      let url = `http://3.111.113.121:61002/beneficiary/filter/${userId}`;
+      let url = `http://3.111.113.121:61002/api/beneficiary/filter/${userId}`;
       const params = new URLSearchParams();
   
       // Add parameters if they are provided
@@ -318,7 +318,7 @@ export const updatedBeneficiarySubTask = async (rowId, object) => {
 export const updatedResubmitBeneficiarySubTask = async (rowId, object) => {
   try {
     const response = await axios.put(
-      `http://3.111.113.121:61002/ops/pm/resubmit/${rowId}`,
+      `http://3.111.113.121:61002/api/ops/pm/resubmit/${rowId}`,
       object,
       {
         headers: {
@@ -337,7 +337,7 @@ export const updatedResubmitBeneficiarySubTask = async (rowId, object) => {
 export const updatedResubmitSubTask = async (userId,rowId,remarks) => {
   try {
     const response = await axios.post(
-      `http://3.111.113.121:61002/ops/user/resubmit/${userId}/${rowId}?remarks=${remarks}`,
+      `http://3.111.113.121:61002/api/ops/user/resubmit/${userId}/${rowId}?remarks=${remarks}`,
       null, // No request body
       {
         headers: {
@@ -357,7 +357,7 @@ export const getPaymentDetails = async (data, category) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://3.111.113.121:61002/ao/payments/pending`;
+    let url = `http://3.111.113.121:61002/api/ao/payments/pending`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -384,7 +384,7 @@ export const getUpdatedPaymentDetails = async (data) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://3.111.113.121:61002/ao/statement/view`;
+    let url = `http://3.111.113.121:61002/api/ao/statement/view`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -409,7 +409,7 @@ export const getUpdatedPaymentDetails = async (data) => {
 export const getStateDetails = async () => {
   
     try {
-        const response = await axios.get(`http://3.111.113.121:61002/api/states`,{
+        const response = await axios.get(`http://3.111.113.121:61002/api/api/states`,{
             headers:getAuthorizationHeader()
           });
         return response.data.states;
@@ -422,7 +422,7 @@ export const getStateDetails = async () => {
 export const getDistrictDetails = async (state_id) => {
   
     try {
-        const response = await axios.get(`http://3.111.113.121:61002/api/districts/${state_id}`,{
+        const response = await axios.get(`http://3.111.113.121:61002/api/api/districts/${state_id}`,{
             headers:getAuthorizationHeader()
           });
         return response.data.districts;
@@ -544,7 +544,7 @@ export const bulkInProgressSubmitDetails = async (object) => {
 export const domainDetails = async (taskId) => {
   try {
     const response = await axios.get(
-      `http://3.111.113.121:61002/user/search/domain-expert/${taskId}`,
+      `http://3.111.113.121:61002/api/user/search/domain-expert/${taskId}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -560,7 +560,7 @@ export const domainDetails = async (taskId) => {
 export const approveDomainDetails = async (employeeId,taskId,remarks) => {
   try {
     const response = await axios.post(
-      `http://3.111.113.121:61002/ops/user/approve/${employeeId}/${taskId}?remarks=${remarks}`,
+      `http://3.111.113.121:61002/api/ops/user/approve/${employeeId}/${taskId}?remarks=${remarks}`,
        null, // No request body
             {
               headers: {
@@ -578,7 +578,7 @@ export const approveDomainDetails = async (employeeId,taskId,remarks) => {
 export const rejectDomainDetails = async (employeeId,taskId,remarks) => {
   try {
     const response = await axios.post(
-      `http://3.111.113.121:61002/ops/user/rejection/${employeeId}/${taskId}?remarks=${remarks}`, // URL
+      `http://3.111.113.121:61002/api/ops/user/rejection/${employeeId}/${taskId}?remarks=${remarks}`, // URL
       null, // No request body
       {
         headers: {
@@ -596,7 +596,7 @@ export const rejectDomainDetails = async (employeeId,taskId,remarks) => {
 export const generatedVoucherDetails = async (object) => {
   try {
     const response = await axios.post(
-      `http://3.111.113.121:61002/ao/voucher/generate`, // URL
+      `http://3.111.113.121:61002/api/ao/voucher/generate`, // URL
       object, // No request body
       {
         headers: getAuthorizationHeader(),
@@ -613,7 +613,7 @@ export const generatedVoucherDetails = async (object) => {
 export const getVoucherDetails = async (voucher_id) => {
   try {
     const response = await axios.get(
-      `http://3.111.113.121:61002/ao/voucher/search/${voucher_id}`,
+      `http://3.111.113.121:61002/api/ao/voucher/search/${voucher_id}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -628,7 +628,7 @@ export const getVoucherDetails = async (voucher_id) => {
 export const getProfileDetails = async (userId) => {
   try {
     const response = await axios.get(
-      `http://3.111.113.121:61002/user/profile/${userId}`,
+      `http://3.111.113.121:61002/api/user/profile/${userId}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -644,7 +644,7 @@ export const getProfileDetails = async (userId) => {
 export const generatedPaymentDetails = async (object) => {
   try {
     const response = await axios.post(
-      `http://3.111.113.121:61002/ao/payments/process`, // URL
+      `http://3.111.113.121:61002/api/ao/payments/process`, // URL
       object, // No request body
       {
         headers: getAuthorizationHeader(),
@@ -662,7 +662,7 @@ export const exportPaymentDetails = async (userId, data) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://3.111.113.121:61002/ao/statement/export/${userId}`;
+    let url = `http://3.111.113.121:61002/api/ao/statement/export/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -689,7 +689,7 @@ export const exportCEOPaymentDetails = async (userId, data, componentName) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://3.111.113.121:61002/download/payee/excel/${userId}`;
+    let url = `http://3.111.113.121:61002/api/download/payee/excel/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -717,7 +717,7 @@ export const exportBeneficiaryDetails = async (userId, data) => {
     const { startDate, endDate, stateName, districtName, projectName, componentName } = data;
     
     // Start building the query parameters
-    let url = `http://3.111.113.121:61002/reports/beneficiary/${userId}`;
+    let url = `http://3.111.113.121:61002/api/reports/beneficiary/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -748,7 +748,7 @@ export const exportComponentDetails = async (userId, data) => {
     const { startDate, endDate, stateName, districtName, projectName, componentName } = data;
     
     // Start building the query parameters
-    let url = `http://3.111.113.121:61002/reports/component/${userId}`;
+    let url = `http://3.111.113.121:61002/api/reports/component/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -779,7 +779,7 @@ export const exportFinalPreviewDetails = async (userId, data) => {
     const { stateName, districtName, projectName, componentName } = data;
     
     // Start building the query parameters
-    let url = `http://3.111.113.121:61002/download/beneficiary/excel/${userId}`;
+    let url = `http://3.111.113.121:61002/api/download/beneficiary/excel/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided

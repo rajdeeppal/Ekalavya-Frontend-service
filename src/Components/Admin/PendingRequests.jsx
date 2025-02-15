@@ -24,7 +24,7 @@ const PendingRequests = ({ setPendingCount }) => {
     const token = localStorage.getItem('jwtToken');
     const userRole = jwtDecode(token).role[0].authority;
 
-    axios.get('http://3.111.113.121:61002/admin/manageRoles', {
+    axios.get('http://3.111.113.121:61002/api/admin/manageRoles', {
       headers:{
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ const PendingRequests = ({ setPendingCount }) => {
 
   // Handle status change
   const handleStatusChange = (requestId, newStatus, approverComments) => {
-    axios.post('http://3.111.113.121:61002/admin/approveRoleRequest', {
+    axios.post('http://3.111.113.121:61002/api/admin/approveRoleRequest', {
         requestId,
         approverComments,
       },{
@@ -64,7 +64,7 @@ const PendingRequests = ({ setPendingCount }) => {
   };
 
   const handleRejectRoleRequest = (requestId, approverComments) => {
-    axios.post('http://3.111.113.121:61002/admin/rejectRoleRequest', {
+    axios.post('http://3.111.113.121:61002/api/admin/rejectRoleRequest', {
         requestId,
         approverComments,
       },{
