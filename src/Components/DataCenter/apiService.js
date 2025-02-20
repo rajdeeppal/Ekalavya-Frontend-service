@@ -409,7 +409,7 @@ export const getUpdatedPaymentDetails = async (data) => {
 export const getStateDetails = async () => {
   
     try {
-        const response = await axios.get(`https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/api/states`,{
+        const response = await axios.get(`https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/states`,{
             headers:getAuthorizationHeader()
           });
         return response.data.states;
@@ -422,7 +422,7 @@ export const getStateDetails = async () => {
 export const getDistrictDetails = async (state_id) => {
   
     try {
-        const response = await axios.get(`https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/api/districts/${state_id}`,{
+        const response = await axios.get(`https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/districts/${state_id}`,{
             headers:getAuthorizationHeader()
           });
         return response.data.districts;
