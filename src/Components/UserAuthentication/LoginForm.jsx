@@ -17,7 +17,7 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/auth/login', {
+      const response = await fetch('https://projects.ekalavya.net/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

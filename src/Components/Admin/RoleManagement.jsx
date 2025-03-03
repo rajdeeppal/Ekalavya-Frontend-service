@@ -20,7 +20,7 @@ const RoleManagement = () => {
   // Fetch roles from backend when the component mounts
   useEffect(() => {
     setLoading(true);
-    axios.get('https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/roleAudit')
+    axios.get('https://projects.ekalavya.net/api/roleAudit')
       .then((response) => {
         setRoles(response.data);
         setLoading(false);
@@ -47,7 +47,7 @@ const RoleManagement = () => {
   const handleSearch = () => {
     if (selectedRole) {
       setLoading(true);
-      axios.get(`https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/roleAudit/searchRole/${selectedRole}`, {
+      axios.get(`https://projects.ekalavya.net/api/roleAudit/searchRole/${selectedRole}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const RoleManagement = () => {
   // Handle revoking role from a user
   const handleRevoke = (userId, roleId) => {
     setLoading(true);
-    axios.post(`https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/roleAudit/revokeRole`, null, {
+    axios.post(`https://projects.ekalavya.net/api/roleAudit/revokeRole`, null, {
       params: {
         userId: userId, // Pass userId as a request parameter
         roleId: roleId   // Pass roleId as a request parameter
@@ -96,7 +96,7 @@ const RoleManagement = () => {
     const newRole = selectedUserRole[userId];
     if (newRole) {
       setLoading(true);
-      axios.post(`https://ec2-13-232-188-255.ap-south-1.compute.amazonaws.com/api/roleAudit/changeRole`, null, {
+      axios.post(`https://projects.ekalavya.net/api/roleAudit/changeRole`, null, {
         params: {
           userId: userId,   // Pass userId as a request parameter
           newRoleName: newRole // Pass new role name as a request parameter
