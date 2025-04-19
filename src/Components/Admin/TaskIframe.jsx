@@ -15,6 +15,7 @@ function TaskIframe() {
     const [newComponentName, setNewComponentName] = useState('');
     const [newActivityName, setNewActivityName] = useState('');
     const [taskName, setTaskName] = useState('');
+    const [lastUpdated, setLastUpdated] = useState('');
     const [units, setUnits] = useState('');
     const [ratePerUnit, setRatePerUnit] = useState('');
     const [isAll,setIsAll]=useState(false);   
@@ -78,6 +79,7 @@ function TaskIframe() {
             async function fetchTaskDetails() {
                 const data = await getTaskById(selectedTask);
                 setTaskName(data.taskName);
+                setLastUpdated(data.lastUpdated)
                 setUnits(data.units);
                 setRatePerUnit(data.ratePerUnit);
             }
@@ -85,6 +87,7 @@ function TaskIframe() {
         } else {
             // Clear the fields if 'Other' is selected
             setTaskName('');
+            setLastUpdated('');
             setUnits('');
             setRatePerUnit('');
         }
@@ -119,6 +122,7 @@ const handleSave = async () => {
         setNewComponentName('');
         setNewActivityName('');
         setTaskName('');
+        setLastUpdated('');
         setUnits('');
         setRatePerUnit('');
 
@@ -266,7 +270,16 @@ const handleSave = async () => {
                     />
                 </>
             )}
-
+{selectedTask && selectedTask !== 'other' && (
+    <TextField
+        label="Last Updated on"
+        fullWidth
+        value={lastUpdated}
+        onChange={(e) => setLastUpdated(e.target.value)}
+        sx={{ mb: 2, fontSize: '14px' }}
+        disabled
+    />
+)}
             <Button variant="contained" color="primary" onClick={handleSave} sx={{ fontSize: '14px' }}>
                 Save Configuration
             </Button>
