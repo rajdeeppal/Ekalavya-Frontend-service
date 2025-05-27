@@ -443,7 +443,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                 </TableRow>
                                 <TableRow>
                                     <TableCell colSpan={10} style={{ padding: 0 }}>
-                                        <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
+<Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
+                                            <div style={{ padding: '10px' }}>
                                             <Accordion>
                                                 <AccordionSummary
                                                     expandIcon={<ExpandMoreIcon />}
@@ -464,6 +465,86 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                                 {beneficiary.passbookDocs &&
                                                                     beneficiary.passbookDocs.length > 0 ? (
                                                                     beneficiary.passbookDocs.map((file, idx) => (
+                                                                        <TableRow key={idx}
+                                                                        sx={{
+                                                                                  bgcolor: idx % 2 === 0 ? 'rgba(240, 248, 255, 0.5)' : 'white', // soft blue for even rows
+                                                                                  '&:hover': {
+                                                                                    bgcolor: 'rgba(173, 216, 230, 0.3)', // lighter blue on hover
+                                                                                    boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.1)', // subtle shadow
+                                                                                    borderRadius: '8px', // rounded corners
+                                                                                    transition: '0.3s', // smooth transition
+                                                                                  },
+                                                                                }}
+                                                                        >
+                                                                            <TableCell>
+                                                                                <a
+                                                                                    href={file.downloadUrl}
+                                                                                    download={file.fileName}
+                                                                                    style={{
+                                                                                        textDecoration: 'underline',
+                                                                                        color: '#007BFF',
+                                                                                        fontWeight: '500',
+                                                                                    }}
+                                                                                >
+                                                                                    {file.fileName}
+                                                                                </a>
+                                                                            </TableCell>
+                                                                        </TableRow>
+                                                                    ))
+                                                                ) : (
+                                                                    <TableRow>
+                                                                        <TableCell>
+                                                                            <Typography color="text.secondary">No File Uploaded</Typography>
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                )}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </TableContainer>
+                                                </AccordionDetails>
+                                            </Accordion>
+                                            {isReview && <div style={{ display: 'flex', gap: '10px', padding: '10px' }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    onClick={() => handleSubmit(beneficiary.id)}
+                                                    style={{ marginTop: '10px' }}
+                                                >
+                                                    Generate Voucher
+                                                </Button>
+                                                <Button
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    style={{ marginTop: '10px' }}
+                                                    onClick={() => handlePaymentSubmit()}
+                                                >
+                                                    Payment Details
+                                                </Button>
+                                            </div>}
+                                            </div>
+                                        </Collapse>
+                                        <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
+                                            <div style={{ padding: '10px' }}>
+                                            <Accordion>
+                                                <AccordionSummary
+                                                    expandIcon={<ExpandMoreIcon />}
+                                                    aria-controls={`otherdoc-content-${beneficiary.id}`}
+                                                    id={`otherdoc-header-${beneficiary.id}`}
+                                                >
+                                                    <Typography>Other Documents</Typography>
+                                                </AccordionSummary>
+                                                <AccordionDetails>
+                                                    <TableContainer component={Paper} elevation={2} sx={{ mb: 2 }}>
+                                                        <Table size="small" aria-label="otherdoc table">
+                                                            <TableHead>
+                                                                <TableRow>
+                                                                    <TableCell style={{ fontWeight: 'bold' }}>Document List</TableCell>
+                                                                </TableRow>
+                                                            </TableHead>
+                                                            <TableBody>
+                                                                {beneficiary.otherDocs &&
+                                                                    beneficiary.otherDocs.length > 0 ? (
+                                                                    beneficiary.otherDocs.map((file, idx) => (
                                                                         <TableRow key={idx}>
                                                                             <TableCell>
                                                                                 <a
@@ -509,6 +590,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                     Payment Details
                                                 </Button>
                                             </div>}
+                                            </div>
                                         </Collapse>
                                     </TableCell>
                                 </TableRow>

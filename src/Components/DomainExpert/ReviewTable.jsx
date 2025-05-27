@@ -272,13 +272,14 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess })
                                                                                                                             <TableHead>
                                                                                                                                 <TableRow>
                                                                                                                                     <TableCell>Unit Achievement</TableCell>
+                                                                                                                                    <TableCell>Discounted Rate</TableCell>
                                                                                                                                     <TableCell>Beneficiary Contribution</TableCell>
                                                                                                                                     <TableCell>Current Cost</TableCell>
                                                                                                                                     <TableCell>Payee Name</TableCell>
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
-                                                                                                                                    <TableCell>Domain Expert</TableCell>
+                                                                                                                                    {/*<TableCell>Domain Expert</TableCell>*/}
                                                                                                                                     <TableCell>Reviews</TableCell>
                                                                                                                                     <TableCell>Remarks</TableCell>
                                                                                                                                     <TableCell>Actions</TableCell>
@@ -288,6 +289,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess })
                                                                                                                                 {(task.taskUpdates || []).map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
                                                                                                                                         <TableCell>{row.achievementUnit}</TableCell>
+                                                                                                                                        <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                         <TableCell>{row.currentCost}</TableCell>
                                                                                                                                         <TableCell>{row.payeeName}</TableCell>
@@ -329,7 +331,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess })
                                                                                                                                                 <Typography>No File Uploaded</Typography>
                                                                                                                                             )}
                                                                                                                                         </TableCell>
-                                                                                                                                        <TableCell>{row.domainExpertEmpId}</TableCell>
+                                                                                                                                        {/*<TableCell>{row.domainExpertEmpId}</TableCell>*/}
                                                                                                                                         <TableCell>
                                                                                                                                             <IconButton
                                                                                                                                                 color={

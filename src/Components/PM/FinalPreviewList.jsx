@@ -192,13 +192,14 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                             <TableHead>
                                                                                                                                 <TableRow>
                                                                                                                                     <TableCell>Unit Achievement</TableCell>
+                                                                                                                                    <TableCell>Discounted Rate</TableCell>
                                                                                                                                     <TableCell>Beneficiary Contribution</TableCell>
                                                                                                                                     <TableCell>Current Cost</TableCell>
                                                                                                                                     <TableCell>Payee Name</TableCell>
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
-                                                                                                                                    {!isReview && <TableCell>Domain Expert</TableCell>}
+                                                                                                                                    {/*{!isReview && <TableCell>Domain Expert</TableCell>}*/}
                                                                                                                                     {isReview && <TableCell>Pending With</TableCell>}
                                                                                                                                     {isReview && <TableCell>Payment Status</TableCell>}
                                                                                                                                 </TableRow>
@@ -207,6 +208,7 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                                 {(task.taskUpdates || [])?.map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
                                                                                                                                         <TableCell>{row.achievementUnit}</TableCell>
+                                                                                                                                        <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                         <TableCell>{row.currentCost}</TableCell>
                                                                                                                                         <TableCell>{row.payeeName}</TableCell>
@@ -246,7 +248,7 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                                                 <Typography>No File Uploaded</Typography>
                                                                                                                                             )}
                                                                                                                                         </TableCell>
-                                                                                                                                        {!isReview && <TableCell>{row.domainExpertEmpId}</TableCell>}
+                                                                                                                                        {/*{!isReview && <TableCell>{row.domainExpertEmpId}</TableCell>}*/}
                                                                                                                                         {isReview && <TableCell>{row.pendingWith}</TableCell>}
                                                                                                                                         {isReview && <TableCell>{row.paymentStatus}</TableCell>}
                                                                                                                                     </TableRow>

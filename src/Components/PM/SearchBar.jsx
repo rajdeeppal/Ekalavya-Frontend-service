@@ -71,7 +71,7 @@ const SearchBar = ({ onSearch }) => {
       projectName:selectedProject,
       componentName:selectedComponent
     }
-    console.log("hello");
+
     onSearch(data);
   };
 

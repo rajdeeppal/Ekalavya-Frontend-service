@@ -177,42 +177,48 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
         }));
     };
 
-    const handleInputChange = (taskIndex, rowIndex, field, value) => {
-        setBeneficiaries((prevBeneficiaries) => {
-            return prevBeneficiaries.map((beneficiary) => ({
-                ...beneficiary,
-                components: beneficiary.components.map((component) => ({
-                    ...component,
-                    activities: component.activities.map((activity) => ({
-                        ...activity,
-                        tasks: activity.tasks.map((task) => {
-                            if (task.id === taskIndex) {
-                                setTaskId(task.id);
-                                const updatedTaskUpdates = [...task.taskUpdates];
-                                const updatedRow = {
-                                    ...updatedTaskUpdates[rowIndex],
-                                    [field]: value,
-                                };
+const handleInputChange = (taskIndex, rowIndex, field, value) => {
+    setBeneficiaries((prevBeneficiaries) => {
+        return prevBeneficiaries.map((beneficiary) => ({
+            ...beneficiary,
+            components: beneficiary.components.map((component) => ({
+                ...component,
+                activities: component.activities.map((activity) => ({
+                    ...activity,
+                    tasks: activity.tasks.map((task) => {
+                        if (task.id === taskIndex) {
+                            setTaskId(task.id);
+                            const updatedTaskUpdates = [...task.taskUpdates];
+                            const updatedRow = {
+                                ...updatedTaskUpdates[rowIndex],
+                                [field]: value,
+                            };
 
-                                if (field === 'currentBeneficiaryContribution' || field === 'achievementUnit') {
-                                    const ratePerUnit = task.ratePerUnit || 0;
-                                    const data = updatedRow.achievementUnit;
-                                    const beneficiaryContribution = updatedRow.currentBeneficiaryContribution || 0;
+                            if (
+                                field === 'currentBeneficiaryContribution' ||
+                                field === 'achievementUnit' ||
+                                field === 'revisedRatePerUnit'
+                            ) {
+                                const ratePerUnit = task.ratePerUnit || 0;
+                                const revisedRatePerUnit = field === 'revisedRatePerUnit' ? value : task.revisedRatePerUnit || 0;
+                                const data = field === 'achievementUnit' ? value : updatedRow.achievementUnit || 0;
 
-                                    updatedRow.currentCost = (data * ratePerUnit);
-                                }
-
-                                updatedTaskUpdates[rowIndex] = updatedRow;
-
-                                return { ...task, taskUpdates: updatedTaskUpdates };
+                                const effectiveRate = revisedRatePerUnit > 0 ? revisedRatePerUnit : ratePerUnit;
+                                updatedRow.currentCost = data * effectiveRate;
                             }
-                            return task;
-                        })
-                    }))
+
+                            updatedTaskUpdates[rowIndex] = updatedRow;
+
+                            return { ...task, taskUpdates: updatedTaskUpdates };
+                        }
+                        return task;
+                    })
                 }))
-            }));
-        });
-    };
+            }))
+        }));
+    });
+};
+
 
     const handleInputReviewChange = (taskIndex, rowIndex, field, value) => {
         setBeneficiaries((prevBeneficiaries) =>
@@ -285,9 +291,10 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
         const changedData = task.taskUpdates[rowIndex];
 
         const taskUpdateDTO = {
-            domainExpertEmpId: changedData.domainExpertEmpId,
+            /*domainExpertEmpId: changedData.domainExpertEmpId,*/
             payeeName: changedData.payeeName,
             accountNumber: parseInt(changedData.accountNumber, 10),
+            revisedRatePerUnit: parseFloat(changedData.revisedRatePerUnit),
             benContribution: parseFloat(changedData.currentBeneficiaryContribution),
             achievementUnit: parseInt(changedData.achievementUnit, 10),
             currentCost: parseFloat(changedData.currentCost),
@@ -367,6 +374,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                 if (
                     !lastRow ||
                     lastRow.achievementUnit !== '' ||
+                    lastRow.revisedRatePerUnit !== '' ||
                     lastRow.currentBeneficiaryContribution !== '' ||
                     lastRow.payeeName !== '' ||
                     lastRow.passbookDoc !== ''
@@ -374,12 +382,13 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                     setNewTask(true);
                     task.taskUpdates.push({
                         achievementUnit: '',
+                        revisedRatePerUnit: '',
                         currentBeneficiaryContribution: '',
                         currentCost: '',
                         payeeName: '',
                         passbookDoc: null,
-                        otherDocs: [],
-                        domainExpertEmpId: ''
+                        otherDocs: []
+                        /* domainExpertEmpId: '' */
                     });
                 }
             }
@@ -576,13 +585,14 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                                                                                                             <TableHead>
                                                                                                                                 <TableRow>
                                                                                                                                     <TableCell>Unit Achievement</TableCell>
+                                                                                                                                    <TableCell>Discounted Rate</TableCell>
                                                                                                                                     <TableCell>Beneficiary Contribution</TableCell>
                                                                                                                                     <TableCell>Current Cost</TableCell>
                                                                                                                                     <TableCell>Payee Name</TableCell>
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
-                                                                                                                                    <TableCell>Domain Expert</TableCell>
+                                                                                                                                    {/*<TableCell>Domain Expert</TableCell>*/}
                                                                                                                                     {isReject && <TableCell>Reviews</TableCell>}
                                                                                                                                     <TableCell>Actions</TableCell>
                                                                                                                                 </TableRow>
@@ -602,6 +612,21 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                                                                                                                                                 task.id,
                                                                                                                                                                 rowIndex,
                                                                                                                                                                 'achievementUnit',
+                                                                                                                                                                e.target.value
+                                                                                                                                                            )
+                                                                                                                                                        }
+                                                                                                                                                    />
+                                                                                                                                                </TableCell>
+                                                                                                                                                <TableCell>
+                                                                                                                                                    <TextField
+                                                                                                                                                        variant="outlined"
+                                                                                                                                                        size="small"
+                                                                                                                                                        value={row.revisedRatePerUnit || ''}
+                                                                                                                                                        onChange={(e) =>
+                                                                                                                                                            handleInputChange(
+                                                                                                                                                                task.id,
+                                                                                                                                                                rowIndex,
+                                                                                                                                                                'revisedRatePerUnit',
                                                                                                                                                                 e.target.value
                                                                                                                                                             )
                                                                                                                                                         }
@@ -739,7 +764,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                                                                                                                                         </div>
                                                                                                                                                     )}
                                                                                                                                                 </TableCell>
-                                                                                                                                                <TableCell>
+                                                                                                                                                {/* <TableCell>
                                                                                                                                                     <FormControl variant="outlined" size="small" fullWidth>
                                                                                                                                                         <Select
                                                                                                                                                             value={row.domainExpertEmpId || ''}
@@ -752,7 +777,6 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                                                                                                                                                 )
                                                                                                                                                             }
                                                                                                                                                         >
-                                                                                                                                                            {/* Replace the options below with the actual values */}
                                                                                                                                                             <MenuItem value="">
                                                                                                                                                                 <em>None</em>
                                                                                                                                                             </MenuItem>
@@ -764,7 +788,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
 
                                                                                                                                                         </Select>
                                                                                                                                                     </FormControl>
-                                                                                                                                                </TableCell>
+                                                                                                                                                </TableCell> */}
                                                                                                                                                 {isReject && (
                                                                                                                                                     <TableCell>
                                                                                                                                                         <TextField
@@ -795,6 +819,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                                                                                                                             </>) : (
                                                                                                                                             <>
                                                                                                                                                 <TableCell>{row.achievementUnit}</TableCell>
+                                                                                                                                                <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                                 <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                                 <TableCell>{row.currentCost}</TableCell>
                                                                                                                                                 <TableCell>{row.payeeName}</TableCell>
@@ -834,7 +859,7 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
                                                                                                                                                         <Typography>No File Uploaded</Typography>
                                                                                                                                                     )}
                                                                                                                                                 </TableCell>
-                                                                                                                                                <TableCell>{row.domainExpertEmpId}</TableCell>
+                                                                                                                                                {/*<TableCell>{row.domainExpertEmpId}</TableCell>*/}
                                                                                                                                                 {isReject &&
                                                                                                                                                     <TableCell>
                                                                                                                                                         <IconButton

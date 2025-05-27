@@ -12,10 +12,15 @@ const DatePickerSearch = ({ onSearch }) => {
     console.log('Start Date:', startDate ? startDate.format('YYYY-MM-DD') : 'Not selected');
     console.log('End Date:', endDate ? endDate.format('YYYY-MM-DD') : 'Not selected');
     const data = {
-      startDate: startDate.format('YYYY-MM-DD'),
-      endDate: endDate.format('YYYY-MM-DD')
+    startDate: startDate ? startDate.format('YYYY-MM-DD') : null,
+    endDate: endDate ? endDate.format('YYYY-MM-DD') : null,
     }
     onSearch(data);
+  };
+
+  const handleReset = () => {
+    setStartDate(null);
+    setEndDate(null);
   };
 
   return (
@@ -45,9 +50,18 @@ const DatePickerSearch = ({ onSearch }) => {
             variant="contained"
             color="primary"
             onClick={handleSearch}
-            disabled={!startDate || !endDate}
+            disabled={!startDate && !endDate}
           >
             Search
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleReset}
+          >
+            Reset
           </Button>
         </Grid>
       </Grid>

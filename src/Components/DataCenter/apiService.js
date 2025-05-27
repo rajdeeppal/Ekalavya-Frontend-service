@@ -1,7 +1,8 @@
 import axios from "axios";
 // import { jwtDecode } from 'jwt-decode';
-const BASE_URL = "https://projects.ekalavya.net/api/admin"; // Update with your actual API URL https://projects.ekalavya.net/api/admin
+const BASE_URL = "https://projects.ekalavya.net/api/admin"; // Update with your actual API URL http://localhost:61002/api/admin
 const PM_BASE_URL = "https://projects.ekalavya.net/api/user/pm";
+const GENERIC_BASE_URL = "https://projects.ekalavya.net/api/user";
 const BASE_PUBLIC_URL = "https://projects.ekalavya.net/api/self-service";
 
 const BENEFICIARY_BASE_URL = "https://projects.ekalavya.net/api/beneficiary";
@@ -21,7 +22,7 @@ const getAuthorizationHeader = () => {
 // Fetch all Projects created by PM **(Riya to use while add Beneficiary)
 export const getUserProjects = async (userId) => {
   try {
-    const response = await axios.get(`${PM_BASE_URL}/projects/${userId}`, {
+    const response = await axios.get(`${GENERIC_BASE_URL}/projects/${userId}`, {
       headers: getAuthorizationHeader(),
     });
     return response.data;
@@ -195,6 +196,21 @@ export const saveProjectConfiguration = async (userId, projectDto) => {
   }
 };
 
+export const updateProjectConfiguration = async (userId, updatedProject) => {
+  try {
+    const response = await axios.post(
+      `${PM_BASE_URL}/project/edit/${userId}`,
+      updatedProject,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating project:', error);
+    throw error;
+  }
+};
 // Update an existing task
 export const updateTask = async (taskId, updatedTask) => {
   try {
@@ -219,22 +235,20 @@ export const getBeneficiaryByProjectName = async (projectName) => {
 };
 
 export const getBeneficiary = async (userId, data, category) => {
-    try {
-      const { stateName, districtName, projectName, componentName } = data;
-      
-      // Start building the query parameters
-      let url = `https://projects.ekalavya.net/api/beneficiary/filter/${userId}`;
-      const params = new URLSearchParams();
-  
-      // Add parameters if they are provided
-      if (componentName) params.append("componentName", componentName);
-      if (stateName) params.append("stateName", stateName);
-      if (districtName) params.append("districtName", districtName);
+  try {
+    const { stateName, districtName, projectName, componentName } = data;
 
-    // Construct the final URL
-    url = `${url}?${params.toString()}&projectName=${projectName}&stage=${category}`;
+    // Use URLSearchParams to encode all query parameters
+    const params = new URLSearchParams();
 
-    // Send the request with authorization headers
+    if (componentName) params.append("componentName", componentName);
+    if (stateName) params.append("stateName", stateName);
+    if (districtName) params.append("districtName", districtName);
+    if (projectName) params.append("projectName", projectName);
+    if (category) params.append("stage", category);
+
+    const url = `${BENEFICIARY_BASE_URL}/filter/${userId}?${params.toString()}`;
+
     const response = await axios.get(url, {
       headers: getAuthorizationHeader(),
     });

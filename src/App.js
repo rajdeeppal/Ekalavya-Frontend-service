@@ -81,7 +81,7 @@ function App() {
       <Route
         path="/myprofile"
         element={
-          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','CEO','TRUSTEE']}>
+          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE']}>
             <UserProfile />
           </PrivateRoute>
         }
@@ -113,7 +113,7 @@ function App() {
       <Route
         path="/resolution-list"
         element={
-          <PrivateRoute requiredRoles={['DOMAIN EXPERT']}>
+          <PrivateRoute requiredRoles={['DOMAIN EXPERT', 'PROCUREMENT']}>
             <ResolutionList />
           </PrivateRoute>
         }
@@ -122,7 +122,7 @@ function App() {
       <Route
         path="/inprogress-list"
         element={
-          <PrivateRoute requiredRoles={['DOMAIN EXPERT']}>
+          <PrivateRoute requiredRoles={['DOMAIN EXPERT', 'PROCUREMENT']}>
             <ReviewPage />
           </PrivateRoute>
         }
@@ -131,7 +131,7 @@ function App() {
       <Route
         path="/review-list"
         element={
-          <PrivateRoute requiredRoles={['DOMAIN EXPERT']}>
+          <PrivateRoute requiredRoles={['DOMAIN EXPERT', 'PROCUREMENT']}>
             <RejectPage />
           </PrivateRoute>
         }
