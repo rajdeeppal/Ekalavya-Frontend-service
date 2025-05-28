@@ -195,7 +195,7 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                             };
 
                             if (
-                                field === 'currentBeneficiaryContribution' ||
+//                                 /* field === 'currentBeneficiaryContribution' || */
                                 field === 'achievementUnit' ||
                                 field === 'revisedRatePerUnit'
                             ) {
