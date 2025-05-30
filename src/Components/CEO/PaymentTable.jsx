@@ -503,24 +503,6 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                     </TableContainer>
                                                 </AccordionDetails>
                                             </Accordion>
-                                            {isReview && <div style={{ display: 'flex', gap: '10px', padding: '10px' }}>
-                                                <Button
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    onClick={() => handleSubmit(beneficiary.id)}
-                                                    style={{ marginTop: '10px' }}
-                                                >
-                                                    Generate Voucher
-                                                </Button>
-                                                <Button
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    style={{ marginTop: '10px' }}
-                                                    onClick={() => handlePaymentSubmit()}
-                                                >
-                                                    Payment Details
-                                                </Button>
-                                            </div>}
                                             </div>
                                         </Collapse>
                                         <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
