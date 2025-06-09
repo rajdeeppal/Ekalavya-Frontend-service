@@ -758,7 +758,13 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                                                                                                                                                                         </IconButton>
                                                                                                                                                                     }
                                                                                                                                                                 >
-                                                                                                                                                                    {newTask ? (<>{file.file.name}</>) : (!isEdit ? <>{file.fileName}</> : <>{file.file.name}</>)}
+                                                                                                                                                                    {newTask
+                                                                                                                                                                      ? <>{file.file?.name}</>
+                                                                                                                                                                      : (!isEdit
+                                                                                                                                                                          ? <>{file.fileName}</>
+                                                                                                                                                                          : <>{file.file?.name}</>
+                                                                                                                                                                        )
+                                                                                                                                                                    }
                                                                                                                                                                 </Alert>
                                                                                                                                                             ))}
                                                                                                                                                         </div>
