@@ -35,7 +35,7 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      fetch('https://projects.ekalavya.net/api/api/self-service/submitRoleRequest', {
+      fetch('http://localhost:61002/api/api/self-service/submitRoleRequest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

@@ -17,6 +17,7 @@ import {
     Typography,
     Checkbox,
     Modal,
+    Divider,
     Box, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import {
@@ -26,11 +27,13 @@ import {
     Reviews,
 } from '@mui/icons-material';
 import { useAuth } from '../PrivateRoute';
-import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails } from '../DataCenter/apiService';
+import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails,rejectVCPaymentDetails, approveVCPaymentDetails } from '../DataCenter/apiService';
 import AOPaymentTable from '../AO/AOPaymentTable';
 import DownloadIcon from '@mui/icons-material/Download';
+import Avatar from '@mui/material/Avatar';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 
-function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSucess }) {
+function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSucess, isApprove, isReject, isVC }) {
     const { userId } = useAuth();
     const [open, setOpen] = useState({});
     const [selectedTasks, setSelectedTasks] = useState({});
@@ -41,10 +44,14 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
     });
     const [errors, setErrors] = useState('');
     const [benId, setBenId] = useState('');
+    const [remarks, setRemarks] = useState('');
+    const [comments, setComments] = useState([]);
     const [showViewConfirmation, setShowViewConfirmation] = useState(false);
+    const [showViewCommentConfirmation, setShowViewCommentConfirmation] = useState(false);
     const [showViewPaymentConfirmation, setShowViewPaymentConfirmation] = useState(false);
     const [selectedComponent, setSelectedComponent] = useState('');
     const [components, setComponents] = useState([]);
+    const [voucher,setVoucher]=useState('');
 
     useEffect(() => {
         async function fetchComponents() {
@@ -188,6 +195,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
             bankName: formValues.bankName,
             ifscCode: formValues.iFSCNo,
             branchName: formValues.branchName,
+            passbookDocs: beneficiary.passbookDocs,
+            otherDocs: beneficiary.otherDocs
         };
 
         console.log(totalAmount)
@@ -224,6 +233,10 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         setShowViewConfirmation(false);
     };
 
+    const handleCloseViewCommentConfirmation = () => {
+        setShowViewCommentConfirmation(false);
+    };
+
     const handleCloseViewPaymentConfirmation = () => {
         setShowViewPaymentConfirmation(false);
     };
@@ -233,8 +246,9 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         setShowViewConfirmation(true);
     };
 
-    const handlePaymentSubmit = () => {
+    const handlePaymentSubmit = (value) => {
         setShowViewPaymentConfirmation(true);
+        setVoucher(value);
     };
 
     const handleChange = (e) => {
@@ -248,6 +262,11 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
 
     };
 
+    const toggleViewMode = (comments) => {
+        setShowViewCommentConfirmation(true);
+        setComments(comments);
+    };
+
     const exportToExcel = async () => {
         try {
             console.log("ok");
@@ -257,6 +276,33 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
             console.log(beneficiaries);
         } catch (error) {
             console.error('Error fetching activities:', error);
+        }
+    }
+
+    const handleApproval = async (beneficiaryId, status) => {
+        if (status === 'Approve') {
+            try {
+                await approveVCPaymentDetails(userId, beneficiaryId, remarks);
+                setIsSucess(true);
+                console.log("User ID:", userId, "Row ID:", beneficiaryId, "Remarks:", remarks);
+                alert("Tasks have been approved successfully");
+            } catch (error) {
+                console.error("Error approving tasks:", error);
+                setIsSucess(true);
+                alert("An error occurred while approving the tasks. Please try again.");
+            }
+        } else {
+            try {
+                await rejectVCPaymentDetails(userId, beneficiaryId, remarks);
+                setIsSucess(true);
+                console.log("User ID:", userId, "Row ID:", beneficiaryId, "Remarks:", remarks);
+                alert("Tasks have been rejected successfully");
+            } catch (error) {
+                console.error("Error tasks:", error);
+                setIsSucess(true);
+                const backendErrors = error.response?.data || 'An error occurred while rejecting the tasks. Please try again.';
+                alert(backendErrors);
+            }
         }
     }
 
@@ -318,6 +364,14 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                             <TableCell style={{ fontWeight: 'bold' }}>Payee Name</TableCell>
                             <TableCell style={{ fontWeight: 'bold' }}>Account Number</TableCell>
                             <TableCell style={{ fontWeight: 'bold' }}>Total Amount</TableCell>
+                            {(isApprove || isReject || isVC) &&
+                                <>
+
+                                    <TableCell style={{ fontWeight: 'bold' }}>Voucher</TableCell>
+                                    {(!isVC) &&
+                                        <TableCell style={{ fontWeight: 'bold' }}>Comments</TableCell>}
+                                </>
+                            }
                             <TableCell style={{ fontWeight: 'bold' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -335,6 +389,33 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                             maximumFractionDigits: 2,
                                         }).format(beneficiary.grandTotal)}
                                     </TableCell>
+                                    {(isApprove || isReject || isVC) && (
+                                        <>
+                                            <TableCell>
+                                                <a
+                                                    href={beneficiary.voucherUrl}
+                                                    download={beneficiary.voucherUrl}
+                                                    style={{
+                                                        textDecoration: 'underline',
+                                                        color: '#007BFF',
+                                                    }}
+                                                >
+                                                    {beneficiary.voucherId}
+                                                </a>
+                                            </TableCell>
+                                            {(!isVC) &&
+                                                <TableCell>
+                                                    <IconButton
+                                                        color={
+                                                            'primary'
+                                                        }
+                                                        onClick={() => toggleViewMode(beneficiary?.comments)}
+                                                    >
+                                                        <RemoveRedEyeOutlinedIcon />
+                                                    </IconButton>
+                                                </TableCell>}
+                                        </>
+                                    )}
                                     <TableCell>
                                         <Button
                                             variant="contained"
@@ -388,7 +469,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                                                                     <Table size="small" aria-label="tasks table">
                                                                                                         <TableHead>
                                                                                                             <TableRow>
-                                                                                                                {isReview && <TableCell style={{ fontWeight: 'bold' }}>Checkbox</TableCell>}
+                                                                                                                {(isReview && !isApprove && !isReject && !isVC) && <TableCell style={{ fontWeight: 'bold' }}>Checkbox</TableCell>}
                                                                                                                 <TableCell style={{ fontWeight: 'bold' }}>Name of the Work</TableCell>
                                                                                                                 <TableCell style={{ fontWeight: 'bold' }}>Total Cost</TableCell>
                                                                                                                 <TableCell style={{ fontWeight: 'bold' }}>Beneficiary Contribution</TableCell>
@@ -398,7 +479,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                                                                             {activity.tasks?.map((task, taskIndex) => (
                                                                                                                 <React.Fragment key={task.id}>
                                                                                                                     <TableRow>
-                                                                                                                        {isReview && <TableCell>
+                                                                                                                        {(isReview && !isApprove && !isReject && !isVC) && <TableCell>
                                                                                                                             <Checkbox
                                                                                                                                 checked={
                                                                                                                                     !!selectedTasks[beneficiary.id]?.[project.id]?.[component.id]?.[activity.id]?.[task.id]
@@ -443,135 +524,169 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                 </TableRow>
                                 <TableRow>
                                     <TableCell colSpan={10} style={{ padding: 0 }}>
-<Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
+                                        <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
                                             <div style={{ padding: '10px' }}>
-                                            <Accordion>
-                                                <AccordionSummary
-                                                    expandIcon={<ExpandMoreIcon />}
-                                                    aria-controls={`passbook-content-${beneficiary.id}`}
-                                                    id={`passbook-header-${beneficiary.id}`}
-                                                >
-                                                    <Typography>Passbook Document</Typography>
-                                                </AccordionSummary>
-                                                <AccordionDetails>
-                                                    <TableContainer component={Paper} elevation={2} sx={{ mb: 2 }}>
-                                                        <Table size="small" aria-label="passbook table">
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    <TableCell style={{ fontWeight: 'bold' }}>Name of the Document</TableCell>
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {beneficiary.passbookDocs &&
-                                                                    beneficiary.passbookDocs.length > 0 ? (
-                                                                    beneficiary.passbookDocs.map((file, idx) => (
-                                                                        <TableRow key={idx}
-                                                                        sx={{
-                                                                                  bgcolor: idx % 2 === 0 ? 'rgba(240, 248, 255, 0.5)' : 'white', // soft blue for even rows
-                                                                                  '&:hover': {
-                                                                                    bgcolor: 'rgba(173, 216, 230, 0.3)', // lighter blue on hover
-                                                                                    boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.1)', // subtle shadow
-                                                                                    borderRadius: '8px', // rounded corners
-                                                                                    transition: '0.3s', // smooth transition
-                                                                                  },
+                                                <Accordion>
+                                                    <AccordionSummary
+                                                        expandIcon={<ExpandMoreIcon />}
+                                                        aria-controls={`passbook-content-${beneficiary.id}`}
+                                                        id={`passbook-header-${beneficiary.id}`}
+                                                    >
+                                                        <Typography>Passbook Document</Typography>
+                                                    </AccordionSummary>
+                                                    <AccordionDetails>
+                                                        <TableContainer component={Paper} elevation={2} sx={{ mb: 2 }}>
+                                                            <Table size="small" aria-label="passbook table">
+                                                                <TableHead>
+                                                                    <TableRow>
+                                                                        <TableCell style={{ fontWeight: 'bold' }}>Name of the Document</TableCell>
+                                                                    </TableRow>
+                                                                </TableHead>
+                                                                <TableBody>
+                                                                    {beneficiary.passbookDocs &&
+                                                                        beneficiary.passbookDocs.length > 0 ? (
+                                                                        beneficiary.passbookDocs.map((file, idx) => (
+                                                                            <TableRow key={idx}
+                                                                                sx={{
+                                                                                    bgcolor: idx % 2 === 0 ? 'rgba(240, 248, 255, 0.5)' : 'white', // soft blue for even rows
+                                                                                    '&:hover': {
+                                                                                        bgcolor: 'rgba(173, 216, 230, 0.3)', // lighter blue on hover
+                                                                                        boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.1)', // subtle shadow
+                                                                                        borderRadius: '8px', // rounded corners
+                                                                                        transition: '0.3s', // smooth transition
+                                                                                    },
                                                                                 }}
-                                                                        >
+                                                                            >
+                                                                                <TableCell>
+                                                                                    <a
+                                                                                        href={file.downloadUrl}
+                                                                                        download={file.fileName}
+                                                                                        style={{
+                                                                                            textDecoration: 'underline',
+                                                                                            color: '#007BFF',
+                                                                                            fontWeight: '500',
+                                                                                        }}
+                                                                                    >
+                                                                                        {file.fileName}
+                                                                                    </a>
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        ))
+                                                                    ) : (
+                                                                        <TableRow>
                                                                             <TableCell>
-                                                                                <a
-                                                                                    href={file.downloadUrl}
-                                                                                    download={file.fileName}
-                                                                                    style={{
-                                                                                        textDecoration: 'underline',
-                                                                                        color: '#007BFF',
-                                                                                        fontWeight: '500',
-                                                                                    }}
-                                                                                >
-                                                                                    {file.fileName}
-                                                                                </a>
+                                                                                <Typography color="text.secondary">No File Uploaded</Typography>
                                                                             </TableCell>
                                                                         </TableRow>
-                                                                    ))
-                                                                ) : (
-                                                                    <TableRow>
-                                                                        <TableCell>
-                                                                            <Typography color="text.secondary">No File Uploaded</Typography>
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                )}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                </AccordionDetails>
-                                            </Accordion>
+                                                                    )}
+                                                                </TableBody>
+                                                            </Table>
+                                                        </TableContainer>
+                                                    </AccordionDetails>
+                                                </Accordion>
                                             </div>
                                         </Collapse>
                                         <Collapse in={open[beneficiaryIndex]} timeout="auto" unmountOnExit>
                                             <div style={{ padding: '10px' }}>
-                                            <Accordion>
-                                                <AccordionSummary
-                                                    expandIcon={<ExpandMoreIcon />}
-                                                    aria-controls={`otherdoc-content-${beneficiary.id}`}
-                                                    id={`otherdoc-header-${beneficiary.id}`}
-                                                >
-                                                    <Typography>Other Documents</Typography>
-                                                </AccordionSummary>
-                                                <AccordionDetails>
-                                                    <TableContainer component={Paper} elevation={2} sx={{ mb: 2 }}>
-                                                        <Table size="small" aria-label="otherdoc table">
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    <TableCell style={{ fontWeight: 'bold' }}>Document List</TableCell>
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {beneficiary.otherDocs &&
-                                                                    beneficiary.otherDocs.length > 0 ? (
-                                                                    beneficiary.otherDocs.map((file, idx) => (
-                                                                        <TableRow key={idx}>
+                                                <Accordion>
+                                                    <AccordionSummary
+                                                        expandIcon={<ExpandMoreIcon />}
+                                                        aria-controls={`otherdoc-content-${beneficiary.id}`}
+                                                        id={`otherdoc-header-${beneficiary.id}`}
+                                                    >
+                                                        <Typography>Other Documents</Typography>
+                                                    </AccordionSummary>
+                                                    <AccordionDetails>
+                                                        <TableContainer component={Paper} elevation={2} sx={{ mb: 2 }}>
+                                                            <Table size="small" aria-label="otherdoc table">
+                                                                <TableHead>
+                                                                    <TableRow>
+                                                                        <TableCell style={{ fontWeight: 'bold' }}>Document List</TableCell>
+                                                                    </TableRow>
+                                                                </TableHead>
+                                                                <TableBody>
+                                                                    {beneficiary.otherDocs &&
+                                                                        beneficiary.otherDocs.length > 0 ? (
+                                                                        beneficiary.otherDocs.map((file, idx) => (
+                                                                            <TableRow key={idx}>
+                                                                                <TableCell>
+                                                                                    <a
+                                                                                        href={file.downloadUrl}
+                                                                                        download={file.fileName}
+                                                                                        style={{
+                                                                                            textDecoration: 'underline',
+                                                                                            color: '#007BFF',
+                                                                                        }}
+                                                                                    >
+                                                                                        {file.fileName}
+                                                                                    </a>
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        ))
+                                                                    ) : (
+                                                                        <TableRow>
                                                                             <TableCell>
-                                                                                <a
-                                                                                    href={file.downloadUrl}
-                                                                                    download={file.fileName}
-                                                                                    style={{
-                                                                                        textDecoration: 'underline',
-                                                                                        color: '#007BFF',
-                                                                                    }}
-                                                                                >
-                                                                                    {file.fileName}
-                                                                                </a>
+                                                                                <Typography>No File Uploaded</Typography>
                                                                             </TableCell>
                                                                         </TableRow>
-                                                                    ))
-                                                                ) : (
-                                                                    <TableRow>
-                                                                        <TableCell>
-                                                                            <Typography>No File Uploaded</Typography>
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                )}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                </AccordionDetails>
-                                            </Accordion>
-                                            {isReview && <div style={{ display: 'flex', gap: '10px', padding: '10px' }}>
-                                                <Button
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    onClick={() => handleSubmit(beneficiary.id)}
-                                                    style={{ marginTop: '10px' }}
-                                                >
-                                                    Generate Voucher
-                                                </Button>
-                                                <Button
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    style={{ marginTop: '10px' }}
-                                                    onClick={() => handlePaymentSubmit()}
-                                                >
-                                                    Payment Details
-                                                </Button>
-                                            </div>}
+                                                                    )}
+                                                                </TableBody>
+                                                            </Table>
+                                                        </TableContainer>
+                                                    </AccordionDetails>
+                                                </Accordion>
+                                                {isReview && <div style={{ display: 'flex', gap: '10px', padding: '10px' }}>
+                                                    {!isApprove && !isReject && !isVC &&
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="primary"
+                                                            onClick={() => handleSubmit(beneficiary.id)}
+                                                            style={{ marginTop: '10px' }}
+                                                        >
+                                                            Generate Voucher
+                                                        </Button>
+                                                    }
+                                                    {isApprove &&
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="primary"
+                                                            style={{ marginTop: '10px' }}
+                                                            onClick={() => handlePaymentSubmit(beneficiary.voucherId)}
+                                                        >
+                                                            Pay
+                                                        </Button>
+                                                    }
+                                                    {isVC &&
+                                                        <>
+                                                            <TableCell>
+                                                                <TextField
+                                                                    label="Remarks"
+                                                                    value={remarks}
+                                                                    onChange={(e) => setRemarks(e.target.value)}
+                                                                    size="small"
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Box sx={{ display: 'flex', gap: 0.5 }} >
+                                                                    <Button
+                                                                        variant="contained"
+                                                                        color="success"
+                                                                        onClick={() => handleApproval(beneficiary.id, 'Approve')}
+                                                                    >
+                                                                        Approve
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="contained"
+                                                                        color="error"
+                                                                        onClick={() => handleApproval(beneficiary.id, 'Reject')}
+                                                                    >
+                                                                        Reject
+                                                                    </Button>
+                                                                </Box>
+                                                            </TableCell>
+                                                        </>
+                                                    }
+                                                </div>}
                                             </div>
                                         </Collapse>
                                     </TableCell>
@@ -639,6 +754,97 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                     </Button>
                 </Box>
             </Modal>
+            <Modal
+                open={showViewCommentConfirmation}
+                onClose={handleCloseViewCommentConfirmation}
+                aria-labelledby="confirmation-modal"
+                aria-describedby="confirmation-modal-description"
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 500,
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 4,
+                        borderRadius: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                    }}
+                >
+                    <Typography
+                        variant="h6"
+                        component="h2"
+                        sx={{ mb: 2, textAlign: 'center', fontWeight: 'bold' }}
+                    >
+                        Comments
+                    </Typography>
+                    <div
+                        className="comment-section"
+                        style={{
+                            maxHeight: '300px',
+                            overflowY: 'auto',
+                            padding: '8px',
+                            border: '1px solid #e0e0e0',
+                            borderRadius: '8px',
+                            background: '#f9f9f9',
+                        }}
+                    >
+                        {comments !== null ? <>
+                            {comments?.map((comment, id) => (
+                                <div
+                                    key={id}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        marginBottom: '16px',
+                                    }}
+                                >
+                                    <Avatar
+                                        sx={{
+                                            bgcolor: comment.role === 'Admin' ? 'primary.main' : 'secondary.main',
+                                            mr: 2,
+                                        }}
+                                    >
+                                        {comment.role.charAt(0)}
+                                    </Avatar>
+                                    <div>
+                                        <Typography
+                                            variant="subtitle1"
+                                            sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                                        >
+                                            {comment.role}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                            {comment.message}
+                                        </Typography>
+                                    </div>
+                                </div>
+                            ))}
+                        </> : <>No Remarks found</>}
+                    </div>
+                    <Divider sx={{ my: 2 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                        <button
+                            style={{
+                                padding: '8px 16px',
+                                backgroundColor: '#d32f2f',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                            onClick={handleCloseViewCommentConfirmation}
+                        >
+                            Close
+                        </button>
+                    </Box>
+                </Box>
+            </Modal>
 
             <Modal
                 open={showViewPaymentConfirmation}
@@ -660,7 +866,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                     <Typography variant="h6" component="h2" gutterBottom>
                         Payment Form
                     </Typography>
-                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} setIsSucess={setIsSucess} />
+                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} setIsSucess={setIsSucess} voucher={voucher}/>
                 </Box>
             </Modal>
         </div>

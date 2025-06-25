@@ -11,6 +11,7 @@ function AOPaymentPage() {
   const [showTable, setShowTable] = useState(true);
   const [isReview, setIsReview] = useState(true);
   const [isSuccess, setIsSucess] = useState(false);
+  const [isVoucher, setIsVoucher] = useState(false);
   const [value, setValue] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
 
@@ -53,7 +54,7 @@ function AOPaymentPage() {
       >
 
         <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper' }}>
-          <DatePickerSearch onSearch={handleSearch} />
+          <DatePickerSearch onSearch={handleSearch} setIsVoucher={setIsVoucher} isVoucher={isVoucher} />
         </Box>
 
         {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>

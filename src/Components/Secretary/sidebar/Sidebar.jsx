@@ -36,7 +36,7 @@ const Sidebar = () => {
 
 
           <li>
-            <NavLink to="/AO/payment-list" style={({ isActive }) => ({
+            <NavLink to="/VCS/dashboard" style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
               backgroundColor: isActive ? '#ece8ff' : 'transparent',
@@ -45,56 +45,8 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
-              <span>Pending Payments</span>
-            </NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/AO/dashboard/payment-list/success" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
-              <span>Approved Vouchers</span>
-            </NavLink>
-          </li>
-
-
-          <li>
-            <NavLink to="/AO/dashboard/payment-list/reject" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
-              <span>Rejected Vouchers</span>
-            </NavLink>
-          </li>
-
-
-
-          <li>
-            <NavLink to="/AO/dashboard/payment-list" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <DashboardIcon className="icon" style={{ color: "black" }} />
-              <span>Payment Dashboard</span>
+              <PendingIcon className="icon" style={{ color: "black" }} />
+              <span>Approval Center</span>
             </NavLink>
           </li>
 

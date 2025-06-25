@@ -28,6 +28,9 @@ import AOPaymentPage from "./Components/AO/AOPaymentPage";
 import CEODashboard from "./Components/CEO/CEODashboard";
 import AODashboard from "./Components/AO/AODashboard";
 import ReportPage from "./Components/CEO/ReportPage";
+import AOPaymentSuccess from "./Components/AO/AOPaymentSuccess";
+import AOPaymentReject from "./Components/AO/AOPaymentReject";
+import SecretaryApprovalPage from "./Components/Secretary/SecretaryApprovalPage";
 
 function App() {
   return (
@@ -81,7 +84,7 @@ function App() {
       <Route
         path="/myprofile"
         element={
-          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE']}>
+          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE', 'Secretary', 'VICE_CHAIRMAN']}>
             <UserProfile />
           </PrivateRoute>
         }
@@ -210,6 +213,24 @@ function App() {
       />
 
       <Route
+        path="/AO/dashboard/payment-list/success"
+        element={
+          <PrivateRoute requiredRoles={['AO']}>
+            <AOPaymentSuccess />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/AO/dashboard/payment-list/reject"
+        element={
+          <PrivateRoute requiredRoles={['AO']}>
+            <AOPaymentReject />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
         path="/CEO/dashboard-list"
         element={
           <PrivateRoute requiredRoles={['CEO']}>
@@ -223,6 +244,15 @@ function App() {
         element={
           <PrivateRoute requiredRoles={['PM']}>
             <RejectIframe />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/VCS/dashboard"
+        element={
+          <PrivateRoute requiredRoles={['Secretary', 'VICE_CHAIRMAN']}>
+            <SecretaryApprovalPage />
           </PrivateRoute>
         }
       />

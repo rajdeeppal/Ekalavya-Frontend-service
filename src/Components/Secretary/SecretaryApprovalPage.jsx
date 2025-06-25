@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Typography, Box } from '@mui/material';
-import Sidebar from '../CEO/sidebar/Sidebar';
+import Sidebar from '../Secretary/sidebar/Sidebar';
 import DatePickerSearch from '../CEO/DatePickerSearch';
-import { getPaymentDetails } from '../DataCenter/apiService';
+import { getVCPaymentDetails } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import PaymentTable from '../CEO/PaymentTable';
 
-function PaymentPage() {
+function SecretaryApprovalPage() {
   const { userId } = useAuth();
-  const [showTable, setShowTable] = useState(false);
-  const [isReview, setIsReview] = useState(false);
-  const [beneficiaries, setBeneficiaries] = useState([]);
-  const [isVoucher, setIsVoucher] = useState(false);
-  const [date, setDate] = useState(true);
+  const [showTable, setShowTable] = useState(true);
+  const [isReview, setIsReview] = useState(true);
   const [isSuccess, setIsSucess] = useState(false);
+  const [isVoucher, setIsVoucher] = useState(false);
+
+  const [value, setValue] = useState(false);
+  const [beneficiaries, setBeneficiaries] = useState([]);
 
   useEffect(() => {
     console.log("isSuccess:", isSuccess);
     if (isSuccess) {
       console.log("Calling handleSearch...");
-      handleSearch(date);
+      handleSearch(value);
     }
   }, [isSuccess]);
 
@@ -27,11 +28,11 @@ function PaymentPage() {
     if (!criteria) return;
     try {
       console.log("ok");
-      const data = await getPaymentDetails(criteria);
-      setDate(criteria);
+      const data = await getVCPaymentDetails(criteria);
       setBeneficiaries(Array.isArray(data) ? data : []);
       setShowTable(true);
       setIsSucess(false);
+      setValue(criteria);
       console.log(beneficiaries);
     } catch (error) {
       setShowTable(false);
@@ -54,15 +55,15 @@ function PaymentPage() {
       >
 
         <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper' }}>
-          <DatePickerSearch onSearch={handleSearch} setIsVoucher={setIsVoucher} isVoucher={isVoucher}/>
+          <DatePickerSearch onSearch={handleSearch} setIsVoucher={setIsVoucher} isVoucher={isVoucher} />
         </Box>
 
         {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-          <PaymentTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} date={date} setDate={setDate} setIsSucess={setIsSucess} />
+          <PaymentTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} isVC='true'/>
         </Box>}
       </Box>
     </Box>
   )
 }
 
-export default PaymentPage;
+export default SecretaryApprovalPage;

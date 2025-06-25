@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Container,
@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { getVoucherDetails, generatedPaymentDetails } from '../DataCenter/apiService';
 
-function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess }) {
+function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher }) {
     const [formValues, setFormValues] = useState({
         voucherId: '',
         payeeName: '',
@@ -37,42 +37,46 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess }) {
         setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
     };
 
-const handleSearch = async (value) => {
-  if (!value) {
-    setErrors((prevErrors) => ({ ...prevErrors, voucherId: 'Voucher ID is required' }));
-    return;
-  }
+    useEffect(() => {
+        handleSearch(voucher);
+    }, [])
 
-  try {
-    const response = await getVoucherDetails(value);
+    const handleSearch = async (value) => {
+        if (!value) {
+            setErrors((prevErrors) => ({ ...prevErrors, voucherId: 'Voucher ID is required' }));
+            return;
+        }
 
-    if (response.status === 200) {
-      const data = response.data;
+        try {
+            const response = await getVoucherDetails(value);
 
-      // Populate the form with the received data
-      setFormValues({
-        ...formValues,
-        voucherId: data.voucherId,
-        payeeName: data.payeeName,
-        accountNumber: data.accountNumber,
-        amount: data.amount,
-        taskNames: data.taskNames,
-        projectTaskMappings: data.projectTaskMappings,
-        bankInfo: data.bankInfo,
-      });
+            if (response.status === 200) {
+                const data = response.data;
 
-      setShowFrom(true); // Show the form
-      setBackendMessage(data.lastPaymentNote || ''); // Set backend message
-    }
-  } catch (error) {
-    // Handle errors, including non-200 responses
-    console.error('Error fetching voucher details:', error);
+                // Populate the form with the received data
+                setFormValues({
+                    ...formValues,
+                    voucherId: data.voucherId,
+                    payeeName: data.payeeName,
+                    accountNumber: data.accountNumber,
+                    amount: data.amount,
+                    taskNames: data.taskNames,
+                    projectTaskMappings: data.projectTaskMappings,
+                    bankInfo: data.bankInfo,
+                });
 
-    const errorMessage = error.response?.data || 'Failed to fetch voucher details. Please try again later.';
-    setShowFrom(false);
-    setBackendMessage(errorMessage); // Display error message
-  }
-};
+                //   setShowFrom(true); // Show the form
+                setBackendMessage(data.lastPaymentNote || ''); // Set backend message
+            }
+        } catch (error) {
+            // Handle errors, including non-200 responses
+            console.error('Error fetching voucher details:', error);
+
+            const errorMessage = error.response?.data || 'Failed to fetch voucher details. Please try again later.';
+            // setShowFrom(false);
+            setBackendMessage(errorMessage); // Display error message
+        }
+    };
 
     const handleSave = async () => {
         const criteria = {
@@ -110,7 +114,7 @@ const handleSearch = async (value) => {
                     </Alert>
                 )}
 
-                {/* Voucher ID Input */}
+                {/* Voucher ID Input
                 <Box display="flex" alignItems="center" gap={1} mt={2}>
                     <TextField
                         fullWidth
@@ -131,132 +135,132 @@ const handleSearch = async (value) => {
                     >
                         Find
                     </Button>
-                </Box>
+                </Box> */}
 
                 {/* Conditionally Render Form */}
-                {showForm && (
-                    <Box>
-                        <TextField
-                            fullWidth
-                            label="Payee Name"
-                            name="payeeName"
-                            placeholder="Payee Name"
-                            value={formValues.payeeName}
-                            margin="normal"
-                            required
-                            error={!!errors.payeeName}
-                            helperText={errors.payeeName}
-                            InputProps={{ readOnly: true }}
-                        />
 
-                        <TextField
-                            fullWidth
-                            label="Account Number"
-                            name="accountNumber"
-                            placeholder="Account Number"
-                            value={formValues.accountNumber}
-                            margin="normal"
-                            required
-                            error={!!errors.accountNumber}
-                            helperText={errors.accountNumber}
-                            InputProps={{ readOnly: true }}
-                        />
+                <Box>
+                    <TextField
+                        fullWidth
+                        label="Payee Name"
+                        name="payeeName"
+                        placeholder="Payee Name"
+                        value={formValues.payeeName}
+                        margin="normal"
+                        required
+                        error={!!errors.payeeName}
+                        helperText={errors.payeeName}
+                        InputProps={{ readOnly: true }}
+                    />
 
-                        <TextField
-                            fullWidth
-                            label="Amount"
-                            name="amount"
-                            placeholder="Amount"
-                            value={formValues.amount}
-                            margin="normal"
-                            required
-                            error={!!errors.amount}
-                            helperText={errors.amount}
-                            InputProps={{ readOnly: true }}
-                        />
+                    <TextField
+                        fullWidth
+                        label="Account Number"
+                        name="accountNumber"
+                        placeholder="Account Number"
+                        value={formValues.accountNumber}
+                        margin="normal"
+                        required
+                        error={!!errors.accountNumber}
+                        helperText={errors.accountNumber}
+                        InputProps={{ readOnly: true }}
+                    />
 
-                        <TextField
-                            fullWidth
-                            label="Transaction ID"
-                            name="transactionId"
-                            placeholder="Transaction ID"
+                    <TextField
+                        fullWidth
+                        label="Amount"
+                        name="amount"
+                        placeholder="Amount"
+                        value={formValues.amount}
+                        margin="normal"
+                        required
+                        error={!!errors.amount}
+                        helperText={errors.amount}
+                        InputProps={{ readOnly: true }}
+                    />
+
+                    <TextField
+                        fullWidth
+                        label="Transaction ID"
+                        name="transactionId"
+                        placeholder="Transaction ID"
+                        onChange={handleChange}
+                        margin="normal"
+                        required
+                        error={!!errors.transactionId}
+                        helperText={errors.transactionId}
+                    />
+
+                    <TextField
+                        fullWidth
+                        label="Task Names"
+                        name="taskNames"
+                        placeholder="Task Names"
+                        value={formValues.taskNames.join(', ')}
+                        margin="normal"
+                        required
+                        error={!!errors.taskNames}
+                        helperText={errors.taskNames}
+                        InputProps={{ readOnly: true }}
+                    />
+
+                    <TextField
+                        fullWidth
+                        label="Bank Info"
+                        name="bankInfo"
+                        placeholder="Bank Info"
+                        value={formValues.bankInfo}
+                        margin="normal"
+                        required
+                        error={!!errors.bankInfo}
+                        helperText={errors.bankInfo}
+                        InputProps={{ readOnly: true }}
+                    />
+
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>Payment Status</InputLabel>
+                        <Select
+                            name="paymentStatus"
+                            value={formValues.paymentStatus}
                             onChange={handleChange}
-                            margin="normal"
                             required
-                            error={!!errors.transactionId}
-                            helperText={errors.transactionId}
-                        />
-
-                        <TextField
-                            fullWidth
-                            label="Task Names"
-                            name="taskNames"
-                            placeholder="Task Names"
-                            value={formValues.taskNames.join(', ')}
-                            margin="normal"
-                            required
-                            error={!!errors.taskNames}
-                            helperText={errors.taskNames}
-                            InputProps={{ readOnly: true }}
-                        />
-
-                        <TextField
-                            fullWidth
-                            label="Bank Info"
-                            name="bankInfo"
-                            placeholder="Bank Info"
-                            value={formValues.bankInfo}
-                            margin="normal"
-                            required
-                            error={!!errors.bankInfo}
-                            helperText={errors.bankInfo}
-                            InputProps={{ readOnly: true }}
-                        />
-
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel>Payment Status</InputLabel>
-                            <Select
-                                name="paymentStatus"
-                                value={formValues.paymentStatus}
-                                onChange={handleChange}
-                                required
-                            >
-                                <MenuItem value="">Select Payment Status</MenuItem>
-                                {status.map((status, id) => (
-                                    <MenuItem key={id} value={status}>
-                                        {status}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel>Payment Mode</InputLabel>
-                            <Select
-                                name="paymentMode"
-                                value={formValues.paymentMode}
-                                onChange={handleChange}
-                                required
-                            >
-                                <MenuItem value="">Select Payment Mode</MenuItem>
-                                {modes.map((mode, id) => (
-                                    <MenuItem key={id} value={mode}>
-                                        {mode}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleSave}
-                            sx={{ marginTop: 2 }}
                         >
-                            Save
-                        </Button>
-                    </Box>
-                )}
+                            <MenuItem value="">Select Payment Status</MenuItem>
+                            {status.map((status, id) => (
+                                <MenuItem key={id} value={status}>
+                                    {status}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>Payment Mode</InputLabel>
+                        <Select
+                            name="paymentMode"
+                            value={formValues.paymentMode}
+                            onChange={handleChange}
+                            required
+                        >
+                            <MenuItem value="">Select Payment Mode</MenuItem>
+                            {modes.map((mode, id) => (
+                                <MenuItem key={id} value={mode}>
+                                    {mode}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSave}
+                        sx={{ marginTop: 2 }}
+                    >
+                        Save
+                    </Button>
+                </Box>
+
             </Box>
         </Container>
     );
