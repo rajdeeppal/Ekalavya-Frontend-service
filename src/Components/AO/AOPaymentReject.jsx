@@ -8,7 +8,7 @@ import PaymentTable from '../CEO/PaymentTable';
 
 function AOPaymentReject() {
   const { userId } = useAuth();
-  const [showTable, setShowTable] = useState(true);
+  const [showTable, setShowTable] = useState(false);
   const [isReview, setIsReview] = useState(true);
   const [isSuccess, setIsSucess] = useState(false);
   const [isReject, setIsReject] = useState(false);

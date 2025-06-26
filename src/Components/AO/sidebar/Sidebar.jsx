@@ -6,6 +6,8 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -51,7 +53,7 @@ const Sidebar = () => {
           </li>
 
           <li>
-            <NavLink to="/AO/dashboard/payment-list/success" style={({ isActive }) => ({
+            <NavLink to="/AO/dashboard/payment-list/success" end style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
               backgroundColor: isActive ? '#ece8ff' : 'transparent',
@@ -60,14 +62,14 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
+              <CheckCircleOutlineIcon className="icon" style={{ color: "black" }} />
               <span>Approved Vouchers</span>
             </NavLink>
           </li>
 
 
           <li>
-            <NavLink to="/AO/dashboard/payment-list/reject" style={({ isActive }) => ({
+            <NavLink to="/AO/dashboard/payment-list/reject" end style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
               backgroundColor: isActive ? '#ece8ff' : 'transparent',
@@ -76,7 +78,7 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
+              <ReportGmailerrorredIcon className="icon" style={{ color: "black" }} />
               <span>Rejected Vouchers</span>
             </NavLink>
           </li>
@@ -84,7 +86,7 @@ const Sidebar = () => {
 
 
           <li>
-            <NavLink to="/AO/dashboard/payment-list" style={({ isActive }) => ({
+            <NavLink to="/AO/dashboard/payment-list" end style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
               backgroundColor: isActive ? '#ece8ff' : 'transparent',
