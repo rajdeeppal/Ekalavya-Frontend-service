@@ -50,6 +50,10 @@ const LoginForm = () => {
     navigate('/dashboard');
   };
 
+  const handleForgotPassword = () => {
+    navigate('/forgot-password');
+  };
+
   return (
     <Grid container component="main" sx={{ height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
@@ -130,6 +134,14 @@ const LoginForm = () => {
                   disabled={isLoading}
                 >
                   {isLoading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Login'}
+                </Button>
+                <Button
+                  fullWidth
+                  variant="text"
+                  sx={{ color: '#1976d2', textTransform: 'none', mt: 1 }}
+                  onClick={handleForgotPassword}
+                >
+                  Forgot Password?
                 </Button>
               </Box>
               <Grid container spacing={2} sx={{ mt: 2 }}>

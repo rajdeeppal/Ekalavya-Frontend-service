@@ -12,6 +12,7 @@ import RoleManagement from "./Components/Admin/RoleManagement";
 import TaskIframe from "./Components/Admin/TaskIframe";
 import { PrivateRoute } from "./Components/PrivateRoute";
 import RegisterUserForm from "./Components/UserAuthentication/RegisterUserForm";
+import ForgotPassword from "./Components/UserAuthentication/ForgotPassword";
 import EmailOtpVerification from "./Components/Admin/EmailOtpVerification";
 import UserProfile from "./Components/MyProfile/UserProfile";
 import ResolutionList from "./Components/DomainExpert/ResolutionList";
@@ -38,6 +39,7 @@ function App() {
       <Route path="/" element={<LoginForm />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/register" element={<RegisterUserForm />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route path="/otpValidation" element={<EmailOtpVerification />} />
 
