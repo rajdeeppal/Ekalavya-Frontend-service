@@ -66,12 +66,11 @@ const RoleManagement = () => {
   };
 
   // Handle revoking role from a user
-  const handleRevoke = (userId, roleId) => {
+  const handleRevoke = (userId) => {
     setLoading(true);
     axios.post(`http://localhost:61002/api/roleAudit/revokeRole`, null, {
       params: {
-        userId: userId, // Pass userId as a request parameter
-        roleId: roleId   // Pass roleId as a request parameter
+        userId: userId // Pass userId as a request parameter
       },
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -175,7 +174,9 @@ const RoleManagement = () => {
           <TableHead>
             <TableRow>
               <TableCell>UserName</TableCell>
+              <TableCell>Employee Id</TableCell>
               <TableCell>Role</TableCell>
+              {selectedRole === 'PM' && <TableCell>Projects</TableCell>}
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -184,7 +185,11 @@ const RoleManagement = () => {
               users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.role ? user.role.name : 'None'}</TableCell>
+                  <TableCell>{user.empId}</TableCell>
+                  <TableCell>{user.role ? user.role : 'None'}</TableCell>
+                  {selectedRole === 'PM' && (
+                      <TableCell>{user.projects}</TableCell>
+                    )}
                   <TableCell>
                     {selectedRole === "UNASSIGN" ? (
                       <>
@@ -217,7 +222,7 @@ const RoleManagement = () => {
                       </>
                     ) : (
                       <Tooltip title="Revoke Role">
-                        <IconButton color="secondary" onClick={() => handleRevoke(user.id, user.role.id)}>
+                        <IconButton color="secondary" onClick={() => handleRevoke(user.id)}>
                           <Cancel />
                         </IconButton>
                       </Tooltip>
