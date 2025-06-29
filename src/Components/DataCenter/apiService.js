@@ -423,9 +423,7 @@ export const getUpdatedPaymentDetails = async (data) => {
 export const getStateDetails = async () => {
   
     try {
-        const response = await axios.get(`http://localhost:61002/api/states`,{
-            headers:getAuthorizationHeader()
-          });
+        const response = await axios.get(`http://localhost:61002/api/states`);
         return response.data.states;
     } catch (error) {
         console.error('Error fetching Projects by USERID:', error);
@@ -436,9 +434,7 @@ export const getStateDetails = async () => {
 export const getDistrictDetails = async (state_id) => {
   
     try {
-        const response = await axios.get(`http://localhost:61002/api/districts/${state_id}`,{
-            headers:getAuthorizationHeader()
-          });
+        const response = await axios.get(`http://localhost:61002/api/districts/${state_id}`);
         return response.data.districts;
     } catch (error) {
         console.error('Error fetching Projects by USERID:', error);

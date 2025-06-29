@@ -4,9 +4,12 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { getPublicVerticals, getPublicComponents } from '../DataCenter/apiService';
-
+import { getPublicVerticals, getPublicComponents, getStateDetails, getDistrictDetails } from '../DataCenter/apiService';
 const RegisterUserForm = () => {
+  const [states, setStates] = useState([]);
+  const [district, setDistrict] = useState([]);
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedVertical, setSelectedVertical] = useState('');
   const [selectedComponent, setSelectedComponent] = useState('');
   const [username, setUsername] = useState('');
@@ -59,6 +62,27 @@ const RegisterUserForm = () => {
     fetchComponents();
   }, [selectedVertical, verticals]);
 
+  useEffect(() => {
+    async function fetchStates() {
+      const data = await getStateDetails();
+      setStates(Array.isArray(data) ? data : []);
+      console.log(states);
+    }
+    fetchStates();
+  }, []);
+
+  useEffect(() => {
+    async function fetchDistricts() {
+      if (!selectedState) return;
+      const state = states.find(s => s.state_name === selectedState);
+      if (state) {
+        const data = await getDistrictDetails(state.state_id);
+        setDistrict(Array.isArray(data) ? data : []);
+      }
+    }
+    fetchDistricts();
+  }, [selectedState, states]);
+
   const handleRoleChange = (e) => {
     const selectedRole = e.target.value;
     setRequestedRole(selectedRole);
@@ -72,7 +96,18 @@ const RegisterUserForm = () => {
     e.preventDefault();
     setLoading(true);
     
-    const formData = { username, password, vertical : selectedVertical, component : selectedComponent, emailId, requestedRole };
+const formData = {
+  username,
+  password,
+  vertical: selectedVertical,
+  component: selectedComponent,
+  emailId,
+  requestedRole,
+  ...(requestedRole === 'TRUSTEE' && {
+    state: selectedState,
+    district: selectedDistrict,
+  }),
+};
 
     try {
       const response = await axios.post('http://localhost:61002/api/self-service/submitRoleRequest', JSON.stringify(formData), {
@@ -192,7 +227,49 @@ const RegisterUserForm = () => {
                   </MenuItem>
                 ))}
             </TextField>
+{requestedRole === 'TRUSTEE' && (
+  <>
+            <FormControl fullWidth margin="normal">
+                <InputLabel>State</InputLabel>
+                <Select
+                  name="stateName"
+                  value={selectedState}
+                  onChange={(e) => {
+                    setSelectedState(e.target.value);
 
+                  }}
+                  required
+                >
+                  <MenuItem value="">Select State</MenuItem>
+                  {states.map((state) => (
+                    <MenuItem key={state.id} value={state.state_name} >
+                      {state.state_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+
+              </FormControl>
+            <FormControl fullWidth margin="normal">
+                <InputLabel>District</InputLabel>
+                <Select
+                  name="districtName"
+                  value={selectedDistrict}
+                  onChange={(e) => {
+                    setSelectedDistrict(e.target.value);
+
+                  }}
+                  required
+                >
+                  <MenuItem value="">Select District</MenuItem>
+                  {district.map((district) => (
+                    <MenuItem key={district.id} value={district.district_name} >
+                      {district.district_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+  </>
+)}
             {showDomain && (
               <>
                 <FormControl
