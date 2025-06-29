@@ -6,8 +6,6 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -38,7 +36,24 @@ const Sidebar = () => {
 
 
           <li>
-            <NavLink to="/AO/payment-list" style={({ isActive }) => ({
+            <NavLink to="/Director/inprogress-list" style={({ isActive }) => ({
+              textDecoration: "none",
+              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
+              backgroundColor: isActive ? '#ece8ff' : 'transparent',
+              borderRadius: "10px 0px 0px 10px ",
+              padding: "10px 4px",
+              width: "100%",
+              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+            })} >
+              <PendingIcon className="icon" style={{ color: "black" }} />
+              <span>Approval Center</span>
+            </NavLink>
+          </li>
+
+
+
+          <li>
+            <NavLink to="/Director/review-list" style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
               backgroundColor: isActive ? '#ece8ff' : 'transparent',
@@ -48,60 +63,12 @@ const Sidebar = () => {
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
               <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
-              <span>Pending Payments</span>
+              <span>Rejection center</span>
             </NavLink>
           </li>
 
           <li>
-            <NavLink to="/AO/dashboard/payment-list/success" end style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <CheckCircleOutlineIcon className="icon" style={{ color: "black" }} />
-              <span>Approved Vouchers</span>
-            </NavLink>
-          </li>
-
-
-          <li>
-            <NavLink to="/AO/dashboard/payment-list/reject" end style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <ReportGmailerrorredIcon className="icon" style={{ color: "black" }} />
-              <span>Rejected Vouchers</span>
-            </NavLink>
-          </li>
-
-
-
-          <li>
-            <NavLink to="/AO/dashboard/payment-list" end style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <DashboardIcon className="icon" style={{ color: "black" }} />
-              <span>Payment Dashboard</span>
-            </NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/AO/resolution-list" style={({ isActive }) => ({
+            <NavLink to="/Director/resolution-list" style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
               backgroundColor: isActive ? '#ece8ff' : 'transparent',
@@ -114,7 +81,6 @@ const Sidebar = () => {
               <span>Resolution View</span>
             </NavLink>
           </li>
-
 
           <li> {/* Profile click handler */}
             <NavLink

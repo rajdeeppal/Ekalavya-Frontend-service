@@ -50,6 +50,21 @@ const Sidebar = () => {
             </NavLink>
           </li>
 
+          <li>
+            <NavLink to="/VCS/resolution-list" style={({ isActive }) => ({
+              textDecoration: "none",
+              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
+              backgroundColor: isActive ? '#ece8ff' : 'transparent',
+              borderRadius: "10px 0px 0px 10px ",
+              padding: "10px 4px",
+              width: "100%",
+              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+            })} >
+              <FormatListBulletedIcon className="icon" style={{ color: "black" }} />
+              <span>Resolution View</span>
+            </NavLink>
+          </li>
+
 
           <li> {/* Profile click handler */}
             <NavLink

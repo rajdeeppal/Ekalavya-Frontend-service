@@ -11,6 +11,7 @@ function AODashboard() {
     const { userId } = useAuth();
     const [showTable, setShowTable] = useState(false);
     const [isReview, setIsReview] = useState(true);
+    const [isVoucher, setIsVoucher] = useState(false);
     const [beneficiaries, setBeneficiaries] = useState([
         
     ]);
@@ -42,7 +43,7 @@ function AODashboard() {
             >
 
                 <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper' }}>
-                    <DatePickerSearch onSearch={handleSearch} setIsReview={setIsReview}/>
+                    <DatePickerSearch onSearch={handleSearch} setIsReview={setIsReview} setIsVoucher={setIsVoucher} isVoucher={isVoucher}/>
                 </Box>
 
                 {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>

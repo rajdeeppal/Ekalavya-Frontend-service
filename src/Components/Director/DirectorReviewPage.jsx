@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Typography, Box } from '@mui/material';
-import Sidebar from '../DomainExpert/sidebar/Sidebar';
+import Sidebar from '../Director/sidebar/Sidebar';
 import SearchBar from '../PM/SearchBar';
 import { getBeneficiary } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
-import ReviewTable from './ReviewTable';
+import ReviewTable from '../DomainExpert/ReviewTable';
 
-function ReviewPage() {
+function DirectorReviewPage() {
   const { userId } = useAuth();
-  const [isSuccess, setIsSucess] = useState(false);
-  const [value, setValue] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const [isReview, setIsReview] = useState(false);
-  const [beneficiaries, setBeneficiaries] = useState([]);
+  const [isSuccess, setIsSucess] = useState(false);
+  const [value, setValue] = useState(false);
+  const [beneficiaries, setBeneficiaries] = useState([]
+  );
 
   useEffect(() => {
     console.log("isSuccess:", isSuccess);
@@ -29,11 +30,12 @@ function ReviewPage() {
       const data = await getBeneficiary(userId, criteria, 'inprogress');
       setBeneficiaries(Array.isArray(data) ? data : []);
       setShowTable(true);
-      setValue(criteria);
       setIsSucess(false);
+      setValue(criteria);
       console.log(beneficiaries);
     } catch (error) {
       setShowTable(false);
+      alert(error);
       console.error('Error fetching activities:', error);
     }
   };
@@ -55,7 +57,7 @@ function ReviewPage() {
           <SearchBar onSearch={handleSearch} />
         </Box>
 
-        {showTable && <Box sx={{ borderRadius: 1, boxShadow: 1, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
+        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
           <ReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} />
         </Box>}
       </Box>
@@ -63,4 +65,4 @@ function ReviewPage() {
   )
 }
 
-export default ReviewPage;
+export default DirectorReviewPage;

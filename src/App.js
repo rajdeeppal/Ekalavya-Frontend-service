@@ -10,12 +10,16 @@ import Dashboard from "./Components/UserAuthentication/Dashboard";
 import PendingRequests from "./Components/Admin/PendingRequests";
 import RoleManagement from "./Components/Admin/RoleManagement";
 import TaskIframe from "./Components/Admin/TaskIframe";
-import { PrivateRoute } from "./Components/PrivateRoute";
+import { PrivateRoute, useAuth } from "./Components/PrivateRoute";
 import RegisterUserForm from "./Components/UserAuthentication/RegisterUserForm";
 import ForgotPassword from "./Components/UserAuthentication/ForgotPassword";
 import EmailOtpVerification from "./Components/Admin/EmailOtpVerification";
 import UserProfile from "./Components/MyProfile/UserProfile";
 import ResolutionList from "./Components/DomainExpert/ResolutionList";
+import AOResolutionList from "./Components/AO/AOResolutionList";
+import CEOResolutionList from "./Components/CEO/CEOResolutionList";
+import TrusteeResolutionList from "./Components/Trustee/TrusteeResolutionList";
+import SecretaryResolutionList from "./Components/Secretary/SecretaryResolutionList";
 import ReviewPage from "./Components/DomainExpert/ReviewPage";
 import RejectPage from "./Components/DomainExpert/RejectPage";
 import "./App.css";
@@ -32,8 +36,14 @@ import ReportPage from "./Components/CEO/ReportPage";
 import AOPaymentSuccess from "./Components/AO/AOPaymentSuccess";
 import AOPaymentReject from "./Components/AO/AOPaymentReject";
 import SecretaryApprovalPage from "./Components/Secretary/SecretaryApprovalPage";
+import { jwtDecode }   from 'jwt-decode';
+import DirectorReviewPage from "./Components/Director/DirectorReviewPage";
+import DirectorRejectPage from "./Components/Director/DirectorRejectPage";
+import DirectorResolutionList from "./Components/Director/DirectorResolutionList";
 
 function App() {
+  const { userRole } = useAuth();
+console.log(userRole);
   return (
     <Routes>
       <Route path="/" element={<LoginForm />} />
@@ -258,6 +268,70 @@ function App() {
           </PrivateRoute>
         }
       />
+
+       <Route
+        path="/Trustee/resolution-list"
+        element={
+          <PrivateRoute requiredRoles={['TRUSTEE']}>
+            <TrusteeResolutionList />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/VCS/resolution-list"
+        element={
+          <PrivateRoute requiredRoles={['Secretary', 'VICE_CHAIRMAN']}>
+            <SecretaryResolutionList />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/CEO/resolution-list"
+        element={
+          <PrivateRoute requiredRoles={['CEO']}>
+            <CEOResolutionList />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/AO/resolution-list"
+        element={
+          <PrivateRoute requiredRoles={['AO']}>
+            <AOResolutionList />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Director/inprogress-list"
+        element={
+          <PrivateRoute requiredRoles={['DIRECTOR']}>
+            <DirectorReviewPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Director/review-list"
+        element={
+          <PrivateRoute requiredRoles={['DIRECTOR']}>
+            <DirectorRejectPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Director/resolution-list"
+        element={
+          <PrivateRoute requiredRoles={['DIRECTOR']}>
+            <DirectorResolutionList />
+          </PrivateRoute>
+        }
+      />
+
     </Routes>
   );
 }
