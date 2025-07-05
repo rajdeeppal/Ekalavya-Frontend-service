@@ -52,6 +52,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
     const [selectedComponent, setSelectedComponent] = useState('');
     const [components, setComponents] = useState([]);
     const [voucher,setVoucher]=useState('');
+    const [isPay,setIsPay]=useState('');
+
 
     useEffect(() => {
         async function fetchComponents() {
@@ -218,6 +220,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                 branchName: '',
             });
             setShowViewConfirmation(false);
+            setIsSucess(true);
         } catch (error) {
             console.error('Error generating voucher:', error);
         }
@@ -249,6 +252,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
     const handlePaymentSubmit = (value) => {
         setShowViewPaymentConfirmation(true);
         setVoucher(value);
+        setIsPay(true);
     };
 
     const handleChange = (e) => {
@@ -651,7 +655,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                             variant="outlined"
                                                             color="primary"
                                                             style={{ marginTop: '10px' }}
-                                                            onClick={() => handlePaymentSubmit(beneficiary.voucherId)}
+                                                            onClick={() => handlePaymentSubmit(beneficiary.id)}
                                                         >
                                                             Pay
                                                         </Button>
@@ -866,7 +870,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                     <Typography variant="h6" component="h2" gutterBottom>
                         Payment Form
                     </Typography>
-                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} setIsSucess={setIsSucess} voucher={voucher}/>
+                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} setIsSucess={setIsSucess} voucher={voucher} isPay={isPay}/>
                 </Box>
             </Modal>
         </div>

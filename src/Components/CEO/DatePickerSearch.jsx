@@ -24,6 +24,7 @@ const DatePickerSearch = ({ onSearch, setIsVoucher, isVoucher, isTrue }) => {
   };
 
   const handleReset = () => {
+    setVoucherId('');
     setStartDate(null);
     setEndDate(null);
   };

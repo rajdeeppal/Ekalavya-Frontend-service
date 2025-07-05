@@ -635,6 +635,21 @@ export const getVoucherDetails = async (voucher_id) => {
   }
 };
 
+export const getVoucherDetailsUsingId = async (voucher_id) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/api/ao/voucher/click-pay/${voucher_id}`,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response; // Return the full response object
+  } catch (error) {
+    console.error("Error fetching voucher details:", error);
+    throw error; // Re-throw the error so it can be caught in the frontend
+  }
+};
+
 export const getProfileDetails = async (userId) => {
   try {
     const response = await axios.get(

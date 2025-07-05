@@ -32,7 +32,7 @@ import * as XLSX from 'xlsx';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import { updatedResubmitSubTask, approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
 
-function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess }) {
+function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , isCEO}) {
     const { userId } = useAuth();
     const [remarks, setRemarks] = useState('');
     const [open, setOpen] = useState({});
@@ -366,13 +366,14 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess })
                                                                                                                                                 >
                                                                                                                                                     Approve
                                                                                                                                                 </Button>
+                                                                                                                                                {!isCEO &&
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     color="error"
                                                                                                                                                     onClick={() => handleSave('Reject', task.id, row.id, rowIndex)}
                                                                                                                                                 >
                                                                                                                                                     Reject
-                                                                                                                                                </Button>
+                                                                                                                                                </Button>}
                                                                                                                                             </Box>
                                                                                                                                         </TableCell>
                                                                                                                                     </TableRow>

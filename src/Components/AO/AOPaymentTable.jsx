@@ -10,15 +10,16 @@ import {
     MenuItem,
     Alert,
 } from '@mui/material';
-import { getVoucherDetails, generatedPaymentDetails } from '../DataCenter/apiService';
+import { getVoucherDetails, generatedPaymentDetails, getVoucherDetailsUsingId } from '../DataCenter/apiService';
 
-function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher }) {
+function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher, isPay }) {
     const [formValues, setFormValues] = useState({
         voucherId: '',
         payeeName: '',
         accountNumber: '',
         amount: '',
         taskNames: [],
+        taskUpdateIds: [],
         projectTaskMappings: [],
         bankInfo: '',
         transactionId: '',
@@ -48,7 +49,12 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher }
         }
 
         try {
-            const response = await getVoucherDetails(value);
+            let response; 
+            if(isPay){
+                response = await getVoucherDetailsUsingId(value);
+            }else{
+                response = await getVoucherDetails(value);
+            }
 
             if (response.status === 200) {
                 const data = response.data;
@@ -61,6 +67,7 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher }
                     accountNumber: data.accountNumber,
                     amount: data.amount,
                     taskNames: data.taskNames,
+                    taskUpdateIds:data.taskUpdateIds,
                     projectTaskMappings: data.projectTaskMappings,
                     bankInfo: data.bankInfo,
                 });
@@ -84,7 +91,7 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher }
             payeeName: formValues.payeeName,
             accountNumber: formValues.accountNumber,
             amount: formValues.amount,
-            taskNames: formValues.taskNames,
+            taskUpdateIds: formValues.taskUpdateIds,
             projectTaskMappings: formValues.projectTaskMappings,
             bankInfo: formValues.bankInfo,
             paymentMode: formValues.paymentMode,
@@ -93,10 +100,11 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher }
         };
 
         try {
-            await generatedPaymentDetails(criteria);
+            const response = await generatedPaymentDetails(criteria);
             setShowFrom(false);
             setIsSucess(true);
             setShowViewPaymentConfirmation(false);
+            alert(response);
         } catch (error) {
             setIsSucess(true);
             alert(error);

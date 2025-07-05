@@ -13,6 +13,7 @@ function CEOReviewPage() {
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [isSuccess, setIsSucess] = useState(false);
   const [value, setValue] = useState(false);
+  const [isCEO, setIsCEO] = useState(true);
 
   useEffect(() => {
     console.log("isSuccess:", isSuccess);
@@ -57,7 +58,7 @@ function CEOReviewPage() {
         </Box>
 
         {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-          <ReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} />
+          <ReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} isCEO={isCEO}/>
         </Box>}
       </Box>
     </Box>
