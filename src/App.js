@@ -96,7 +96,7 @@ console.log(userRole);
       <Route
         path="/myprofile"
         element={
-          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE', 'Secretary', 'VICE_CHAIRMAN']}>
+          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE', 'SECRETARY', 'VICE_CHAIRMAN']}>
             <UserProfile />
           </PrivateRoute>
         }
@@ -263,7 +263,7 @@ console.log(userRole);
       <Route
         path="/VCS/dashboard"
         element={
-          <PrivateRoute requiredRoles={['Secretary', 'VICE_CHAIRMAN']}>
+          <PrivateRoute requiredRoles={['SECRETARY', 'VICE_CHAIRMAN']}>
             <SecretaryApprovalPage />
           </PrivateRoute>
         }

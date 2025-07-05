@@ -34,10 +34,12 @@ function TrusteeReviewPage() {
       setValue(criteria);
       console.log(beneficiaries);
     } catch (error) {
-      setShowTable(false);
-      alert(error);
-      console.error('Error fetching activities:', error);
-    }
+        setShowTable(false);
+        const errorData = error.response?.data;
+        const errorMessage = errorData?.error || 'Error fetching activities.';
+        console.error(errorMessage);
+        alert(errorMessage); // Now displays the actual message text
+      }
   };
 
   return (
