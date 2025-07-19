@@ -16,6 +16,7 @@ const RegisterUserForm = () => {
   const [password, setPassword] = useState('');
   const [domain, setDomain] = useState('');
   const [emailId, setEmailId] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [requestedRole, setRequestedRole] = useState('');
   const [roles, setRoles] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
@@ -102,6 +103,7 @@ const formData = {
   vertical: selectedVertical,
   component: selectedComponent,
   emailId,
+  mobileNumber,
   requestedRole,
   ...(requestedRole === 'TRUSTEE' && {
     state: selectedState,
@@ -125,6 +127,7 @@ const formData = {
         setSelectedVertical('');
         setSelectedComponent('');
         setEmailId('');
+        setMobileNumber('');
         setRequestedRole('');
         setShowDomain(false);
         navigate('/');
@@ -339,6 +342,21 @@ const formData = {
               error={!emailId && !!errorMessage}
               helperText={!emailId && !!errorMessage ? 'Email ID is required' : ''}
             />
+
+            <TextField
+                          margin="normal"
+                          required
+                          fullWidth
+                          id="mobileNumber"
+                          label="Mobile Number"
+                          name="mobileNumber"
+                          type="number"
+                          autoComplete="number"
+                          value={mobileNumber}
+                          onChange={(e) => setMobileNumber(e.target.value)}
+                          error={!mobileNumber && !!errorMessage}
+                          helperText={!mobileNumber && !!errorMessage ? 'Mobile number is required' : ''}
+                        />
 
             {successMessage && (
               <Typography color="success" variant="body2" sx={{ mt: 2 }}>
