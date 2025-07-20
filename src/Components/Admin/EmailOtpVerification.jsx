@@ -23,7 +23,7 @@ const EmailOtpVerification = ({ username }) => {
     setLoading(true); // Start loading spinner
 
     try {
-      const response = await axios.post('http://localhost:61002/api/admin/sendOtp', { username });
+      const response = await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username });
       setIsOtpSent(true);
       setMessage('OTP has been sent to your email.');
     } catch (error) {
@@ -38,7 +38,7 @@ const EmailOtpVerification = ({ username }) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:61002/api/admin/validateOtp', { username, otp });
+      const response = await axios.post('https://projects.ekalavya.net/api/admin/validateOtp', { username, otp });
       if (response.data === 'Otp Validated Successfully!') {
         setMessage('OTP verified successfully!');
         navigate('/adminDashboard');
