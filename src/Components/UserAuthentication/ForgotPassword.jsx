@@ -56,7 +56,7 @@ const ForgotPassword = () => {
       await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username, loginMethod });
       setOtpSent(true);
       setOtpExpired(false);
-      setTimer(900); // reset 15 minutes
+      setTimer(120); // reset 2 minutes
       setMessage('OTP sent successfully.');
     } catch (error) {
       setMessage('Failed to send OTP.');
