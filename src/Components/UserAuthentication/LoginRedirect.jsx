@@ -51,6 +51,8 @@ const LoginRedirect = ({ token }) => {
         console.error('Invalid token', error);
         // Handle token decoding error
       }
+    }else{
+      navigate('/'); 
     }
   }, [token, navigate]);
 
