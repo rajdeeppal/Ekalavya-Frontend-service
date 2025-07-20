@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Grid, TextField, Button, Typography, useMediaQuery, CircularProgress, Modal, Box } from '@mui/material';
+import { Container, Grid, TextField, Button, Typography, useMediaQuery, CircularProgress, Modal, Box, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,6 +16,7 @@ const EmailOtpVerification = ({ username }) => {
 
   const successColor = theme.palette.success.main;
   const errorColor = theme.palette.error.main;
+   const [loginMethod, setLoginMethod] = useState('email'); 
 
   // Handle form submission to request OTP
   const handleRequestOtp = async (e) => {
@@ -23,7 +24,7 @@ const EmailOtpVerification = ({ username }) => {
     setLoading(true); // Start loading spinner
 
     try {
-      const response = await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username });
+      const response = await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username, loginMethod });
       setIsOtpSent(true);
       setMessage('OTP has been sent to your email.');
     } catch (error) {
@@ -92,6 +93,19 @@ const EmailOtpVerification = ({ username }) => {
                     }}
                   />
                 </Grid>
+                 <Grid item xs={12}>
+        <FormControl component="fieldset" fullWidth>
+          <FormLabel component="legend">Select OTP delivery method</FormLabel>
+          <RadioGroup
+            row
+            value={loginMethod}
+            onChange={(e) => setLoginMethod(e.target.value)}
+          >
+            <FormControlLabel value="email" control={<Radio />} label="Email ID" />
+            <FormControlLabel value="phone" control={<Radio />} label="Phone No" />
+          </RadioGroup>
+        </FormControl>
+      </Grid>
                 <Grid item xs={12}>
                   <Button
                     type="submit"
