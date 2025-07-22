@@ -20,7 +20,7 @@ const ForgotPassword = () => {
 
   const navigate = useNavigate();
 
-  // Timer logic (15 mins = 900 seconds)
+  // Timer logic (2 mins = 120 seconds)
   useEffect(() => {
     let countdown;
     if (otpSent && timer > 0 && !otpExpired) {
@@ -51,11 +51,11 @@ const ForgotPassword = () => {
   const handleSendOtp = async () => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:61002/api/admin/sendOtp', { username });
+      const response = await axios.post('http://localhost:61002/api/admin/sendOtp', { username });
       setOtpSent(true);
       setOtpExpired(false);
-      setTimer(900); // reset 15 minutes
-      setMessage('OTP sent successfully.');
+      setTimer(120); // reset 2 minutes
+      setMessage(response.data);
     } catch (error) {
       setMessage('Failed to send OTP.');
     } finally {
@@ -149,7 +149,7 @@ const ForgotPassword = () => {
         {otpSent && !otpVerified && (
           <>
             <Typography variant="body2" sx={{ mt: 2 }}>
-              Enter the OTP sent to the email associated with Employee ID <b>{username}</b>
+              Enter the OTP sent to the account associated with Employee ID <b>{username}</b>
             </Typography>
             <TextField
               label="Enter OTP"

@@ -25,7 +25,7 @@ const EmailOtpVerification = ({ username }) => {
     try {
       const response = await axios.post('http://localhost:61002/api/admin/sendOtp', { username });
       setIsOtpSent(true);
-      setMessage('OTP has been sent to your email.');
+      setMessage(response.data);
     } catch (error) {
       setMessage('Error sending OTP. Please try again.');
     } finally {
@@ -114,7 +114,7 @@ const EmailOtpVerification = ({ username }) => {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <Typography variant="h6" align="center" gutterBottom color="textSecondary">
-                    Enter the OTP sent to the email associated with <strong>{username}</strong>
+                    Enter the OTP sent to the account associated with <strong>{username}</strong>
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
