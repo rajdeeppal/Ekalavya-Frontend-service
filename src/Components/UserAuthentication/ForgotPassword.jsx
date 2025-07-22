@@ -20,7 +20,7 @@ const ForgotPassword = () => {
 
   const navigate = useNavigate();
 
-  // Timer logic (15 mins = 900 seconds)
+  // Timer logic (2 mins = 120 seconds)
   useEffect(() => {
     let countdown;
     if (otpSent && timer > 0 && !otpExpired) {
@@ -51,10 +51,10 @@ const ForgotPassword = () => {
   const handleSendOtp = async () => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:61002/api/admin/sendOtp', { username });
+      await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username });
       setOtpSent(true);
       setOtpExpired(false);
-      setTimer(900); // reset 15 minutes
+      setTimer(120); // reset 2 minutes
       setMessage('OTP sent successfully.');
     } catch (error) {
       setMessage('Failed to send OTP.');
@@ -66,7 +66,7 @@ const ForgotPassword = () => {
   const handleVerifyOtp = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:61002/api/admin/validateOtp', {
+      const response = await axios.post('https://projects.ekalavya.net/api/admin/validateOtp', {
         username,
         otp,
       });
@@ -91,7 +91,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:61002/api/self-service/resetPassword', {
+      await axios.post('https://projects.ekalavya.net/api/self-service/resetPassword', {
         username,
         newPassword,
       });
