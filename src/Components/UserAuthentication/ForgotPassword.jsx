@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container, TextField, Button, Typography, Grid, CircularProgress, Paper
+  Container, TextField, Button, Typography, Grid, CircularProgress, Paper, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio
 } from '@mui/material';
 import axios from 'axios';
 import { Alert } from '@mui/material';
@@ -17,10 +17,12 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0); // in seconds
   const [otpExpired, setOtpExpired] = useState(false);
+  const [loginMethod, setLoginMethod] = useState('email'); 
+
 
   const navigate = useNavigate();
 
-  // Timer logic (15 mins = 900 seconds)
+  // Timer logic (2 mins = 120 seconds)
   useEffect(() => {
     let countdown;
     if (otpSent && timer > 0 && !otpExpired) {
@@ -51,10 +53,10 @@ const ForgotPassword = () => {
   const handleSendOtp = async () => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:61002/api/admin/sendOtp', { username });
+      await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username, loginMethod });
       setOtpSent(true);
       setOtpExpired(false);
-      setTimer(900); // reset 15 minutes
+      setTimer(120); // reset 2 minutes
       setMessage('OTP sent successfully.');
     } catch (error) {
       setMessage('Failed to send OTP.');
@@ -66,7 +68,7 @@ const ForgotPassword = () => {
   const handleVerifyOtp = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:61002/api/admin/validateOtp', {
+      const response = await axios.post('https://projects.ekalavya.net/api/admin/validateOtp', {
         username,
         otp,
       });
@@ -91,7 +93,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:61002/api/self-service/resetPassword', {
+      await axios.post('https://projects.ekalavya.net/api/self-service/resetPassword', {
         username,
         newPassword,
       });
@@ -125,6 +127,17 @@ const ForgotPassword = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
+             <FormControl component="fieldset" sx={{ mt: 1 }}>
+      <FormLabel component="legend">Select OTP delivery method</FormLabel>
+      <RadioGroup
+        row
+        value={loginMethod}
+        onChange={(e) => setLoginMethod(e.target.value)}
+      >
+        <FormControlLabel value="email" control={<Radio />} label="Email ID" />
+        <FormControlLabel value="phone" control={<Radio />} label="Phone No" />
+      </RadioGroup>
+    </FormControl>
             <Button
               variant="contained"
               fullWidth
