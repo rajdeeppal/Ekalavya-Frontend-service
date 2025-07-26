@@ -45,6 +45,7 @@ const AODashboardTable = ({ beneficiaries ,date, setDate}) => {
                             <TableCell style={{ fontWeight: 'bold' }}>Payee Account Details</TableCell>
                             <TableCell style={{ fontWeight: 'bold' }}>Account Head</TableCell>
                             <TableCell style={{ fontWeight: 'bold' }}>Total Amount</TableCell>
+                            <TableCell style={{ fontWeight: 'bold' }}>Voucher</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -55,6 +56,18 @@ const AODashboardTable = ({ beneficiaries ,date, setDate}) => {
                                 <TableCell>{beneficiary.payeeAccountInfo}</TableCell>
                                 <TableCell>{beneficiary.headOfAcount}</TableCell>
                                 <TableCell>{beneficiary.amount}</TableCell>
+                                            <TableCell>
+                                                <a
+                                                    href={beneficiary.voucherUrl}
+                                                    download={beneficiary.voucherUrl}
+                                                    style={{
+                                                        textDecoration: 'underline',
+                                                        color: '#007BFF',
+                                                    }}
+                                                >
+                                                    {beneficiary.voucherId}
+                                                </a>
+                                            </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
