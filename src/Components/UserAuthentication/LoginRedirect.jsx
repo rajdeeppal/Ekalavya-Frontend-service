@@ -42,8 +42,11 @@ const LoginRedirect = ({ token }) => {
           console.log("SECRETARY User has logged in....");
           // setShowOtpModal(true); // Show OTP modal instead of navigating
           navigate('/VCS/dashboard');
-        }
-        else{
+        }else if (userRole === 'PROJECT DIRECTOR') {
+         console.log("PROJECT DIRECTOR User has logged in....");
+        // setShowOtpModal(true); // Show OTP modal instead of navigating
+        navigate('/Director/inprogress-list');
+        }else{
           console.log("Non Admin User has logged in....");
           navigate('/beneficiary');
         }

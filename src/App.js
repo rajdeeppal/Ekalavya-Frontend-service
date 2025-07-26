@@ -308,7 +308,7 @@ console.log(userRole);
       <Route
         path="/Director/inprogress-list"
         element={
-          <PrivateRoute requiredRoles={['DIRECTOR']}>
+          <PrivateRoute requiredRoles={['PROJECT DIRECTOR']}>
             <DirectorReviewPage />
           </PrivateRoute>
         }
@@ -317,7 +317,7 @@ console.log(userRole);
       <Route
         path="/Director/review-list"
         element={
-          <PrivateRoute requiredRoles={['DIRECTOR']}>
+          <PrivateRoute requiredRoles={['PROJECT DIRECTOR']}>
             <DirectorRejectPage />
           </PrivateRoute>
         }
@@ -326,7 +326,7 @@ console.log(userRole);
       <Route
         path="/Director/resolution-list"
         element={
-          <PrivateRoute requiredRoles={['DIRECTOR']}>
+          <PrivateRoute requiredRoles={['PROJECT DIRECTOR']}>
             <DirectorResolutionList />
           </PrivateRoute>
         }
