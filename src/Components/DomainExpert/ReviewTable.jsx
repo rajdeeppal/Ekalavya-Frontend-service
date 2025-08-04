@@ -25,6 +25,7 @@ import {
     Save as SaveIcon,
     Reviews,
 } from '@mui/icons-material';
+import Checkbox from '@mui/material/Checkbox';
 import Avatar from '@mui/material/Avatar';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useAuth } from '../PrivateRoute';
@@ -275,6 +276,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , 
                                                                                                                                     <TableCell>Discounted Rate</TableCell>
                                                                                                                                     <TableCell>Beneficiary Contribution</TableCell>
                                                                                                                                     <TableCell>Current Cost</TableCell>
+                                                                                                                                    <TableCell>Procurement Check</TableCell>
                                                                                                                                     <TableCell>Payee Name</TableCell>
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
@@ -292,6 +294,12 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , 
                                                                                                                                         <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                         <TableCell>{row.currentCost}</TableCell>
+                                                                                                                                                <TableCell>
+                                                                                                                                                  <Checkbox
+                                                                                                                                                    checked={row.procurementCheck || false}
+                                                                                                                                                    disabled
+                                                                                                                                                  />
+                                                                                                                                                </TableCell>
                                                                                                                                         <TableCell>{row.payeeName}</TableCell>
                                                                                                                                         <TableCell>{row.accountNumber}</TableCell>
                                                                                                                                         <TableCell>

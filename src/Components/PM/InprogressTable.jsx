@@ -32,6 +32,7 @@ import * as XLSX from 'xlsx';
 import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask } from '../DataCenter/apiService';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import Checkbox from '@mui/material/Checkbox';
 
 const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSucess }) => {
     const [open, setOpen] = useState({});
@@ -298,6 +299,7 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
             benContribution: parseFloat(changedData.currentBeneficiaryContribution),
             achievementUnit: parseInt(changedData.achievementUnit, 10),
             currentCost: parseFloat(changedData.currentCost),
+            procurementCheck: changedData.procurementCheck === true,
             ...(isReject && { remark: changedData.remarks }),
         };
         console.log(firstTask);
@@ -370,32 +372,33 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                     task.taskUpdates = [];
                 }
 
-                const lastRow = task.taskUpdates[task.taskUpdates.length - 1];
-                if (
-                    !lastRow ||
-                    lastRow.achievementUnit !== '' ||
-                    lastRow.revisedRatePerUnit !== '' ||
-                    lastRow.currentBeneficiaryContribution !== '' ||
-                    lastRow.payeeName !== '' ||
-                    lastRow.passbookDoc !== ''
-                ) {
-                    setNewTask(true);
-                    task.taskUpdates.push({
-                        achievementUnit: '',
-                        revisedRatePerUnit: '',
-                        currentBeneficiaryContribution: '',
-                        currentCost: '',
-                        payeeName: '',
-                        passbookDoc: null,
-                        otherDocs: []
-                        /* domainExpertEmpId: '' */
-                    });
-                }
+            const lastRow = task.taskUpdates[task.taskUpdates.length - 1];
+            if (
+                !lastRow ||
+                lastRow.achievementUnit !== '' ||
+                lastRow.revisedRatePerUnit !== '' ||
+                lastRow.currentBeneficiaryContribution !== '' ||
+                lastRow.payeeName !== '' ||
+                lastRow.passbookDoc !== ''
+            ) {
+                setNewTask(true);
+                task.taskUpdates.push({
+                    achievementUnit: '',
+                    revisedRatePerUnit: '',
+                    currentBeneficiaryContribution: '',
+                    currentCost: '',
+                    payeeName: '',
+                    passbookDoc: null,
+                    otherDocs: [],
+                    procurementCheck: false,
+                    /* domainExpertEmpId: '' */
+                });
             }
+        }
 
-            return updatedBeneficiaries;
-        });
-    };
+        return updatedBeneficiaries;
+    });
+};
 
 
     const handleFileChange = (taskIndex, rowIndex, fileType, e) => {
@@ -588,6 +591,7 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                                                                                                                                     <TableCell>Discounted Rate</TableCell>
                                                                                                                                     <TableCell>Beneficiary Contribution</TableCell>
                                                                                                                                     <TableCell>Current Cost</TableCell>
+                                                                                                                                    <TableCell>Procurement Check</TableCell>
                                                                                                                                     <TableCell>Payee Name</TableCell>
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
@@ -655,6 +659,14 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
 
                                                                                                                                                         readonly
                                                                                                                                                     />
+                                                                                                                                                </TableCell>
+                                                                                                                                                <TableCell>
+                                                                                                                                                  <Checkbox
+                                                                                                                                                    checked={row.procurementCheck || false}
+                                                                                                                                                    onChange={(e) =>
+                                                                                                                                                      handleInputChange(task.id, rowIndex, 'procurementCheck', e.target.checked)
+                                                                                                                                                    }
+                                                                                                                                                  />
                                                                                                                                                 </TableCell>
                                                                                                                                                 <TableCell>
                                                                                                                                                     <TextField
@@ -828,6 +840,12 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                                                                                                                                                 <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                                 <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                                 <TableCell>{row.currentCost}</TableCell>
+                                                                                                                                                <TableCell>
+                                                                                                                                                  <Checkbox
+                                                                                                                                                    checked={row.procurementCheck || false}
+                                                                                                                                                    disabled
+                                                                                                                                                  />
+                                                                                                                                                </TableCell>
                                                                                                                                                 <TableCell>{row.payeeName}</TableCell>
                                                                                                                                                 <TableCell>{row.accountNumber}</TableCell>
                                                                                                                                                 <TableCell>{row.passbookDoc ? (<a

@@ -16,6 +16,7 @@ import {
     IconButton,
     Typography,
 } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
 import {
     ExpandMore as ExpandMoreIcon,
     Edit as EditIcon,
@@ -195,6 +196,7 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                                     <TableCell>Discounted Rate</TableCell>
                                                                                                                                     <TableCell>Beneficiary Contribution</TableCell>
                                                                                                                                     <TableCell>Current Cost</TableCell>
+                                                                                                                                    <TableCell>Procurement Check</TableCell>
                                                                                                                                     <TableCell>Payee Name</TableCell>
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
@@ -211,6 +213,12 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                                         <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                         <TableCell>{row.currentCost}</TableCell>
+                                                                                                                                                <TableCell>
+                                                                                                                                                  <Checkbox
+                                                                                                                                                    checked={row.procurementCheck || false}
+                                                                                                                                                    disabled
+                                                                                                                                                  />
+                                                                                                                                                </TableCell>
                                                                                                                                         <TableCell>{row.payeeName}</TableCell>
                                                                                                                                         <TableCell>{row.accountNumber}</TableCell>
                                                                                                                                         <TableCell>{row.passbookDoc ? (<a
