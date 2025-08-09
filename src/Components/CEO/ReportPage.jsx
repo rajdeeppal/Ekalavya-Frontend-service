@@ -58,7 +58,7 @@ function ReportPage() {
             if (!selectedState) return;
             const state = states.find(s => s.state_name === selectedState);
             if (state) {
-                const data = await getDistrictDetails(state.state_id);
+                const data = await getDistrictDetails(state.id);
                 setDistrict(Array.isArray(data) ? data : []);
             }
         }

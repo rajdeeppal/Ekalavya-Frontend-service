@@ -66,7 +66,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
       if (!beneficiary.stateName) return;
       const state = states.find(s => s.state_name === beneficiary.stateName);
       if (state) {
-        const data = await getDistrictDetails(state.state_id);
+        const data = await getDistrictDetails(state.id);
         setDistrict(Array.isArray(data) ? data : []);
       }
     }
