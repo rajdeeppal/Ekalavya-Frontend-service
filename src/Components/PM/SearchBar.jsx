@@ -42,22 +42,27 @@ const SearchBar = ({ onSearch }) => {
     async function fetchStates() {
       const data = await getStateDetails();
       setStates(Array.isArray(data) ? data : []);
-      console.log(states);
+      console.log("States: ",states);
     }
     fetchStates();
   }, []);
 
-  useEffect(() => {
-    async function fetchDistricts() {
-      if (!selectedState) return;
-      const state = states.find(s => s.state_name === selectedState);
-      if (state) {
-        const data = await getDistrictDetails(state.state_id);
-        setDistrict(Array.isArray(data) ? data : []);
-      }
-    }
-    fetchDistricts();
-  }, [selectedState, states]);
+ useEffect(() => {
+   async function fetchDistricts() {
+     if (!selectedState) return;
+
+     const state = states.find(s => s.state_name === selectedState);
+     if (state) {
+       try {
+         const data = await getDistrictDetails(state.id);
+         setDistrict(Array.isArray(data) ? data : []);
+       } catch (err) {
+         setDistrict([]); // in case of error, reset
+       }
+     }
+   }
+   fetchDistricts();
+ }, [selectedState, states]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,47 +85,45 @@ const SearchBar = ({ onSearch }) => {
       <Grid container spacing={3} alignItems="center">
         <Grid item xs={12} sm={6} md={2.5}>
         <FormControl fullWidth margin="normal">
-            <InputLabel>State</InputLabel>
-            <Select
-              name="stateName"
-              value={selectedState}
-              onChange={(e) => {
-                setSelectedState(e.target.value);
-                
-              }}
-              required
-            >
-              <MenuItem value="">Select State</MenuItem>
-              {states.map((state) => (
-                <MenuItem key={state.id} value={state.state_name} >
-                  {state.state_name}
-                </MenuItem>
-              ))}
-            </Select>
-           
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6} md={2.5}>
-        <FormControl fullWidth margin="normal">
-            <InputLabel>District</InputLabel>
-            <Select
-              name="districtName"
-              value={selectedDistrict}
-              onChange={(e) => {
-                setSelectedDistrict(e.target.value);
-                
-              }}
-              required
-            >
-              <MenuItem value="">Select District</MenuItem>
-              {district.map((district) => (
-                <MenuItem key={district.id} value={district.district_name} >
-                  {district.district_name}
-                </MenuItem>
-              ))}
-            </Select>
-           
-          </FormControl>
+                            <InputLabel>State</InputLabel>
+                            <Select
+                              name="stateName"
+                              value={selectedState}
+                              onChange={(e) => {
+                                setSelectedState(e.target.value);
+                                setSelectedDistrict(""); // reset district on state change
+                              }}
+                              required
+                            >
+                              <MenuItem value="">Select State</MenuItem>
+                              {states.map((state) => (
+                                <MenuItem key={state.id} value={state.state_name}>
+                                  {state.state_name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2.5}>
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>District</InputLabel>
+                        <Select
+                          name="districtName"
+                          value={selectedDistrict}
+                          onChange={(e) => {
+                            setSelectedDistrict(e.target.value);
+
+                          }}
+                          required
+                        >
+                          <MenuItem value="">Select District</MenuItem>
+                          {district.map((district) => (
+                            <MenuItem key={district.id} value={district.district_name} >
+                              {district.district_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
           
         </Grid>
         <Grid item xs={12} sm={6} md={2.5}>

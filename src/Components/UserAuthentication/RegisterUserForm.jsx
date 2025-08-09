@@ -67,22 +67,28 @@ const RegisterUserForm = () => {
     async function fetchStates() {
       const data = await getStateDetails();
       setStates(Array.isArray(data) ? data : []);
-      console.log(states);
+      console.log("States: ",states);
     }
     fetchStates();
   }, []);
 
-  useEffect(() => {
-    async function fetchDistricts() {
-      if (!selectedState) return;
-      const state = states.find(s => s.state_name === selectedState);
-      if (state) {
-        const data = await getDistrictDetails(state.state_id);
-        setDistrict(Array.isArray(data) ? data : []);
-      }
-    }
-    fetchDistricts();
-  }, [selectedState, states]);
+ useEffect(() => {
+   async function fetchDistricts() {
+     if (!selectedState) return;
+
+     const state = states.find(s => s.state_name === selectedState);
+     if (state) {
+       try {
+         const data = await getDistrictDetails(state.id); // ✅ use "id" from state object
+         setDistrict(Array.isArray(data) ? data : []); // ✅ store the array directly
+       } catch (err) {
+         setDistrict([]); // in case of error, reset
+       }
+     }
+   }
+   fetchDistricts();
+ }, [selectedState, states]);
+
 
   const handleRoleChange = (e) => {
     const selectedRole = e.target.value;
@@ -233,25 +239,24 @@ const formData = {
 {requestedRole === 'TRUSTEE' && (
   <>
             <FormControl fullWidth margin="normal">
-                <InputLabel>State</InputLabel>
-                <Select
-                  name="stateName"
-                  value={selectedState}
-                  onChange={(e) => {
-                    setSelectedState(e.target.value);
-
-                  }}
-                  required
-                >
-                  <MenuItem value="">Select State</MenuItem>
-                  {states.map((state) => (
-                    <MenuItem key={state.id} value={state.state_name} >
-                      {state.state_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-
-              </FormControl>
+                    <InputLabel>State</InputLabel>
+                    <Select
+                      name="stateName"
+                      value={selectedState}
+                      onChange={(e) => {
+                        setSelectedState(e.target.value);
+                        setSelectedDistrict(""); // reset district on state change
+                      }}
+                      required
+                    >
+                      <MenuItem value="">Select State</MenuItem>
+                      {states.map((state) => (
+                        <MenuItem key={state.id} value={state.state_name}>
+                          {state.state_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
             <FormControl fullWidth margin="normal">
                 <InputLabel>District</InputLabel>
                 <Select
