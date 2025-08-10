@@ -96,7 +96,7 @@ console.log(userRole);
       <Route
         path="/myprofile"
         element={
-          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE', 'SECRETARY', 'VICE_CHAIRMAN']}>
+          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE', 'SECRETARY', 'VICE_CHAIRMAN', 'PROJECT DIRECTOR']}>
             <UserProfile />
           </PrivateRoute>
         }

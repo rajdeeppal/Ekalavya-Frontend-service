@@ -945,3 +945,16 @@ export const rejectVCPaymentDetails = async (employeeId, taskId, remarks) => {
     throw error;
   }
 };
+
+
+export const getPendingCounts = async (userId) => {
+  try {
+    const response = await axios.get(`${GENERIC_BASE_URL}/approval-rejection-count/${userId}`, {
+      headers: getAuthorizationHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};

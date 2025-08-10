@@ -44,7 +44,7 @@ function TrusteeReviewPage() {
 
   return (
     <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
-      <Sidebar />
+      <Sidebar isSuccess={isSuccess}/>
       <Box
         component="main"
         sx={{

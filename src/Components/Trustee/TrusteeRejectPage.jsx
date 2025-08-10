@@ -44,7 +44,7 @@ function TrusteeRejectPage() {
   };
   return (
     <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
-      <Sidebar />
+      <Sidebar isSuccess={isSuccess}/>
       <div className="homeContainer">
         {/* <Navbar /> */}
         <Box

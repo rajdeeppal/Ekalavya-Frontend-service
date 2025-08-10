@@ -36,7 +36,7 @@ function ResolutionList() {
 
     return (
         <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
-            <Sidebar />
+            <Sidebar isSuccess={false}/>
             <Box
                 component="main"
                 sx={{

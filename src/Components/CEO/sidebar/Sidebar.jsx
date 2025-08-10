@@ -2,6 +2,7 @@ import "./sidebar.scss";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import StoreIcon from "@mui/icons-material/Store";
+import React, { useEffect, useState } from 'react';
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -12,10 +13,24 @@ import PendingIcon from '@mui/icons-material/Pending';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import { useAuth } from '../../PrivateRoute';
+import { getPendingCounts } from '../../DataCenter/apiService';
+import Badge from "@mui/material/Badge";
 
-const Sidebar = () => {
+const Sidebar = ({isSuccess}) => {
 
-  const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState('');
+    const { userId } = useAuth();
+    const navigate = useNavigate();
+    useEffect(() => {
+            async function fetchProjects() {
+                const data = await getPendingCounts(userId);
+                setPendingCount(data);
+                console.log("Pending Counts:", pendingCount);
+            }
+            fetchProjects();
+        }, [isSuccess, userId]);
+  
 
   const handleLogout = () => {
     localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
@@ -47,9 +62,30 @@ const Sidebar = () => {
               padding: "10px 4px",
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+              display: "flex",
+              alignItems: "center"
             })} >
-              <PendingIcon className="icon" style={{ color: "black" }} />
-              <span>Approval Center</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <PendingIcon className="icon" style={{ color: "black", marginTop: "5px" }} />
+                <Badge
+                  badgeContent={pendingCount.approvalCount}
+                  color="success"
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      color: "white ! important",
+                      fontSize: "0.7rem",
+                      height: "16px",
+                      minWidth: "16px"
+                    }
+                  }}
+                >
+                  <span style={{ "margin-left": "-2%" , paddingTop: "2px" }}>Approval Center</span>
+                </Badge>
+              </div>
             </NavLink>
           </li>
 
@@ -63,9 +99,30 @@ const Sidebar = () => {
               padding: "10px 4px",
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+              display: "flex",
+              alignItems: "center"
             })} >
-              <PlaylistRemoveIcon className="icon" style={{ color: "black" }} />
-              <span>Rejection center</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <PlaylistRemoveIcon className="icon" style={{ color: "black" }} />
+                 <Badge
+                  badgeContent={pendingCount.rejectionCount}
+                  color="error"
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      color: "white ! important",
+                      fontSize: "0.7rem",
+                      height: "16px",
+                      minWidth: "16px"
+                    }
+                  }}
+                >
+                  <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Rejection Center</span>
+                </Badge>
+              </div>
             </NavLink>
           </li>
 

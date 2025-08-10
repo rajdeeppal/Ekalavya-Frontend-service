@@ -1,4 +1,5 @@
 import "./sidebar.scss";
+import React, { useEffect, useState } from 'react';
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import StoreIcon from "@mui/icons-material/Store";
@@ -9,10 +10,22 @@ import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
 import PendingIcon from '@mui/icons-material/Pending';
+import { useAuth } from '../../PrivateRoute';
+import { getPendingCounts } from '../../DataCenter/apiService';
+import Badge from "@mui/material/Badge";
 
-const Sidebar = () => {
-
+const Sidebar = ({isSuccess}) => {
+  const [pendingCount, setPendingCount] = useState('');
+  const { userId } = useAuth();
   const navigate = useNavigate();
+  useEffect(() => {
+          async function fetchProjects() {
+              const data = await getPendingCounts(userId);
+              setPendingCount(data);
+              console.log("Pending Counts:", pendingCount);
+          }
+          fetchProjects();
+      }, [isSuccess, userId]);
 
   const handleLogout = () => {
     localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
@@ -43,10 +56,32 @@ const Sidebar = () => {
               borderRadius: "10px 0px 0px 10px ",
               padding: "10px 4px",
               width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+              // margin: isActive ? 'margin: 5px 0px 5px 5px' : "4px",
+              display: "flex",
+              alignItems: "center"
             })} >
-              <PendingIcon className="icon" style={{ color: "black" }} />
-              <span>Approval Center</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <PendingIcon className="icon" style={{ color: "black", marginTop: "5px" }} />
+
+                <Badge
+                  badgeContent={pendingCount.approvalCount}
+                  color="success"
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      color: "white ! important",
+                      fontSize: "0.7rem",
+                      height: "16px",
+                      minWidth: "16px"
+                    }
+                  }}
+                >
+                  <span style={{ "margin-left": "-2%" , paddingTop: "2px" }}>Approval Center</span>
+                </Badge>
+              </div>
             </NavLink>
           </li>
 
@@ -61,9 +96,30 @@ const Sidebar = () => {
               padding: "10px 4px",
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+              display: "flex",
+              alignItems: "center"
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
-              <span>Rejection center</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <RateReviewOutlinedIcon className="icon" style={{ color: "black", marginTop: "5px" }} />
+                <Badge
+                  badgeContent={pendingCount.rejectionCount}
+                  color="error"
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      color: "white ! important",
+                      fontSize: "0.7rem",
+                      height: "16px",
+                      minWidth: "16px"
+                    }
+                  }}
+                >
+                  <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Rejection Center</span>
+                </Badge>
+              </div>
             </NavLink>
           </li>
 
