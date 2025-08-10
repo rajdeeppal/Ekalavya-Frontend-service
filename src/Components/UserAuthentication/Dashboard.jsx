@@ -14,9 +14,9 @@ const Dashboard = () => {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      axios.get("http://localhost:61002/api/dashboard/project/count"),
-      axios.get("http://localhost:61002/api/dashboard/beneficiary/count"),
-      axios.get("http://localhost:61002/api/dashboard/project/progress"),
+      axios.get("https://projects.ekalavya.net/api/dashboard/project/count"),
+      axios.get("https://projects.ekalavya.net/api/dashboard/beneficiary/count"),
+      axios.get("https://projects.ekalavya.net/api/dashboard/project/progress"),
     ])
       .then(([projectCountRes, familyCountRes, projectProgressRes]) => {
         setProjectsCount(projectCountRes.data);

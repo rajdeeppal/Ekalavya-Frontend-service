@@ -1,12 +1,12 @@
 import axios from "axios";
 // import { jwtDecode } from 'jwt-decode';
-const BASE_URL = "http://localhost:61002/api/admin"; // Update with your actual API URL http://localhost:61002/api/admin
-const PM_BASE_URL = "http://localhost:61002/api/user/pm";
-const GENERIC_BASE_URL = "http://localhost:61002/api/user";
-const BASE_PUBLIC_URL = "http://localhost:61002/api/self-service";
+const BASE_URL = "https://projects.ekalavya.net/api/admin"; // Update with your actual API URL https://projects.ekalavya.net/api/admin
+const PM_BASE_URL = "https://projects.ekalavya.net/api/user/pm";
+const GENERIC_BASE_URL = "https://projects.ekalavya.net/api/user";
+const BASE_PUBLIC_URL = "https://projects.ekalavya.net/api/self-service";
 
-const BENEFICIARY_BASE_URL = "http://localhost:61002/api/beneficiary";
-const SUBMIT_BASE_URL = "http://localhost:61002/api/ops/pm";
+const BENEFICIARY_BASE_URL = "https://projects.ekalavya.net/api/beneficiary";
+const SUBMIT_BASE_URL = "https://projects.ekalavya.net/api/ops/pm";
 
 const getToken = () => localStorage.getItem("jwtToken");
 const getAuthorizationHeader = () => {
@@ -332,7 +332,7 @@ export const updatedBeneficiarySubTask = async (rowId, object) => {
 export const updatedResubmitBeneficiarySubTask = async (rowId, object) => {
   try {
     const response = await axios.put(
-      `http://localhost:61002/api/ops/pm/resubmit/${rowId}`,
+      `https://projects.ekalavya.net/api/ops/pm/resubmit/${rowId}`,
       object,
       {
         headers: {
@@ -351,7 +351,7 @@ export const updatedResubmitBeneficiarySubTask = async (rowId, object) => {
 export const updatedResubmitSubTask = async (userId,rowId,remarks) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/ops/user/resubmit/${userId}/${rowId}?remarks=${remarks}`,
+      `https://projects.ekalavya.net/api/ops/user/resubmit/${userId}/${rowId}?remarks=${remarks}`,
       null, // No request body
       {
         headers: {
@@ -371,7 +371,7 @@ export const getPaymentDetails = async (data, category) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/ao/payments/pending`;
+    let url = `https://projects.ekalavya.net/api/ao/payments/pending`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -398,7 +398,7 @@ export const getUpdatedPaymentDetails = async (data) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/ao/statement/view`;
+    let url = `https://projects.ekalavya.net/api/ao/statement/view`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -423,7 +423,7 @@ export const getUpdatedPaymentDetails = async (data) => {
 export const getStateDetails = async () => {
   
     try {
-        const response = await axios.get(`http://localhost:61002/api/states`);
+        const response = await axios.get(`https://projects.ekalavya.net/api/states`);
         return response.data;
     } catch (error) {
         console.error('Error fetching Projects by USERID:', error);
@@ -434,7 +434,7 @@ export const getStateDetails = async () => {
 export const getDistrictDetails = async (state_id) => {
   
     try {
-        const response = await axios.get(`http://localhost:61002/api/districts/${state_id}`);
+        const response = await axios.get(`https://projects.ekalavya.net/api/districts/${state_id}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching Projects by USERID:', error);
@@ -554,7 +554,7 @@ export const bulkInProgressSubmitDetails = async (object) => {
 export const domainDetails = async (taskId) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/user/search/domain-expert/${taskId}`,
+      `https://projects.ekalavya.net/api/user/search/domain-expert/${taskId}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -570,7 +570,7 @@ export const domainDetails = async (taskId) => {
 export const approveDomainDetails = async (employeeId,taskId,remarks) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/ops/user/approve/${employeeId}/${taskId}?remarks=${remarks}`,
+      `https://projects.ekalavya.net/api/ops/user/approve/${employeeId}/${taskId}?remarks=${remarks}`,
        null, // No request body
             {
               headers: {
@@ -588,7 +588,7 @@ export const approveDomainDetails = async (employeeId,taskId,remarks) => {
 export const rejectDomainDetails = async (employeeId,taskId,remarks) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/ops/user/rejection/${employeeId}/${taskId}?remarks=${remarks}`, // URL
+      `https://projects.ekalavya.net/api/ops/user/rejection/${employeeId}/${taskId}?remarks=${remarks}`, // URL
       null, // No request body
       {
         headers: {
@@ -606,7 +606,7 @@ export const rejectDomainDetails = async (employeeId,taskId,remarks) => {
 export const generatedVoucherDetails = async (object) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/ao/voucher/generate`, // URL
+      `https://projects.ekalavya.net/api/ao/voucher/generate`, // URL
       object, // No request body
       {
         headers: getAuthorizationHeader(),
@@ -623,7 +623,7 @@ export const generatedVoucherDetails = async (object) => {
 export const getVoucherDetails = async (voucher_id) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/ao/voucher/search/${voucher_id}`,
+      `https://projects.ekalavya.net/api/ao/voucher/search/${voucher_id}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -638,7 +638,7 @@ export const getVoucherDetails = async (voucher_id) => {
 export const getVoucherDetailsUsingId = async (voucher_id) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/ao/voucher/click-pay/${voucher_id}`,
+      `https://projects.ekalavya.net/api/ao/voucher/click-pay/${voucher_id}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -653,7 +653,7 @@ export const getVoucherDetailsUsingId = async (voucher_id) => {
 export const getProfileDetails = async (userId) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/user/profile/${userId}`,
+      `https://projects.ekalavya.net/api/user/profile/${userId}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -668,7 +668,7 @@ export const getProfileDetails = async (userId) => {
 export const updateProfileDetails = async (userId, profileData) => {
   try {
     const response = await axios.put(
-      `http://localhost:61002/api/user/profile/${userId}`,
+      `https://projects.ekalavya.net/api/user/profile/${userId}`,
       profileData,
       { headers: getAuthorizationHeader() }
     );
@@ -684,7 +684,7 @@ export const updateProfileDetails = async (userId, profileData) => {
 export const generatedPaymentDetails = async (object) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/ao/payments/process`, // URL
+      `https://projects.ekalavya.net/api/ao/payments/process`, // URL
       object, // No request body
       {
         headers: getAuthorizationHeader(),
@@ -702,7 +702,7 @@ export const exportPaymentDetails = async (userId, data) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/ao/statement/export/${userId}`;
+    let url = `https://projects.ekalavya.net/api/ao/statement/export/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -729,7 +729,7 @@ export const exportCEOPaymentDetails = async (userId, data, componentName) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/download/payee/excel/${userId}`;
+    let url = `https://projects.ekalavya.net/api/download/payee/excel/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -757,7 +757,7 @@ export const exportBeneficiaryDetails = async (userId, data) => {
     const { startDate, endDate, stateName, districtName, projectName, componentName } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/reports/beneficiary/${userId}`;
+    let url = `https://projects.ekalavya.net/api/reports/beneficiary/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -788,7 +788,7 @@ export const exportComponentDetails = async (userId, data) => {
     const { startDate, endDate, stateName, districtName, projectName, componentName } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/reports/component/${userId}`;
+    let url = `https://projects.ekalavya.net/api/reports/component/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -819,7 +819,7 @@ export const exportFinalPreviewDetails = async (userId, data) => {
     const { stateName, districtName, projectName, componentName } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/download/beneficiary/excel/${userId}`;
+    let url = `https://projects.ekalavya.net/api/download/beneficiary/excel/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -849,7 +849,7 @@ export const getSuccessPaymentDetails = async (data, category) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/ao/voucher/list/approve`;
+    let url = `https://projects.ekalavya.net/api/ao/voucher/list/approve`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -876,7 +876,7 @@ export const getRejectPaymentDetails = async (data, category) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/ao/voucher/list/reject`;
+    let url = `https://projects.ekalavya.net/api/ao/voucher/list/reject`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -903,7 +903,7 @@ export const getVCPaymentDetails = async (data, category) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `http://localhost:61002/api/vc/vouchers/list`;
+    let url = `https://projects.ekalavya.net/api/vc/vouchers/list`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -928,7 +928,7 @@ export const getVCPaymentDetails = async (data, category) => {
 export const approveVCPaymentDetails = async (employeeId, taskId, remarks) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/vc/vouchers/approved/${employeeId}/${taskId}?remarks=${remarks}`,
+      `https://projects.ekalavya.net/api/vc/vouchers/approved/${employeeId}/${taskId}?remarks=${remarks}`,
        null, // No request body
             {
               headers: {
@@ -946,7 +946,7 @@ export const approveVCPaymentDetails = async (employeeId, taskId, remarks) => {
 export const rejectVCPaymentDetails = async (employeeId, taskId, remarks) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/vc/vouchers/reject/${employeeId}/${taskId}?remarks=${remarks}`,
+      `https://projects.ekalavya.net/api/vc/vouchers/reject/${employeeId}/${taskId}?remarks=${remarks}`,
        null, // No request body
             {
               headers: {

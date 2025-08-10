@@ -32,7 +32,7 @@ const RegisterUserForm = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await axios.get('http://localhost:61002/api/roleAudit');
+        const response = await axios.get('https://projects.ekalavya.net/api/roleAudit');
         setRoles(response.data);
       } catch (error) {
         console.error('Error fetching roles:', error);
@@ -118,7 +118,7 @@ const formData = {
 };
 
     try {
-      const response = await axios.post('http://localhost:61002/api/self-service/submitRoleRequest', JSON.stringify(formData), {
+      const response = await axios.post('https://projects.ekalavya.net/api/self-service/submitRoleRequest', JSON.stringify(formData), {
         headers: {
           'Content-Type': 'application/json',
         }

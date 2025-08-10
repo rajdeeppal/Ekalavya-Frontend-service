@@ -53,7 +53,7 @@ const ForgotPassword = () => {
   const handleSendOtp = async () => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:61002/api/admin/sendOtp', { username, loginMethod });
+      await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username, loginMethod });
       setOtpSent(true);
       setOtpExpired(false);
       setTimer(120); // reset 2 minutes
@@ -68,7 +68,7 @@ const ForgotPassword = () => {
   const handleVerifyOtp = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:61002/api/admin/validateOtp', {
+      const response = await axios.post('https://projects.ekalavya.net/api/admin/validateOtp', {
         username,
         otp,
       });
@@ -93,7 +93,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:61002/api/self-service/resetPassword', {
+      await axios.post('https://projects.ekalavya.net/api/self-service/resetPassword', {
         username,
         newPassword,
       });
