@@ -665,6 +665,21 @@ export const getProfileDetails = async (userId) => {
   }
 };
 
+export const updateProfileDetails = async (userId, profileData) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:61002/api/user/profile/${userId}`,
+      profileData,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    throw error;
+  }
+};
+
+
 
 export const generatedPaymentDetails = async (object) => {
   try {
