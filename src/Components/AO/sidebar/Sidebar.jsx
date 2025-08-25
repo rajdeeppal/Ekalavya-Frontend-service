@@ -1,7 +1,6 @@
 import "./sidebar.scss";
+import React, { useEffect, useState } from 'react';
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import StoreIcon from "@mui/icons-material/Store";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -10,11 +9,22 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
-import PendingIcon from '@mui/icons-material/Pending';
+import { getAOPendingCounts } from '../../DataCenter/apiService';
+import Badge from "@mui/material/Badge";
+import { useAuth } from '../../PrivateRoute';
 
-const Sidebar = () => {
-
+const Sidebar = ({ isSuccess }) => {
+  const [pendingCount, setPendingCount] = useState('');
   const navigate = useNavigate();
+  const { userId } = useAuth();
+  useEffect(() => {
+    async function fetchProjects() {
+      const data = await getAOPendingCounts(userId);
+      setPendingCount(data);
+      console.log("Pending Counts:", pendingCount);
+    }
+    fetchProjects();
+  }, [isSuccess, userId]);
 
   const handleLogout = () => {
     localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
@@ -47,8 +57,28 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
-              <span>Pending Payments</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
+                <Badge
+                  badgeContent={pendingCount.pendingPayment}
+                  color="success"
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      color: "white ! important",
+                      fontSize: "0.7rem",
+                      height: "16px",
+                      minWidth: "16px"
+                    }
+                  }}
+                >
+                  <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Pending Payments</span>
+                </Badge>
+
+              </div>
             </NavLink>
           </li>
 
@@ -62,8 +92,27 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <CheckCircleOutlineIcon className="icon" style={{ color: "black" }} />
-              <span>Approved Vouchers</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <CheckCircleOutlineIcon className="icon" style={{ color: "black" }} />
+                <Badge
+                  badgeContent={pendingCount.approvedVoucher}
+                  color="success"
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      color: "white ! important",
+                      fontSize: "0.7rem",
+                      height: "16px",
+                      minWidth: "16px"
+                    }
+                  }}
+                >
+                  <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Approved Vouchers</span>
+                </Badge>
+              </div>
             </NavLink>
           </li>
 
@@ -78,8 +127,27 @@ const Sidebar = () => {
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
             })} >
-              <ReportGmailerrorredIcon className="icon" style={{ color: "black" }} />
-              <span>Rejected Vouchers</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <ReportGmailerrorredIcon className="icon" style={{ color: "black" }} />
+                <Badge
+                  badgeContent={pendingCount.rejectionCount}
+                  color="success"
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      color: "white ! important",
+                      fontSize: "0.7rem",
+                      height: "16px",
+                      minWidth: "16px"
+                    }
+                  }}
+                >
+                  <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Rejected Vouchers</span>
+                </Badge>
+              </div>
             </NavLink>
           </li>
 

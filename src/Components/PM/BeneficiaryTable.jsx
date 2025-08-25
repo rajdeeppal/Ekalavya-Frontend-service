@@ -4,9 +4,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
 import Paper from "@mui/material/Paper";
 import DownloadIcon from '@mui/icons-material/Download';
-import { updateActivityTask, submitDetails, bulkSubmitDetails } from '../DataCenter/apiService';
+import { updateActivityTask, submitDetails, bulkSubmitDetails, exportSanctionDetails } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
 
-const BeneficiaryTable = ({ beneficiaries, setBeneficiaries, setIsSucess }) => {
+const BeneficiaryTable = ({ beneficiaries, value, setBeneficiaries, setIsSucess }) => {
+  const { userId } = useAuth();
   const [open, setOpen] = useState({});
   const [editActivityMode, setEditActivityMode] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -63,9 +65,9 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries, setIsSucess }) => {
         const totalCost = name === 'totalCost' ? parseFloat(value) || 0 : parseFloat(task.totalCost) || 0;
 
         // Calculate grantAmount
-        
-          task.grantAmount = totalCost - beneficiaryContribution;
-        
+
+        task.grantAmount = totalCost - beneficiaryContribution;
+
 
       }
 
@@ -158,11 +160,25 @@ const BeneficiaryTable = ({ beneficiaries, setBeneficiaries, setIsSucess }) => {
     setShowConfirmation(false);
   };
 
+  const exportToExcel = async () => {
+    try {
+      console.log("ok");
+      const data = await exportSanctionDetails(userId, value);
+      alert(data);
+      console.log(beneficiaries);
+      console.log(beneficiaries);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
+  };
 
   return (
     <div style={{ padding: '20px' }} className='listContainer'>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h4" gutterBottom style={{ color: '#888' }}>Beneficiary List</Typography>
+        <IconButton onClick={exportToExcel} >
+          <DownloadIcon />
+        </IconButton>
       </div>
       <TableContainer component={Paper} className="table">
         <Table sx={{ minWidth: 650 }} aria-label="beneficiary table">

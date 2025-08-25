@@ -161,7 +161,7 @@ const MainApp = () => {
         </Modal>
 
         {showTable && <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-          <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} setIsSucess={setIsSucess}/>
+          <BeneficiaryTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} setIsSucess={setIsSucess} value={value}/>
         </Box>}
       </Box>
      

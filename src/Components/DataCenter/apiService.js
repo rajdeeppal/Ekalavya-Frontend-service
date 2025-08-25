@@ -843,6 +843,64 @@ export const exportFinalPreviewDetails = async (userId, data) => {
 }
 };
 
+export const exportInProgressDetails = async (userId, data) => {
+  try {
+    const { stateName, districtName, projectName, componentName } = data;
+    
+    // Start building the query parameters
+    let url = `https://projects.ekalavya.net/api/download/beneficiary/progress/excel/${userId}`;
+    const params = new URLSearchParams();
+
+    // Add parameters if they are provided
+    if (projectName) params.append("projectName", projectName);
+    if (componentName) params.append("componentName", componentName);
+    if (stateName) params.append("stateName", stateName);
+    if (districtName) params.append("districtName", districtName);
+
+  // Construct the final URL
+  url = `${url}?${params.toString()}`;
+
+  // Send the request with authorization headers
+  const response = await axios.get(url, {
+    headers: getAuthorizationHeader(),
+  });
+
+  return response.data;
+} catch (error) {
+  console.error("Error fetching beneficiary:", error);
+  throw error;
+}
+};
+
+export const exportSanctionDetails = async (userId, data) => {
+  try {
+    const { stateName, districtName, projectName, componentName } = data;
+    
+    // Start building the query parameters
+    let url = `https://projects.ekalavya.net/api/download/beneficiary/sanction/excel/${userId}`;
+    const params = new URLSearchParams();
+
+    // Add parameters if they are provided
+    if (projectName) params.append("projectName", projectName);
+    if (componentName) params.append("componentName", componentName);
+    if (stateName) params.append("stateName", stateName);
+    if (districtName) params.append("districtName", districtName);
+
+  // Construct the final URL
+  url = `${url}?${params.toString()}`;
+
+  // Send the request with authorization headers
+  const response = await axios.get(url, {
+    headers: getAuthorizationHeader(),
+  });
+
+  return response.data;
+} catch (error) {
+  console.error("Error fetching beneficiary:", error);
+  throw error;
+}
+};
+
 
 export const getSuccessPaymentDetails = async (data, category) => {
   try {
@@ -965,6 +1023,31 @@ export const rejectVCPaymentDetails = async (employeeId, taskId, remarks) => {
 export const getPendingCounts = async (userId) => {
   try {
     const response = await axios.get(`${GENERIC_BASE_URL}/approval-rejection-count/${userId}`, {
+      headers: getAuthorizationHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};
+
+
+export const getAOPendingCounts = async (userId) => {
+  try {
+    const response = await axios.get(`https://projects.ekalavya.net/api/ao/task-count/${userId}`, {
+      headers: getAuthorizationHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Projects by USERID:", error);
+    throw error;
+  }
+};
+
+export const getVCPendingCounts = async (userId) => {
+  try {
+    const response = await axios.get(`https://projects.ekalavya.net/api/vc/vouchers/list/count/${userId}`, {
       headers: getAuthorizationHeader(),
     });
     return response.data;

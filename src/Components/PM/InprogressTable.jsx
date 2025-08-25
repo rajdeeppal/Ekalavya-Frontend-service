@@ -33,8 +33,11 @@ import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBenefi
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import Checkbox from '@mui/material/Checkbox';
+import { useAuth } from '../PrivateRoute';
+import { exportInProgressDetails } from '../DataCenter/apiService';
 
-const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSucess }) => {
+const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, setIsSucess }) => {
+    const { userId } = useAuth();
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
@@ -178,47 +181,47 @@ const InprogressTable = ({ beneficiaries, setBeneficiaries, isReject, setIsSuces
         }));
     };
 
-const handleInputChange = (taskIndex, rowIndex, field, value) => {
-    setBeneficiaries((prevBeneficiaries) => {
-        return prevBeneficiaries.map((beneficiary) => ({
-            ...beneficiary,
-            components: beneficiary.components.map((component) => ({
-                ...component,
-                activities: component.activities.map((activity) => ({
-                    ...activity,
-                    tasks: activity.tasks.map((task) => {
-                        if (task.id === taskIndex) {
-                            setTaskId(task.id);
-                            const updatedTaskUpdates = [...task.taskUpdates];
-                            const updatedRow = {
-                                ...updatedTaskUpdates[rowIndex],
-                                [field]: value,
-                            };
+    const handleInputChange = (taskIndex, rowIndex, field, value) => {
+        setBeneficiaries((prevBeneficiaries) => {
+            return prevBeneficiaries.map((beneficiary) => ({
+                ...beneficiary,
+                components: beneficiary.components.map((component) => ({
+                    ...component,
+                    activities: component.activities.map((activity) => ({
+                        ...activity,
+                        tasks: activity.tasks.map((task) => {
+                            if (task.id === taskIndex) {
+                                setTaskId(task.id);
+                                const updatedTaskUpdates = [...task.taskUpdates];
+                                const updatedRow = {
+                                    ...updatedTaskUpdates[rowIndex],
+                                    [field]: value,
+                                };
 
-                            if (
-//                                 /* field === 'currentBeneficiaryContribution' || */
-                                field === 'achievementUnit' ||
-                                field === 'revisedRatePerUnit'
-                            ) {
-                                const ratePerUnit = task.ratePerUnit || 0;
-                                const revisedRatePerUnit = field === 'revisedRatePerUnit' ? value : task.revisedRatePerUnit || 0;
-                                const data = field === 'achievementUnit' ? value : updatedRow.achievementUnit || 0;
+                                if (
+                                    //                                 /* field === 'currentBeneficiaryContribution' || */
+                                    field === 'achievementUnit' ||
+                                    field === 'revisedRatePerUnit'
+                                ) {
+                                    const ratePerUnit = task.ratePerUnit || 0;
+                                    const revisedRatePerUnit = field === 'revisedRatePerUnit' ? value : task.revisedRatePerUnit || 0;
+                                    const data = field === 'achievementUnit' ? value : updatedRow.achievementUnit || 0;
 
-                                const effectiveRate = revisedRatePerUnit > 0 ? revisedRatePerUnit : ratePerUnit;
-                                updatedRow.currentCost = data * effectiveRate;
+                                    const effectiveRate = revisedRatePerUnit > 0 ? revisedRatePerUnit : ratePerUnit;
+                                    updatedRow.currentCost = data * effectiveRate;
+                                }
+
+                                updatedTaskUpdates[rowIndex] = updatedRow;
+
+                                return { ...task, taskUpdates: updatedTaskUpdates };
                             }
-
-                            updatedTaskUpdates[rowIndex] = updatedRow;
-
-                            return { ...task, taskUpdates: updatedTaskUpdates };
-                        }
-                        return task;
-                    })
+                            return task;
+                        })
+                    }))
                 }))
-            }))
-        }));
-    });
-};
+            }));
+        });
+    };
 
 
     const handleInputReviewChange = (taskIndex, rowIndex, field, value) => {
@@ -280,7 +283,7 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
             firstTask = true;
         }
 
-        if ( row !== undefined) {
+        if (row !== undefined) {
             setNewTask(false);
         }
         console.log(firstTask)
@@ -372,33 +375,33 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                     task.taskUpdates = [];
                 }
 
-            const lastRow = task.taskUpdates[task.taskUpdates.length - 1];
-            if (
-                !lastRow ||
-                lastRow.achievementUnit !== '' ||
-                lastRow.revisedRatePerUnit !== '' ||
-                lastRow.currentBeneficiaryContribution !== '' ||
-                lastRow.payeeName !== '' ||
-                lastRow.passbookDoc !== ''
-            ) {
-                setNewTask(true);
-                task.taskUpdates.push({
-                    achievementUnit: '',
-                    revisedRatePerUnit: '',
-                    currentBeneficiaryContribution: '',
-                    currentCost: '',
-                    payeeName: '',
-                    passbookDoc: null,
-                    otherDocs: [],
-                    procurementCheck: false,
-                    /* domainExpertEmpId: '' */
-                });
+                const lastRow = task.taskUpdates[task.taskUpdates.length - 1];
+                if (
+                    !lastRow ||
+                    lastRow.achievementUnit !== '' ||
+                    lastRow.revisedRatePerUnit !== '' ||
+                    lastRow.currentBeneficiaryContribution !== '' ||
+                    lastRow.payeeName !== '' ||
+                    lastRow.passbookDoc !== ''
+                ) {
+                    setNewTask(true);
+                    task.taskUpdates.push({
+                        achievementUnit: '',
+                        revisedRatePerUnit: '',
+                        currentBeneficiaryContribution: '',
+                        currentCost: '',
+                        payeeName: '',
+                        passbookDoc: null,
+                        otherDocs: [],
+                        procurementCheck: false,
+                        /* domainExpertEmpId: '' */
+                    });
+                }
             }
-        }
 
-        return updatedBeneficiaries;
-    });
-};
+            return updatedBeneficiaries;
+        });
+    };
 
 
     const handleFileChange = (taskIndex, rowIndex, fileType, e) => {
@@ -454,12 +457,27 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
         });
     };
 
+    const exportToExcel = async () => {
+            try {
+                console.log("ok");
+                const data = await exportInProgressDetails(userId, value);
+                alert(data);
+                console.log(beneficiaries);
+                console.log(beneficiaries);
+            } catch (error) {
+                console.error('Error fetching activities:', error);
+            }
+        };
+
     return (
         <div style={{ padding: '20px' }} className='listContainer'>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom style={{ color: '#888' }}>
                     Task List
                 </Typography>
+                <IconButton onClick={exportToExcel} >
+                    <DownloadIcon />
+                </IconButton>
             </div>
             <TableContainer component={Paper}>
                 <Table aria-label="beneficiary table">
@@ -661,12 +679,12 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                                                                                                                                                     />
                                                                                                                                                 </TableCell>
                                                                                                                                                 <TableCell>
-                                                                                                                                                  <Checkbox
-                                                                                                                                                    checked={row.procurementCheck || false}
-                                                                                                                                                    onChange={(e) =>
-                                                                                                                                                      handleInputChange(task.id, rowIndex, 'procurementCheck', e.target.checked)
-                                                                                                                                                    }
-                                                                                                                                                  />
+                                                                                                                                                    <Checkbox
+                                                                                                                                                        checked={row.procurementCheck || false}
+                                                                                                                                                        onChange={(e) =>
+                                                                                                                                                            handleInputChange(task.id, rowIndex, 'procurementCheck', e.target.checked)
+                                                                                                                                                        }
+                                                                                                                                                    />
                                                                                                                                                 </TableCell>
                                                                                                                                                 <TableCell>
                                                                                                                                                     <TextField
@@ -771,10 +789,10 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                                                                                                                                                                     }
                                                                                                                                                                 >
                                                                                                                                                                     {newTask
-                                                                                                                                                                      ? <>{file.file?.name}</>
-                                                                                                                                                                      : (!isEdit
-                                                                                                                                                                          ? <>{file.fileName}</>
-                                                                                                                                                                          : <>{file.file?.name}</>
+                                                                                                                                                                        ? <>{file.file?.name}</>
+                                                                                                                                                                        : (!isEdit
+                                                                                                                                                                            ? <>{file.fileName}</>
+                                                                                                                                                                            : <>{file.file?.name}</>
                                                                                                                                                                         )
                                                                                                                                                                     }
                                                                                                                                                                 </Alert>
@@ -841,10 +859,10 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                                                                                                                                                 <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                                 <TableCell>{row.currentCost}</TableCell>
                                                                                                                                                 <TableCell>
-                                                                                                                                                  <Checkbox
-                                                                                                                                                    checked={row.procurementCheck || false}
-                                                                                                                                                    disabled
-                                                                                                                                                  />
+                                                                                                                                                    <Checkbox
+                                                                                                                                                        checked={row.procurementCheck || false}
+                                                                                                                                                        disabled
+                                                                                                                                                    />
                                                                                                                                                 </TableCell>
                                                                                                                                                 <TableCell>{row.payeeName}</TableCell>
                                                                                                                                                 <TableCell>{row.accountNumber}</TableCell>
@@ -1059,7 +1077,7 @@ const handleInputChange = (taskIndex, rowIndex, field, value) => {
                                     </div>
                                 </div>
                             ))}
-                        </>:<>No Remarks found</>}
+                        </> : <>No Remarks found</>}
                     </div>
                     <Divider sx={{ my: 2 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
