@@ -204,9 +204,8 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                     field === 'revisedRatePerUnit'
                                 ) {
                                     const ratePerUnit = task.ratePerUnit || 0;
-                                    const revisedRatePerUnit = field === 'revisedRatePerUnit' ? value : task.revisedRatePerUnit || 0;
+                                    const revisedRatePerUnit = field === 'revisedRatePerUnit' ? value : updatedRow.revisedRatePerUnit || 0;
                                     const data = field === 'achievementUnit' ? value : updatedRow.achievementUnit || 0;
-
                                     const effectiveRate = revisedRatePerUnit > 0 ? revisedRatePerUnit : ratePerUnit;
                                     updatedRow.currentCost = data * effectiveRate;
                                 }
