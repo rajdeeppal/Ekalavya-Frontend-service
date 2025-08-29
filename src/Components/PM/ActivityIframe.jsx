@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Container, TextField, Button, Alert } from '@mui/material';
 
 function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
@@ -15,6 +15,25 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
   });
 
   const [errors, setErrors] = useState({});
+
+  useEffect(()=>{
+    setActivity((prev) => {
+      const rate = parseFloat(unitRate) || 0;
+      const units = parseFloat(prev.noOfUnits) || 0;
+      const beneficiary = parseFloat(prev.beneficiaryContribution) || 0;
+
+      const totalCost = rate && units ? rate * units : '';
+      const grantAmount = totalCost !== '' ? totalCost - beneficiary : '';
+
+      return {
+        ...prev,
+        typeOfUnit,
+        ratePerUnit: unitRate,
+        totalCost,
+        grantAmount,
+      };
+    });
+  },[typeOfUnit, unitRate])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
