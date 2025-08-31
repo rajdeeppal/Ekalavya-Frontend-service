@@ -4,7 +4,6 @@ import { Container, TextField, Button, Alert, Checkbox, FormControlLabel } from 
 function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
   const [activity, setActivity] = useState({
     task: taskName,
-    // nameOfWork: '',
     typeOfUnit: typeOfUnit,
     ratePerUnit: unitRate,
     noOfUnits: '',
@@ -16,6 +15,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
   });
 
   const [errors, setErrors] = useState({});
+  const [backupFinancials, setBackupFinancials] = useState(null); // ✅ store old values
 
   useEffect(() => {
     setActivity((prev) => {
@@ -34,40 +34,38 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
         grantAmount,
       };
     });
-  }, [typeOfUnit, unitRate])
+  }, [typeOfUnit, unitRate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedActivity = { ...activity, [name]: value };
 
-    if (name === 'ratePerUnit' || name === 'noOfUnits') {
-      const ratePerUnit = name === 'ratePerUnit' ? value : updatedActivity.ratePerUnit;
-      const noOfUnits = name === 'noOfUnits' ? value : updatedActivity.noOfUnits;
+    if (!updatedActivity.financialExtension) {
+      if (name === 'ratePerUnit' || name === 'noOfUnits') {
+        const ratePerUnit = name === 'ratePerUnit' ? value : updatedActivity.ratePerUnit;
+        const noOfUnits = name === 'noOfUnits' ? value : updatedActivity.noOfUnits;
 
-      // Calculate totalCost if both unitRate and noOfUnits are defined
-      if (ratePerUnit && noOfUnits) {
-        updatedActivity.totalCost = parseFloat(ratePerUnit) * parseFloat(noOfUnits);
+        if (ratePerUnit && noOfUnits) {
+          updatedActivity.totalCost = parseFloat(ratePerUnit) * parseFloat(noOfUnits);
+        }
+      }
+
+      if (name === 'beneficiaryContribution' || name === 'totalCost' || name === 'noOfUnits') {
+        const beneficiaryContribution = name === 'beneficiaryContribution' ? value : updatedActivity.beneficiaryContribution;
+        const totalCost = name === 'totalCost' ? value : updatedActivity.totalCost;
+
+        if (beneficiaryContribution && totalCost) {
+          updatedActivity.grantAmount = parseFloat(totalCost) - parseFloat(beneficiaryContribution);
+        }
       }
     }
-
-    if (name === 'beneficiaryContribution' || name === 'totalCost' || name === 'noOfUnits') {
-      const beneficiaryContribution = name === 'beneficiaryContribution' ? value : updatedActivity.beneficiaryContribution;
-      const totalCost = name === 'totalCost' ? value : updatedActivity.totalCost;
-      // Calculate totalCost if both unitRate and noOfUnits are defined
-      if (beneficiaryContribution && totalCost) {
-        updatedActivity.grantAmount = parseFloat(totalCost) - parseFloat(beneficiaryContribution);
-      }
-    }
-
 
     setActivity(updatedActivity);
-    // Clear the error for the changed field
     setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
   const validateForm = () => {
     let formErrors = {};
-    // if (!activity.nameOfWork) formErrors.nameOfWork = 'Number of Work is required';
     if (!activity.noOfUnits) formErrors.noOfUnits = 'Number of Units is required';
     if (!activity.financialExtension) {
       if (!activity.totalCost) formErrors.totalCost = 'Total Cost is required';
@@ -82,22 +80,10 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
   const handleSave = () => {
     if (!validateForm()) return;
 
-    if (!activity.financialExtension) {
-      onSave(activity);
-    } else {
-      // Handle the case when the form is disabled
-      onSave({
-        ...activity,
-        noOfUnits: '',
-        totalCost: '',
-        beneficiaryContribution: '',
-        grantAmount: '',
-        yearOfSanction: '',
-      }); 
-    }
+    onSave(activity);
+
     setActivity({
       task: taskName,
-      // nameOfWork: '',
       typeOfUnit: typeOfUnit,
       ratePerUnit: unitRate,
       noOfUnits: '',
@@ -107,7 +93,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
       yearOfSanction: '',
       financialExtension: false
     });
-    // setErrors({});
+    setBackupFinancials(null); // clear backup
   };
 
   return (
@@ -121,21 +107,6 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           fullWidth
           margin="normal"
         />
-
-        {/* <TextField
-          label="Name of Work"
-          name="nameOfWork"
-          value={activity.nameOfWork}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-          margin="normal"
-        />
-        {errors.nameOfWork && (
-          <Alert severity="error" sx={{ marginTop: 1 }}>
-            {errors.nameOfWork}
-          </Alert>
-        )} */}
 
         <TextField
           label="Type of Unit"
@@ -172,17 +143,44 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           </Alert>
         )}
 
+        {/* ✅ Checkbox with restore/backup logic */}
         <FormControlLabel
           control={
             <Checkbox
               checked={activity.financialExtension}
-              onChange={(e) => setActivity({ ...activity, financialExtension: e.target.checked })}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                if (checked) {
+                  // ✅ Save backup before clearing
+                  setBackupFinancials({
+                    totalCost: activity.totalCost,
+                    beneficiaryContribution: activity.beneficiaryContribution,
+                    grantAmount: activity.grantAmount,
+                    yearOfSanction: activity.yearOfSanction,
+                  });
+
+                  setActivity((prev) => ({
+                    ...prev,
+                    financialExtension: true,
+                    totalCost: '',
+                    beneficiaryContribution: '',
+                    grantAmount: '',
+                    yearOfSanction: '',
+                  }));
+                } else {
+                  // ✅ Restore backup values when unchecked
+                  setActivity((prev) => ({
+                    ...prev,
+                    financialExtension: false,
+                    ...backupFinancials,
+                  }));
+                }
+              }}
               color="primary"
             />
           }
           label="No Financial Extension"
         />
-
 
         <TextField
           label="Total Cost"
@@ -192,10 +190,10 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           variant="outlined"
           fullWidth
           margin="normal"
-          readonly
           disabled={activity.financialExtension}
+          sx={activity.financialExtension ? { bgcolor: '#f0f0f0' } : {}}
         />
-        {errors.totalCost && (
+        {!activity.financialExtension && errors.totalCost && (
           <Alert severity="error" sx={{ marginTop: 1 }}>
             {errors.totalCost}
           </Alert>
@@ -211,8 +209,9 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           fullWidth
           margin="normal"
           disabled={activity.financialExtension}
+          sx={activity.financialExtension ? { bgcolor: '#f0f0f0' } : {}}
         />
-        {errors.beneficiaryContribution && (
+        {!activity.financialExtension && errors.beneficiaryContribution && (
           <Alert severity="error" sx={{ marginTop: 1 }}>
             {errors.beneficiaryContribution}
           </Alert>
@@ -223,14 +222,13 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           name="grantAmount"
           type="number"
           value={activity.grantAmount}
-          // onChange={handleChange}
           variant="outlined"
           fullWidth
           margin="normal"
-          readonly
           disabled={activity.financialExtension}
+          sx={activity.financialExtension ? { bgcolor: '#f0f0f0' } : {}}
         />
-        {errors.grantAmount && (
+        {!activity.financialExtension && errors.grantAmount && (
           <Alert severity="error" sx={{ marginTop: 1 }}>
             {errors.grantAmount}
           </Alert>
@@ -246,8 +244,9 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           fullWidth
           margin="normal"
           disabled={activity.financialExtension}
+          sx={activity.financialExtension ? { bgcolor: '#f0f0f0' } : {}}
         />
-        {errors.yearOfSanction && (
+        {!activity.financialExtension && errors.yearOfSanction && (
           <Alert severity="error" sx={{ marginTop: 1 }}>
             {errors.yearOfSanction}
           </Alert>

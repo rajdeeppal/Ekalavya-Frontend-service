@@ -246,7 +246,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
 
     console.log(projectConfig);
     try {
-      await saveBeneficiaryConfiguration(projectConfig);
+      const response  = await saveBeneficiaryConfiguration(projectConfig);
       alert('Beneficiary and Task saved successfully!');
       setTaskDetails({});
     } catch (error) {
