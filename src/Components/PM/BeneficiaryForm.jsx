@@ -241,7 +241,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
       typeOfUnit: task.typeOfUnit,
       ratePerUnit: parseFloat(task.ratePerUnit),
       yearOfSanction: parseInt(task.yearOfSanction, 10),
-
+      financialExtension: task.financialExtension,
     };
 
     console.log(projectConfig);
