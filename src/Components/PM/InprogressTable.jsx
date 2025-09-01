@@ -457,16 +457,16 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
     };
 
     const exportToExcel = async () => {
-            try {
-                console.log("ok");
-                const data = await exportInProgressDetails(userId, value);
-                alert(data);
-                console.log(beneficiaries);
-                console.log(beneficiaries);
-            } catch (error) {
-                console.error('Error fetching activities:', error);
-            }
-        };
+        try {
+            console.log("ok");
+            const data = await exportInProgressDetails(userId, value);
+            alert(data);
+            console.log(beneficiaries);
+            console.log(beneficiaries);
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+        }
+    };
 
     return (
         <div style={{ padding: '20px' }} className='listContainer'>
@@ -561,6 +561,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                 <TableCell>Name of the Work</TableCell>
                                                                                                 <TableCell>Type of Unit</TableCell>
                                                                                                 <TableCell>Unit Rate</TableCell>
+                                                                                                <TableCell>Financial Extension</TableCell>
                                                                                                 <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
                                                                                                 <TableCell>Beneficiary Contribution Balance</TableCell>
@@ -576,6 +577,9 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                         <TableCell>{task.taskName}</TableCell>
                                                                                                         <TableCell>{task.typeOfUnit}</TableCell>
                                                                                                         <TableCell>{task.ratePerUnit}</TableCell>
+                                                                                                        <TableCell>
+                                                                                                            {task.financialExtension ? 'Y' : 'N'}
+                                                                                                        </TableCell>
                                                                                                         <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
                                                                                                         <TableCell>{task.beneficiaryContributionRemain}</TableCell>

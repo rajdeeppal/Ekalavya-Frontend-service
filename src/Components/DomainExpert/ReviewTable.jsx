@@ -33,7 +33,7 @@ import * as XLSX from 'xlsx';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import { updatedResubmitSubTask, approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
 
-function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , isCEO}) {
+function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, isCEO }) {
     const { userId } = useAuth();
     const [remarks, setRemarks] = useState('');
     const [open, setOpen] = useState({});
@@ -229,6 +229,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , 
                                                                                                 <TableCell>Name of the Work</TableCell>
                                                                                                 <TableCell>Type of Unit</TableCell>
                                                                                                 <TableCell>Unit Rate</TableCell>
+                                                                                                <TableCell>Financial Extension</TableCell>
                                                                                                 <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
                                                                                                 <TableCell>Beneficiary Contribution Balance</TableCell>
@@ -244,6 +245,9 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , 
                                                                                                         <TableCell>{task.taskName}</TableCell>
                                                                                                         <TableCell>{task.typeOfUnit}</TableCell>
                                                                                                         <TableCell>{task.ratePerUnit}</TableCell>
+                                                                                                        <TableCell>
+                                                                                                            {task.financialExtension ? 'Y' : 'N'}
+                                                                                                        </TableCell>
                                                                                                         <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
                                                                                                         <TableCell>{task.beneficiaryContributionRemain}</TableCell>
@@ -294,12 +298,12 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , 
                                                                                                                                         <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                         <TableCell>{row.currentCost}</TableCell>
-                                                                                                                                                <TableCell>
-                                                                                                                                                  <Checkbox
-                                                                                                                                                    checked={row.procurementCheck || false}
-                                                                                                                                                    disabled
-                                                                                                                                                  />
-                                                                                                                                                </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            <Checkbox
+                                                                                                                                                checked={row.procurementCheck || false}
+                                                                                                                                                disabled
+                                                                                                                                            />
+                                                                                                                                        </TableCell>
                                                                                                                                         <TableCell>{row.payeeName}</TableCell>
                                                                                                                                         <TableCell>{row.accountNumber}</TableCell>
                                                                                                                                         <TableCell>
@@ -375,13 +379,13 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , 
                                                                                                                                                     Approve
                                                                                                                                                 </Button>
                                                                                                                                                 {!isCEO &&
-                                                                                                                                                <Button
-                                                                                                                                                    variant="contained"
-                                                                                                                                                    color="error"
-                                                                                                                                                    onClick={() => handleSave('Reject', task.id, row.id, rowIndex)}
-                                                                                                                                                >
-                                                                                                                                                    Reject
-                                                                                                                                                </Button>}
+                                                                                                                                                    <Button
+                                                                                                                                                        variant="contained"
+                                                                                                                                                        color="error"
+                                                                                                                                                        onClick={() => handleSave('Reject', task.id, row.id, rowIndex)}
+                                                                                                                                                    >
+                                                                                                                                                        Reject
+                                                                                                                                                    </Button>}
                                                                                                                                             </Box>
                                                                                                                                         </TableCell>
                                                                                                                                     </TableRow>
@@ -488,7 +492,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess , 
                                     </div>
                                 </div>
                             ))}
-                        </>:<>No Remarks found</>}
+                        </> : <>No Remarks found</>}
                     </div>
                     <Divider sx={{ my: 2 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>

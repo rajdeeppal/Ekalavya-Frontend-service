@@ -149,6 +149,7 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                 <TableCell>Name of the Work</TableCell>
                                                                                                 <TableCell>Type of Unit</TableCell>
                                                                                                 <TableCell>Unit Rate</TableCell>
+                                                                                                <TableCell>Financial Extension</TableCell>
                                                                                                 <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
                                                                                                 <TableCell>Beneficiary Contribution Balance</TableCell>
@@ -164,6 +165,9 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                         <TableCell>{task.taskName}</TableCell>
                                                                                                         <TableCell>{task.typeOfUnit}</TableCell>
                                                                                                         <TableCell>{task.ratePerUnit}</TableCell>
+                                                                                                        <TableCell>
+                                                                                                            {task.financialExtension ? 'Y' : 'N'}
+                                                                                                        </TableCell>
                                                                                                         <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
                                                                                                         <TableCell>{task.beneficiaryContributionRemain}</TableCell>
@@ -213,12 +217,12 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                                         <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                         <TableCell>{row.currentCost}</TableCell>
-                                                                                                                                                <TableCell>
-                                                                                                                                                  <Checkbox
-                                                                                                                                                    checked={row.procurementCheck || false}
-                                                                                                                                                    disabled
-                                                                                                                                                  />
-                                                                                                                                                </TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            <Checkbox
+                                                                                                                                                checked={row.procurementCheck || false}
+                                                                                                                                                disabled
+                                                                                                                                            />
+                                                                                                                                        </TableCell>
                                                                                                                                         <TableCell>{row.payeeName}</TableCell>
                                                                                                                                         <TableCell>{row.accountNumber}</TableCell>
                                                                                                                                         <TableCell>{row.passbookDoc ? (<a
