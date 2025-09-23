@@ -18,7 +18,8 @@ import {
     Checkbox,
     Modal,
     Divider,
-    Box, FormControl, InputLabel, Select, MenuItem
+    Box, FormControl, InputLabel, Select, MenuItem, FormControlLabel
+
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -27,7 +28,7 @@ import {
     Reviews,
 } from '@mui/icons-material';
 import { useAuth } from '../PrivateRoute';
-import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails,rejectVCPaymentDetails, approveVCPaymentDetails } from '../DataCenter/apiService';
+import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails, rejectVCPaymentDetails, approveVCPaymentDetails } from '../DataCenter/apiService';
 import AOPaymentTable from '../AO/AOPaymentTable';
 import DownloadIcon from '@mui/icons-material/Download';
 import Avatar from '@mui/material/Avatar';
@@ -41,6 +42,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         bankName: '',
         iFSCNo: '',
         branchName: '',
+        isFullPayment: true,
+        partialPayment: ''
     });
     const [errors, setErrors] = useState('');
     const [benId, setBenId] = useState('');
@@ -51,8 +54,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
     const [showViewPaymentConfirmation, setShowViewPaymentConfirmation] = useState(false);
     const [selectedComponent, setSelectedComponent] = useState('');
     const [components, setComponents] = useState([]);
-    const [voucher,setVoucher]=useState('');
-    const [isPay,setIsPay]=useState('');
+    const [voucher, setVoucher] = useState('');
+    const [isPay, setIsPay] = useState('');
 
 
     useEffect(() => {
@@ -120,6 +123,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         if (!formValues.bankName) formErrors.bankName = 'Bank name is required';
         if (!formValues.iFSCNo) formErrors.iFSCNo = 'IFSC No is required';
         if (!formValues.branchName) formErrors.branchName = 'Branch name is required';
+        if (!formValues.partialPayment) formErrors.partialPayment = 'Partial payment is required';
 
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
@@ -194,6 +198,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
             accountNumber: beneficiary.accountNumber,
             projects: component,
             amount: totalAmount,
+            isFullPayment: formValues.isFullPayment,
+            partialPayment: formValues.isFullPayment ? totalAmount : parseFloat(formValues.partialPayment || 0),
             bankName: formValues.bankName,
             ifscCode: formValues.iFSCNo,
             branchName: formValues.branchName,
@@ -218,6 +224,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                 bankName: '',
                 iFSCNo: '',
                 branchName: '',
+                isFullPayment: true,
+                partialPayment: ''
             });
             setShowViewConfirmation(false);
             setIsSucess(true);
@@ -753,6 +761,38 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                         helperText={errors.branchName}
                     />
 
+                    <div style={{ marginTop: '16px' }}>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                name="isFullPayment"
+                                checked={formValues.isFullPayment || false}
+                                onChange={(e) =>
+                                    setFormValues((prev) => ({
+                                        ...prev,
+                                        isFullPayment: e.target.checked,
+                                    }))
+                                }
+                            />
+                        }
+                        label="Is Full Payment?"
+                    />
+                    </div>
+
+                    {!formValues.isFullPayment && (
+                        <TextField
+                            fullWidth
+                            label="Partial Payment"
+                            name="partialPayment"
+                            placeholder="Partial Payment Amount"
+                            onChange={handleChange}
+                            margin="normal"
+                            required
+                            error={!!errors.partialPayment}
+                            helperText={errors.partialPayment}
+                        />
+                    )}
+
                     <Button variant="contained" color="primary" onClick={() => handleGenerateVoucher(benId)} sx={{ mt: 2 }} >
                         Submit
                     </Button>
@@ -870,7 +910,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                     <Typography variant="h6" component="h2" gutterBottom>
                         Payment Form
                     </Typography>
-                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} setIsSucess={setIsSucess} voucher={voucher} isPay={isPay}/>
+                    <AOPaymentTable setShowViewPaymentConfirmation={setShowViewPaymentConfirmation} showViewPaymentConfirmation={showViewConfirmation} setIsSucess={setIsSucess} voucher={voucher} isPay={isPay} />
                 </Box>
             </Modal>
         </div>
