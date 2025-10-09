@@ -26,8 +26,8 @@ const LoginRedirect = ({ token }) => {
           console.log("DOMAIN EXPERT or PROCUREMENT User has logged in....");
           // setShowOtpModal(true); // Show OTP modal instead of navigating
           navigate('/resolution-list');
-        } else if (userRole === 'AO') {
-          console.log("AO User has logged in....");
+        } else if (userRole === 'CFO') {
+          console.log("CFO User has logged in....");
           // setShowOtpModal(true); // Show OTP modal instead of navigating
           navigate('/AO/payment-list');
         }else if (userRole === 'TRUSTEE') {

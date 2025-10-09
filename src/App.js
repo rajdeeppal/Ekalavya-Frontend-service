@@ -96,7 +96,7 @@ console.log(userRole);
       <Route
         path="/myprofile"
         element={
-          <PrivateRoute requiredRoles={['EADMIN','PM','AO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE', 'SECRETARY', 'VICE_CHAIRMAN', 'PROJECT DIRECTOR']}>
+          <PrivateRoute requiredRoles={['EADMIN','PM','CFO','DOMAIN EXPERT','PROCUREMENT','CEO','TRUSTEE', 'SECRETARY', 'VICE_CHAIRMAN', 'PROJECT DIRECTOR']}>
             <UserProfile />
           </PrivateRoute>
         }
@@ -209,7 +209,7 @@ console.log(userRole);
       <Route
         path="/AO/payment-list"
         element={
-          <PrivateRoute requiredRoles={['AO']}>
+          <PrivateRoute requiredRoles={['CFO']}>
             <AOPaymentPage />
           </PrivateRoute>
         }
@@ -218,7 +218,7 @@ console.log(userRole);
       <Route
         path="/AO/dashboard/payment-list"
         element={
-          <PrivateRoute requiredRoles={['AO']}>
+          <PrivateRoute requiredRoles={['CFO']}>
             <AODashboard />
           </PrivateRoute>
         }
@@ -227,7 +227,7 @@ console.log(userRole);
       <Route
         path="/AO/dashboard/payment-list/success"
         element={
-          <PrivateRoute requiredRoles={['AO']}>
+          <PrivateRoute requiredRoles={['CFO']}>
             <AOPaymentSuccess />
           </PrivateRoute>
         }
@@ -236,7 +236,7 @@ console.log(userRole);
       <Route
         path="/AO/dashboard/payment-list/reject"
         element={
-          <PrivateRoute requiredRoles={['AO']}>
+          <PrivateRoute requiredRoles={['CFO']}>
             <AOPaymentReject />
           </PrivateRoute>
         }
@@ -299,7 +299,7 @@ console.log(userRole);
       <Route
         path="/AO/resolution-list"
         element={
-          <PrivateRoute requiredRoles={['AO']}>
+          <PrivateRoute requiredRoles={['CFO']}>
             <AOResolutionList />
           </PrivateRoute>
         }

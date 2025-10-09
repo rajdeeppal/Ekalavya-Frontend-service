@@ -102,7 +102,7 @@ function Register() {
             <option value="DOMAIN EXPERT">DOMAIN EXPERT</option>
             <option value="TRUSTEE">TRUSTEE</option>
             <option value="CEO">CEO</option>
-            <option value="AO">AO</option>
+            <option value="CFO">CFO</option>
           </select>
         </div>
         <button type="submit">Register</button>
