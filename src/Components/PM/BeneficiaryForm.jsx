@@ -236,7 +236,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
       taskName: selectedTask,
       beneficiaryContribution: parseFloat(task.beneficiaryContribution),
       grantAmount: parseFloat(task.grantAmount),
-      units: parseInt(task.noOfUnits, 10),
+      units: parseFloat(task.noOfUnits),
       totalCost: parseFloat(task.totalCost),
       typeOfUnit: task.typeOfUnit,
       ratePerUnit: parseFloat(task.ratePerUnit),

@@ -371,7 +371,7 @@ export const getPaymentDetails = async (data, category) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `https://projects.ekalavya.net/api/ao/payments/pending`;
+    let url = `https://projects.ekalavya.net/api/cfo/payments/pending`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -398,7 +398,7 @@ export const getUpdatedPaymentDetails = async (data) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `https://projects.ekalavya.net/api/ao/statement/view`;
+    let url = `https://projects.ekalavya.net/api/cfo/statement/view`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -606,7 +606,7 @@ export const rejectDomainDetails = async (employeeId,taskId,remarks) => {
 export const generatedVoucherDetails = async (object) => {
   try {
     const response = await axios.post(
-      `https://projects.ekalavya.net/api/ao/voucher/generate`, // URL
+      `https://projects.ekalavya.net/api/cfo/voucher/generate`, // URL
       object, // No request body
       {
         headers: getAuthorizationHeader(),
@@ -623,7 +623,7 @@ export const generatedVoucherDetails = async (object) => {
 export const getVoucherDetails = async (voucher_id) => {
   try {
     const response = await axios.get(
-      `https://projects.ekalavya.net/api/ao/voucher/search/${voucher_id}`,
+      `https://projects.ekalavya.net/api/cfo/voucher/search/${voucher_id}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -638,7 +638,7 @@ export const getVoucherDetails = async (voucher_id) => {
 export const getVoucherDetailsUsingId = async (voucher_id) => {
   try {
     const response = await axios.get(
-      `https://projects.ekalavya.net/api/ao/voucher/click-pay/${voucher_id}`,
+      `https://projects.ekalavya.net/api/cfo/voucher/click-pay/${voucher_id}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -684,7 +684,7 @@ export const updateProfileDetails = async (userId, profileData) => {
 export const generatedPaymentDetails = async (object) => {
   try {
     const response = await axios.post(
-      `https://projects.ekalavya.net/api/ao/payments/process`, // URL
+      `https://projects.ekalavya.net/api/cfo/payments/process`, // URL
       object, // No request body
       {
         headers: getAuthorizationHeader(),
@@ -702,7 +702,7 @@ export const exportPaymentDetails = async (userId, data) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `https://projects.ekalavya.net/api/ao/statement/export/${userId}`;
+    let url = `https://projects.ekalavya.net/api/cfo/statement/export/${userId}`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -907,7 +907,7 @@ export const getSuccessPaymentDetails = async (data, category) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `https://projects.ekalavya.net/api/ao/voucher/list/approve`;
+    let url = `https://projects.ekalavya.net/api/cfo/voucher/list/approve`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -934,7 +934,7 @@ export const getRejectPaymentDetails = async (data, category) => {
     const { startDate, endDate } = data;
     
     // Start building the query parameters
-    let url = `https://projects.ekalavya.net/api/ao/voucher/list/reject`;
+    let url = `https://projects.ekalavya.net/api/cfo/voucher/list/reject`;
     const params = new URLSearchParams();
 
     // Add parameters if they are provided
@@ -1035,7 +1035,7 @@ export const getPendingCounts = async (userId) => {
 
 export const getAOPendingCounts = async (userId) => {
   try {
-    const response = await axios.get(`https://projects.ekalavya.net/api/ao/task-count/${userId}`, {
+    const response = await axios.get(`https://projects.ekalavya.net/api/cfo/task-count/${userId}`, {
       headers: getAuthorizationHeader(),
     });
     return response.data;

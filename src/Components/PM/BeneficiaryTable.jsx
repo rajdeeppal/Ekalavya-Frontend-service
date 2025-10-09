@@ -91,7 +91,7 @@ const BeneficiaryTable = ({ beneficiaries, value, setBeneficiaries, setIsSucess 
       beneficiaryContribution: parseFloat(task.beneficiaryContribution),
       grantAmount: parseFloat(task.grantAmount),
       // nameOfWork: task.nameOfWork,
-      units: parseInt(task.units, 10),
+      units: parseFloat(task.units),
       totalCost: parseFloat(task.totalCost),
       typeOfUnit: task.typeOfUnit,
       ratePerUnit: parseFloat(task.ratePerUnit),
