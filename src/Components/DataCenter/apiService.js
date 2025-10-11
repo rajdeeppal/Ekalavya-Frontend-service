@@ -1056,3 +1056,45 @@ export const getVCPendingCounts = async (userId) => {
     throw error;
   }
 };
+
+export const downloadTemplate = async () => {
+  try {
+    const response = await axios.post(
+      `https://projects.ekalavya.net/api/beneficiary/download-template`,
+      {}, // empty body
+      {
+        headers: getAuthorizationHeader(),
+        responseType: 'blob', // important for downloading files (Excel, PDF, etc.)
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error downloading template:", error);
+    throw error;
+  }
+};
+
+export const uploadTemplate = async (userId, file) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await axios.post(
+      `https://projects.ekalavya.net/api/beneficiary/bulk-upload/${userId}`,
+      formData,
+      {
+        headers: {
+          ...getAuthorizationHeader(),
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading template:", error);
+    throw error;
+  }
+};
+
+
+
