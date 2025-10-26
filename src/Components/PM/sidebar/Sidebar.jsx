@@ -9,6 +9,8 @@ import ChecklistRtlIcon from '@mui/icons-material/ChecklistRtl';
 import PreviewIcon from '@mui/icons-material/Preview';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
 import { getPendingCounts } from '../../DataCenter/apiService';
@@ -17,8 +19,10 @@ import { useAuth } from '../../PrivateRoute';
 
 const Sidebar = ({ isSuccess }) => {
   const [pendingCount, setPendingCount] = useState('');
+  const [showTrainingMenu, setShowTrainingMenu] = useState(false);
   const navigate = useNavigate();
   const { userId } = useAuth();
+
   useEffect(() => {
     async function fetchProjects() {
       const data = await getPendingCounts(userId);
@@ -27,9 +31,14 @@ const Sidebar = ({ isSuccess }) => {
     }
     fetchProjects();
   }, [isSuccess, userId]);
+
   const handleLogout = () => {
-    localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
-    navigate('/'); // Redirect to the login page
+    localStorage.removeItem('jwtToken');
+    navigate('/');
+  };
+
+  const toggleTrainingMenu = () => {
+    setShowTrainingMenu((prev) => !prev);
   };
 
   return (
@@ -74,8 +83,8 @@ const Sidebar = ({ isSuccess }) => {
               })}
             >
               <div style={{ display: "flex", alignItems: "center" }}>
-              <ChecklistRtlIcon className="icon" style={{ color: "black" }} />
-              <Badge
+                <ChecklistRtlIcon className="icon" style={{ color: "black" }} />
+                <Badge
                   badgeContent={pendingCount.approvalCount}
                   color="success"
                   anchorOrigin={{
@@ -91,8 +100,8 @@ const Sidebar = ({ isSuccess }) => {
                     }
                   }}
                 >
-              <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Inprogress List</span>
-              </Badge>
+                  <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Inprogress List</span>
+                </Badge>
               </div>
             </NavLink>
           </li>
@@ -169,6 +178,84 @@ const Sidebar = ({ isSuccess }) => {
               </div>
             </NavLink>
           </li>
+
+          <li
+            className="training-section"
+          >
+            <div
+              className="training-header"
+              onClick={toggleTrainingMenu}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <StoreIcon className="icon" style={{ color: "black" }} />
+                <span style={{ marginLeft: "8px" }}>Training Session</span>
+              </div>
+              {showTrainingMenu ? (
+                <ExpandLessIcon className="expand-icon" />
+              ) : (
+                <ExpandMoreIcon className="expand-icon" />
+              )}
+            </div>
+
+            {showTrainingMenu && (
+              <ul className="submenu">
+                <li>
+                  <NavLink
+                    to="/training"
+                    className="submenu-link"
+                    style={({ isActive }) => ({
+                      textDecoration: "none",
+                      // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
+                      backgroundColor: isActive ? '#ece8ff' : 'transparent',
+                      borderRadius: "10px 0px 0px 10px ",
+                      padding: "10px 4px",
+                      width: "100%",
+
+                    })}>
+                    <PlaylistRemoveIcon className="icon" style={{ color: "black" }} />
+                    <Badge
+                      
+                      color="success"
+                      anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "right"
+                      }}
+                      sx={{
+                        "& .MuiBadge-badge": {
+                          color: "white ! important",
+                          fontSize: "0.7rem",
+                          height: "16px",
+                          minWidth: "16px"
+                        }
+                      }}
+                    >
+                      <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Training Center</span>
+                    </Badge>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/resolution"
+                    className="submenu-link"
+                    style={({ isActive }) => ({
+                      textDecoration: "none",
+                      // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
+                      backgroundColor: isActive ? '#ece8ff' : 'transparent',
+                      borderRadius: "10px 0px 0px 10px ",
+                      padding: "10px 4px",
+                      width: "100%",
+                      margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+                    })}
+                  >
+                    <CloudUploadIcon className="icon" style={{ color: "black" }} />
+                    <span>Resolution Upload</span>
+                  </NavLink>
+                </li>
+              </ul>
+            )}
+          </li>
+
+
 
           <li> {/* Profile click handler */}
             <NavLink

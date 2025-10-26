@@ -260,6 +260,62 @@ export const getBeneficiary = async (userId, data, category) => {
   }
 };
 
+export const getTraining = async (userId, data, category) => {
+  try {
+    const {  projectName, formType } = data;
+
+    // Use URLSearchParams to encode all query parameters
+    const params = new URLSearchParams();
+
+    if (projectName) params.append("projectName", projectName);
+    if (formType) params.append("formType", formType);
+    if (category) params.append("stage", category);
+
+    const url = `${BENEFICIARY_BASE_URL}/other/filter/${userId}?${params.toString()}`;
+
+    const response = await axios.get(url, {
+      headers: getAuthorizationHeader(),
+    });
+
+    return response.data.beneficiaries;
+  } catch (error) {
+    console.error("Error fetching beneficiary:", error);
+    throw error;
+  }
+};
+
+export const updateCommonExpTask = async (taskId, object) => {
+  try {
+    const response = await axios.put(
+      `${BENEFICIARY_BASE_URL}/common-exp/updateTask/${taskId}`,
+      object,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching beneficiary:", error);
+    throw error;
+  }
+};
+
+export const updateTrainingTask = async (taskId, object) => {
+  try {
+    const response = await axios.put(
+      `${BENEFICIARY_BASE_URL}/training/updateTask/${taskId}`,
+      object,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching beneficiary:", error);
+    throw error;
+  }
+};
+
 export const updateActivityTask = async (taskId, object) => {
   try {
     const response = await axios.put(
@@ -1093,6 +1149,36 @@ export const uploadTemplate = async (userId, file) => {
   } catch (error) {
     console.error("Error uploading template:", error);
     throw error;
+  }
+};
+
+export const saveCommonExpenditureConfiguration = async (projectDto) => {
+  try {
+    const response = await axios.post(
+      `${BENEFICIARY_BASE_URL}/common-exp/create`,
+      projectDto,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error saving Project:", error);
+  }
+};
+
+export const saveTrainingConfiguration = async (projectDto) => {
+  try {
+    const response = await axios.post(
+      `${BENEFICIARY_BASE_URL}/training/create`,
+      projectDto,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error saving Project:", error);
   }
 };
 

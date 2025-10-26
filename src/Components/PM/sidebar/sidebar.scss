@@ -47,8 +47,7 @@
         cursor: pointer;
         transition: background-color 0.3s ease, border-radius 0.3s ease; /* Smooth transition */
 
-   
-
+        
         .icon {
           font-size: 18px;
           color: #7451f8;
@@ -63,6 +62,54 @@
       }
     }
   }
+
+  .training-section {
+    display: block!important; 
+
+  .training-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 10px 3px;
+    border-radius: 10px 0 0 10px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f3f3f3!important;
+    }
+
+    .expand-icon {
+      font-size: 18px;
+      // color: #555;
+    }
+  }
+
+  .submenu {
+    list-style: none;
+    margin: 5px 0;
+
+    .submenu-link {
+      display: block;
+      padding: 6px 0;
+      color: #555;
+      font-size: 14px;
+      text-decoration: none;
+      transition: color 0.3s ease;
+
+       &:hover {
+        color: #f3f3f3!important;
+      }
+
+      &.active {
+        font-weight: 600;
+        color: #000 !important;
+      }
+    }
+  }
+}
+
+
 
   .bottom {
     display: flex;

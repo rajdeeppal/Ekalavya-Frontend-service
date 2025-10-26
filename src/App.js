@@ -40,6 +40,7 @@ import { jwtDecode }   from 'jwt-decode';
 import DirectorReviewPage from "./Components/Director/DirectorReviewPage";
 import DirectorRejectPage from "./Components/Director/DirectorRejectPage";
 import DirectorResolutionList from "./Components/Director/DirectorResolutionList";
+import TrainingIframe from "./Components/PM/TrainingIframe";
 
 function App() {
   const { userRole } = useAuth();
@@ -122,6 +123,14 @@ console.log(userRole);
         element={
           <PrivateRoute requiredRoles={['PM']}>
             <Resolution />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/training"
+        element={
+          <PrivateRoute requiredRoles={['PM']}>
+            <TrainingIframe />
           </PrivateRoute>
         }
       />
