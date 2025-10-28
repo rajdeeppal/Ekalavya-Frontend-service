@@ -123,8 +123,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         if (!formValues.bankName) formErrors.bankName = 'Bank name is required';
         if (!formValues.iFSCNo) formErrors.iFSCNo = 'IFSC No is required';
         if (!formValues.branchName) formErrors.branchName = 'Branch name is required';
-        // if (!formValues.partialPayment) formErrors.partialPayment = 'Partial payment is required';
-
+ 
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };

@@ -179,7 +179,7 @@ const Sidebar = ({ isSuccess }) => {
             </NavLink>
           </li>
 
-          <li
+          {/* <li
             className="training-section"
           >
             <div
@@ -257,7 +257,7 @@ const Sidebar = ({ isSuccess }) => {
 
 
 
-          <li> {/* Profile click handler */}
+          <li> 
             <NavLink
               to="/myprofile"
               style={({ isActive }) => ({
@@ -273,7 +273,7 @@ const Sidebar = ({ isSuccess }) => {
               <AccountCircleOutlinedIcon className="icon" style={{ color: "black" }} />
               <span>Profile</span>
             </NavLink>
-          </li>
+          </li> */}
 
           <li>
             <NavLink
