@@ -63,50 +63,80 @@
     }
   }
 
-  .training-section {
-    display: block!important; 
+  /* ===== Training Section ===== */
+.training-section {
+  display: block !important;
+  font-family: 'Roboto', sans-serif;
+}
 
-  .training-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    padding: 10px 3px;
-    border-radius: 10px 0 0 10px;
-    transition: background-color 0.2s ease;
+/* Header */
+.training-section .training-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 10px 8px;
+  border-radius: 10px 0 0 10px;
+  background-color: transparent;
+  transition: all 0.25s ease-in-out;
+}
 
-    &:hover {
-      background-color: #f3f3f3!important;
-    }
+.training-section .training-header:hover {
+  background-color: rgba(0, 0, 0, 0.04); /* subtle MUI-like hover */
+}
 
-    .expand-icon {
-      font-size: 18px;
-      // color: #555;
-    }
-  }
+/* Expand icons */
+.training-section .training-header .expand-icon {
+  font-size: 20px;
+  color: #555;
+}
 
-  .submenu {
-    list-style: none;
-    margin: 5px 0;
+/* ===== Submenu ===== */
+.training-section .submenu {
+  list-style: none;
+  margin: 6px 0;
+  padding-left: 6px;
+}
 
-    .submenu-link {
-      display: block;
-      padding: 6px 0;
-      color: #555;
-      font-size: 14px;
-      text-decoration: none;
-      transition: color 0.3s ease;
+/* Submenu Links */
+.training-section .submenu .submenu-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  color: #555;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 10px 0 0 10px;
+  transition: all 0.25s ease-in-out;
+}
 
-       &:hover {
-        color: #f3f3f3!important;
-      }
+.training-section .submenu .submenu-link:hover {
+  background-color: rgba(103, 58, 183, 0.08); /* MUI purple tint */
+  color: #000;
+}
 
-      &.active {
-        font-weight: 600;
-        color: #000 !important;
-      }
-    }
-  }
+/* Active Link */
+.training-section .submenu .submenu-link.active {
+  background-color: #ece8ff !important; /* your color preserved */
+  font-weight: 600;
+  color: #000 !important;
+  box-shadow: inset 3px 0 0 #673ab7; /* subtle active indicator */
+}
+
+/* Icons */
+.training-section .submenu .icon {
+  font-size: 18px;
+  color: #333;
+}
+
+/* Badge adjustments */
+.training-section .submenu .MuiBadge-badge {
+  color: #fff !important;
+  background-color: #4caf50 !important; /* success color */
+  font-size: 0.7rem;
+  height: 16px;
+  min-width: 16px;
 }
 
 

@@ -40,7 +40,9 @@ import { jwtDecode }   from 'jwt-decode';
 import DirectorReviewPage from "./Components/Director/DirectorReviewPage";
 import DirectorRejectPage from "./Components/Director/DirectorRejectPage";
 import DirectorResolutionList from "./Components/Director/DirectorResolutionList";
-// import TrainingIframe from "./Components/PM/TrainingIframe";
+import TrainingIframe from "./Components/PM/TrainingIframe";
+import TrainingInProgressTable from "./Components/PM/TrainingInProgressTable";
+import TrainingInProgressFrame from "./Components/PM/TrainingInProgressframe";
 
 function App() {
   const { userRole } = useAuth();
@@ -126,14 +128,24 @@ console.log(userRole);
           </PrivateRoute>
         }
       />
-      {/* <Route
+      <Route
         path="/training"
         element={
           <PrivateRoute requiredRoles={['PM']}>
             <TrainingIframe />
           </PrivateRoute>
         }
-      /> */}
+      />
+
+      <Route
+        path="/training-in-progress"
+        element={
+          <PrivateRoute requiredRoles={['PM']}>
+            <TrainingInProgressFrame/>
+          </PrivateRoute>
+        }
+      />
+
       <Route
         path="/resolution-list"
         element={

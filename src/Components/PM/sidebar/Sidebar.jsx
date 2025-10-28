@@ -179,7 +179,7 @@ const Sidebar = ({ isSuccess }) => {
             </NavLink>
           </li>
 
-          {/* <li
+         <li
             className="training-section"
           >
             <div
@@ -235,7 +235,7 @@ const Sidebar = ({ isSuccess }) => {
                 </li>
                 <li>
                   <NavLink
-                    to="/resolution"
+                    to="/training-in-progress"
                     className="submenu-link"
                     style={({ isActive }) => ({
                       textDecoration: "none",
@@ -248,7 +248,7 @@ const Sidebar = ({ isSuccess }) => {
                     })}
                   >
                     <CloudUploadIcon className="icon" style={{ color: "black" }} />
-                    <span>Resolution Upload</span>
+                    <span>Training In Progress</span>
                   </NavLink>
                 </li>
               </ul>
@@ -273,7 +273,7 @@ const Sidebar = ({ isSuccess }) => {
               <AccountCircleOutlinedIcon className="icon" style={{ color: "black" }} />
               <span>Profile</span>
             </NavLink>
-          </li> */}
+          </li> 
 
           <li>
             <NavLink
