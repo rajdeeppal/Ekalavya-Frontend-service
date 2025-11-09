@@ -77,6 +77,7 @@ const TrainingSearchBar = ({ onSearch }) => {
                         onClick={handleSearch}
                         style={{padding: '8px'}}
                         fullWidth
+                        disabled={!selectedProject || !selectedFormType}
                     >
                         Search
                     </Button>

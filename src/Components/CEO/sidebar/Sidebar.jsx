@@ -1,12 +1,17 @@
 import "./sidebar.scss";
+import React, { useEffect, useState } from 'react';
+import {
+  ExpandLess,
+  ExpandMore,
+} from "@mui/icons-material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import StoreIcon from "@mui/icons-material/Store";
-import React, { useEffect, useState } from 'react';
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from '../../images/logo.png';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -17,29 +22,69 @@ import { useAuth } from '../../PrivateRoute';
 import { getPendingCounts } from '../../DataCenter/apiService';
 import Badge from "@mui/material/Badge";
 
-const Sidebar = ({isSuccess}) => {
+const Sidebar = ({ isSuccess }) => {
+  const navigate = useNavigate();
+  const { userId } = useAuth();
+  const [pendingCount, setPendingCount] = useState({});
+  const [openMenu, setOpenMenu] = useState({
+    approve: false,
+    reject: false,
+  });
 
-  const [pendingCount, setPendingCount] = useState('');
-    const { userId } = useAuth();
-    const navigate = useNavigate();
-    useEffect(() => {
-            async function fetchProjects() {
-                const data = await getPendingCounts(userId);
-                setPendingCount(data);
-                console.log("Pending Counts:", pendingCount);
-            }
-            fetchProjects();
-        }, [isSuccess, userId]);
-  
+  useEffect(() => {
+    async function fetchCounts() {
+      const data = await getPendingCounts(userId);
+      setPendingCount(data || {});
+    }
+    fetchCounts();
+  }, [isSuccess, userId]);
 
   const handleLogout = () => {
-    localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
-    navigate('/'); // Redirect to the login page
+    localStorage.removeItem('jwtToken');
+    navigate('/');
   };
 
-  const handleProfileClick = () => {
-    navigate('/myprofile'); // Redirect to My Profile page
+  const toggleMenu = (key) => {
+    setOpenMenu((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  const renderSubLink = (to, icon, text, badgeContent = null, badgeColor = "success") => (
+    <li style={{ padding: "3px 6px" }}>
+      <NavLink
+        to={to}
+        style={({ isActive }) => ({
+          textDecoration: "none",
+          backgroundColor: isActive ? "#ece8ff" : "transparent",
+          borderRadius: "8px 0px 0px 8px",
+          padding: "8px 6px",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+        })}
+      >
+        {icon}
+        {badgeContent !== null ? (
+          <Badge
+            badgeContent={badgeContent}
+            color={badgeColor}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            sx={{
+              "& .MuiBadge-badge": {
+                color: "white ! important",
+                fontSize: "0.7rem",
+                height: "16px",
+                minWidth: "16px",
+              },
+            }}
+          >
+            <span style={{ marginLeft: "8px" }}>{text}</span>
+          </Badge>
+        ) : (
+          <span style={{ marginLeft: "8px" }}>{text}</span>
+        )}
+      </NavLink>
+    </li>
+  );
 
   return (
     <div className="sidebar">
@@ -52,181 +97,79 @@ const Sidebar = ({isSuccess}) => {
       <div className="center">
         <ul>
 
+          <li className="menu-header" onClick={() => toggleMenu("approve")}>
+            <div className="menu-title">
+              <PendingIcon className="icon" />
+              <Badge
+                badgeContent={pendingCount.approvalCount + (pendingCount.trainingApprovalCount || 0)}
+                color="success"
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                sx={{
+                  "& .MuiBadge-badge": {
+                    color: "white ! important",
+                    fontSize: "0.7rem",
+                    height: "16px",
+                    minWidth: "16px",
+                  },
+                }}
+              >
+                Approval Center
+              </Badge>
+            </div>
+            {openMenu.approve ? <ExpandLess /> : <ExpandMore />}
+          </li>
+          {openMenu.approve && (
+            <ul className="submenu">
+              {renderSubLink("/CEO/inprogress-list", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Beneficiary Records", pendingCount.approvalCount, "success")}
+              {renderSubLink("/CEO/training/inprogress-list", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Training/Other Exp Records", pendingCount.trainingApprovalCount, "success")}
+            </ul>
+          )}
 
-          <li>
-            <NavLink to="/CEO/inprogress-list" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-              display: "flex",
-              alignItems: "center"
-            })} >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <PendingIcon className="icon" style={{ color: "black", marginTop: "5px" }} />
-                <Badge
-                  badgeContent={pendingCount.approvalCount}
-                  color="success"
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right"
-                  }}
-                  sx={{
-                    "& .MuiBadge-badge": {
-                      color: "white ! important",
-                      fontSize: "0.7rem",
-                      height: "16px",
-                      minWidth: "16px"
-                    }
-                  }}
-                >
-                  <span style={{ "margin-left": "-2%" , paddingTop: "2px" }}>Approval Center</span>
-                </Badge>
-              </div>
-            </NavLink>
+          <li className="menu-header" onClick={() => toggleMenu("reject")}>
+            <div className="menu-title">
+              <PlaylistRemoveIcon className="icon" />
+              <Badge
+                badgeContent={pendingCount.rejectionCount + (pendingCount.trainingRejectionCount || 0)}
+                color="error"
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                sx={{
+                  "& .MuiBadge-badge": {
+                    color: "white ! important",
+                    fontSize: "0.7rem",
+                    height: "16px",
+                    minWidth: "16px",
+                  },
+                }}
+              >
+                Rejection Center
+              </Badge>
+            </div>
+            {openMenu.reject ? <ExpandLess /> : <ExpandMore />}
+          </li>
+          {openMenu.reject && (
+            <ul className="submenu">
+              {renderSubLink("/CEO/review-list", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Beneficiary Records", pendingCount.rejectionCount, "error")}
+              {renderSubLink("/CEO/training/review-list", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Training/Other Exp Records", pendingCount.trainingRejectionCount, "error")}
+            </ul>
+          )}
+
+          {renderSubLink("/CEO/dashboard-list", <DashboardIcon className="icon" />, "Dashboard")}
+
+          {renderSubLink("/CEO/payment-list", <PaymentsIcon className="icon" />, "Payment Report")}
+
+          {renderSubLink("/CEO/report-list", <AssessmentIcon className="icon" />, "Report Tab")}
+
+          {renderSubLink("/CEO/resolution-list", <FormatListBulletedIcon className="icon" />, "Resolution View")}
+
+          {renderSubLink("/myprofile", <AccountCircleOutlinedIcon className="icon" />, "Profile")}
+
+          <li onClick={handleLogout}>
+            <div className="menu-title logout">
+              <ExitToAppIcon className="icon" />
+              <span>Logout</span>
+            </div>
           </li>
 
-
-          <li>
-            <NavLink to="/CEO/review-list" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-              display: "flex",
-              alignItems: "center"
-            })} >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <PlaylistRemoveIcon className="icon" style={{ color: "black" }} />
-                 <Badge
-                  badgeContent={pendingCount.rejectionCount}
-                  color="error"
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right"
-                  }}
-                  sx={{
-                    "& .MuiBadge-badge": {
-                      color: "white ! important",
-                      fontSize: "0.7rem",
-                      height: "16px",
-                      minWidth: "16px"
-                    }
-                  }}
-                >
-                  <span style={{ "margin-left": "-2%", paddingTop: "2px" }}>Rejection Center</span>
-                </Badge>
-              </div>
-            </NavLink>
-          </li>
-
-
-
-          <li>
-            <NavLink to="/CEO/dashboard-list" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <DashboardIcon className="icon" style={{ color: "black" }} />
-              <span>Dashboard</span>
-            </NavLink>
-          </li>
-
-
-
-          <li>
-            <NavLink to="/CEO/payment-list" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })}>
-              <PaymentsIcon className="icon" style={{ color: "black" }} />
-              <span>Payment Report</span>
-            </NavLink>
-          </li>
-
-
-
-          <li>
-            <NavLink to="/CEO/report-list" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <AssessmentIcon className="icon" style={{ color: "black" }} />
-              <span>Report Tab</span>
-            </NavLink>
-          </li>
-
-          <li>
-            <NavLink to="/CEO/resolution-list" style={({ isActive }) => ({
-              textDecoration: "none",
-              // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
-              borderRadius: "10px 0px 0px 10px ",
-              padding: "10px 4px",
-              width: "100%",
-              margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
-              <FormatListBulletedIcon className="icon" style={{ color: "black" }} />
-              <span>Resolution View</span>
-            </NavLink>
-          </li>
-
-          <li> {/* Profile click handler */}
-            <NavLink
-              to="/myprofile"
-              style={({ isActive }) => ({
-                textDecoration: "none",
-                // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-                backgroundColor: isActive ? '#ece8ff' : 'transparent',
-                borderRadius: "10px 0px 0px 10px ",
-                padding: "10px 4px",
-                width: "100%",
-                margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-              })}
-            >
-              <AccountCircleOutlinedIcon className="icon" style={{ color: "black" }} />
-              <span>Profile</span>
-            </NavLink>
-          </li>
-
-          <li>
-            <NavLink
-              to="/"
-              style={({ isActive }) => ({
-                textDecoration: "none",
-                // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-                backgroundColor: isActive ? '#ece8ff' : 'transparent',
-                borderRadius: "10px 0px 0px 10px ",
-                padding: "10px 4px",
-                width: "100%",
-                margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-              })}
-            >
-              <ExitToAppIcon className="icon" style={{ color: "black" }} />
-              <span onClick={handleLogout}>Logout</span>
-            </NavLink>
-          </li>
         </ul>
       </div>
     </div>

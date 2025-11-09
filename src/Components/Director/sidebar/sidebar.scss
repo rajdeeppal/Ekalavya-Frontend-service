@@ -43,17 +43,16 @@
       li {
         display: flex;
         align-items: center;
-        margin-bottom:  2px;
+        margin-bottom: 4px;
         cursor: pointer;
-        transition: background-color 0.3s ease, border-radius 0.3s ease; /* Smooth transition */
+        padding: 6px 8px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
 
         &:hover {
           background-color: #ece8ff;
-          padding:0px;
-          border-radius : 10px 0px 0px 10px ;
-        
+          // padding: 4px 9px;
         }
-
 
         .icon {
           font-size: 18px;
@@ -63,35 +62,24 @@
         span {
           font-size: 13px;
           font-weight: 600;
-          color: #888;
+          color: #555;
           margin-left: 10px;
         }
       }
-    }
-  }
 
-  .bottom {
-    display: flex;
-    align-items: center;
-    margin: 10px;
+      .menu>li {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
-    .colorOption {
-      width: 20px;
-      height: 20px;
-      border-radius: 5px;
-      border: 1px solid #7451f8;
-      cursor: pointer;
-      margin: 5px;
+      .submenu {
+        padding-left: .5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
-      &:nth-child(1) {
-        background-color: whitesmoke;
-      }
-      &:nth-child(2) {
-        background-color: #333;
-      }
-      &:nth-child(3) {
-        background-color: darkblue;
-      }
     }
   }
 }

@@ -43,6 +43,12 @@ import DirectorResolutionList from "./Components/Director/DirectorResolutionList
 import TrainingIframe from "./Components/PM/TrainingIframe";
 import TrainingInProgressTable from "./Components/PM/TrainingInProgressTable";
 import TrainingInProgressFrame from "./Components/PM/TrainingInProgressframe";
+import TrainingDirectorReviewPage from "./Components/Director/TrainingDirectorReviewPage";
+import TrainingDirectorRejectPage from "./Components/Director/TrainingDirectorRejectPage";
+import TrainingTrusteeReviewPage from "./Components/Trustee/TrainingTrusteeReviewPage";
+import TrainingTrusteeRejectPage from "./Components/Trustee/TrainingTrusteeRejectPage";
+import TrainingCEOReviewPage from "./Components/CEO/TrainingCEOReviewPage";
+import TrainingCEORejectPage from "./Components/CEO/TrainingCEORejectPage";
 
 function App() {
   const { userRole } = useAuth();
@@ -192,6 +198,24 @@ console.log(userRole);
       />
 
       <Route
+        path="/CEO/training/inprogress-list"
+        element={
+          <PrivateRoute requiredRoles={['CEO']}>
+            <TrainingCEOReviewPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/CEO/training/review-list"
+        element={
+          <PrivateRoute requiredRoles={['CEO']}>
+            <TrainingCEORejectPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
         path="/CEO/report-list"
         element={
           <PrivateRoute requiredRoles={['CEO']}>
@@ -223,6 +247,24 @@ console.log(userRole);
         element={
           <PrivateRoute requiredRoles={['TRUSTEE']}>
             <TrusteeRejectPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Trustee/training/inprogress-list"
+        element={
+          <PrivateRoute requiredRoles={['TRUSTEE']}>
+            <TrainingTrusteeReviewPage/>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Trustee/training/review-list"
+        element={
+          <PrivateRoute requiredRoles={['TRUSTEE']}>
+            <TrainingTrusteeRejectPage />
           </PrivateRoute>
         }
       />
@@ -334,6 +376,16 @@ console.log(userRole);
           </PrivateRoute>
         }
       />
+      
+
+      <Route
+        path="/Director/training/inprogress-list"
+        element={
+          <PrivateRoute requiredRoles={['PROJECT DIRECTOR']}>
+            <TrainingDirectorReviewPage />
+          </PrivateRoute>
+        }
+      />
 
       <Route
         path="/Director/review-list"
@@ -343,6 +395,16 @@ console.log(userRole);
           </PrivateRoute>
         }
       />
+
+      <Route
+        path="/Director/training/review-list"
+        element={
+          <PrivateRoute requiredRoles={['PROJECT DIRECTOR']}>
+            <TrainingDirectorRejectPage />
+          </PrivateRoute>
+        }
+      />
+      
 
       <Route
         path="/Director/resolution-list"
