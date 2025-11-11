@@ -495,7 +495,7 @@ const TrainingInProgressTable = ({ beneficiaries, value, setBeneficiaries, isRej
                                 <TableRow>
                                     <TableCell>{beneficiary.projectName}</TableCell>
                                     {showTraining === 'TRAINING_FORM' && <TableCell>{beneficiary.beneficiaryName}</TableCell>}
-                                    <TableCell>{beneficiary.components[0].activities[0].tasks[0].activityCode}</TableCell>
+                                    <TableCell>{beneficiary.activityCode}</TableCell>
                                     <TableCell>
                                         <Box display="flex" gap={1} justifyContent="flex-start" alignItems="center">
                                             <Button
@@ -558,7 +558,7 @@ const TrainingInProgressTable = ({ beneficiaries, value, setBeneficiaries, isRej
                                                                                                     </>}
                                                                                                 {showTraining === 'COMMON_EXP_FORM' && <TableCell>Type of Unit</TableCell>}
                                                                                                 <TableCell>Unit Rate</TableCell>
-                                                                                                <TableCell>No of Units (1)</TableCell>
+                                                                                                <TableCell>No of Units</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
                                                                                                 <TableCell>Remain Amount</TableCell>
                                                                                                 <TableCell>Actions</TableCell>

@@ -256,17 +256,7 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
                                                                                         {editActivityMode[`${beneficiaryIndex}-${componentIndex}-${activityIndex}-${taskIndex}`] ? (
                                                                                             <>
 
-                                                                                                <TableCell>
-                                                                                                    <TextField
-                                                                                                        variant="outlined"
-                                                                                                        size="small"
-                                                                                                        name="taskName"
-                                                                                                        value={task.taskName || ''}
-                                                                                                        onChange={(e) =>
-                                                                                                            handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
-                                                                                                        }
-                                                                                                    />
-                                                                                                </TableCell>
+                                                                                                <TableCell>{task.taskName}</TableCell>
 
 
                                                                                                 {showTraining === 'TRAINING_FORM' &&
@@ -338,6 +328,7 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
                                                                                                             }
                                                                                                         />
                                                                                                     </TableCell>}
+                                                                                                    
 
                                                                                                 {/* Editable Unit Rate */}
                                                                                                 <TableCell>
@@ -352,18 +343,7 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
                                                                                                     />
                                                                                                 </TableCell>
 
-                                                                                                {/* Editable Units */}
-                                                                                                <TableCell>
-                                                                                                    <TextField
-                                                                                                        variant="outlined"
-                                                                                                        size="small"
-                                                                                                        name="units"
-                                                                                                        value={task.units || ''}
-                                                                                                        onChange={(e) =>
-                                                                                                            handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
-                                                                                                        }
-                                                                                                    />
-                                                                                                </TableCell>
+                                                                                                <TableCell>{task.units}</TableCell>
 
                                                                                                 {/* Auto-calculated Total Cost (readonly or computed) */}
                                                                                                 <TableCell>

@@ -41,7 +41,7 @@ const TrainingForm = ({ isTraining, isExpenditure }) => {
         expertSubject: '',
         taskName: '',
         typeOfUnit: '',
-        units: '',
+        units: '1',
         ratePerUnit: '',
         totalCost: '',
     });
@@ -103,6 +103,15 @@ const TrainingForm = ({ isTraining, isExpenditure }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        
+        // Special validation for units field - prevent values less than 1
+        if (name === 'units') {
+            const numValue = parseFloat(value);
+            if (value !== '' && (!isNaN(numValue) && numValue < 1)) {
+                return; // Don't update state if value is less than 1
+            }
+        }
+        
         setFormData((prev) => ({
             ...prev,
             [name]: value,
@@ -196,7 +205,7 @@ const TrainingForm = ({ isTraining, isExpenditure }) => {
             expertSubject: '',
             taskName: '',
             typeOfUnit: '',
-            units: '',
+            units: '1',
             ratePerUnit: '',
             totalCost: '',
         });
@@ -391,6 +400,7 @@ const TrainingForm = ({ isTraining, isExpenditure }) => {
                     label="Units"
                     name="units"
                     type="number"
+                    inputProps={{ min: 1 }}
                     value={formData.units}
                     onChange={handleChange}
                     error={!!errors.units}

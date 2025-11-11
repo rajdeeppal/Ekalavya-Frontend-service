@@ -49,6 +49,8 @@ import TrainingTrusteeReviewPage from "./Components/Trustee/TrainingTrusteeRevie
 import TrainingTrusteeRejectPage from "./Components/Trustee/TrainingTrusteeRejectPage";
 import TrainingCEOReviewPage from "./Components/CEO/TrainingCEOReviewPage";
 import TrainingCEORejectPage from "./Components/CEO/TrainingCEORejectPage";
+import TrainingRejectIframe from "./Components/PM/TrainingRejectIframe";
+import TrainingFinalPreview from "./Components/PM/TrainingFinalPreview";
 
 function App() {
   const { userRole } = useAuth();
@@ -126,6 +128,17 @@ console.log(userRole);
           </PrivateRoute>
         }
       />
+      
+
+      <Route
+        path="/training-final-preview"
+        element={
+          <PrivateRoute requiredRoles={['PM']}>
+            <TrainingFinalPreview/>
+          </PrivateRoute>
+        }
+      />
+
       <Route
         path="/resolution"
         element={
@@ -319,6 +332,14 @@ console.log(userRole);
         element={
           <PrivateRoute requiredRoles={['PM']}>
             <RejectIframe />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/training-rejected"
+        element={
+          <PrivateRoute requiredRoles={['PM']}>
+            <TrainingRejectIframe />
           </PrivateRoute>
         }
       />

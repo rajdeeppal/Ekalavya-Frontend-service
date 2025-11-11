@@ -15,33 +15,24 @@ import {
     TextField,
     IconButton,
     Typography,
-    Box,
-    Modal,
-    Divider
 } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
 import {
     ExpandMore as ExpandMoreIcon,
     Edit as EditIcon,
     Save as SaveIcon,
-    Reviews,
 } from '@mui/icons-material';
-import Checkbox from '@mui/material/Checkbox';
-import Avatar from '@mui/material/Avatar';
 import DownloadIcon from '@mui/icons-material/Download';
-import { useAuth } from '../PrivateRoute';
 import * as XLSX from 'xlsx';
-import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-import { updatedResubmitSubTask, approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
+import { useAuth } from '../PrivateRoute';
+import { exportFinalPreviewDetails } from '../DataCenter/apiService';
 
-function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, isCEO, showTraining }) {
+const TrainingFinalPreviewList = ({ beneficiaries, value, isReview, showTraining }) => {
     const { userId } = useAuth();
-    const [remarks, setRemarks] = useState('');
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
-    const [comments, setComments] = useState([]);
     const [editMode, setEditMode] = useState({});
-    const [showViewConfirmation, setShowViewConfirmation] = useState(false);
-    const [newTask, setNewTask] = useState(true);
+    const [newTask, setNewTask] = useState(false);
 
     const toggleEditMode = (taskIndex, rowIndex) => {
         setEditMode((prevEditMode) => ({
@@ -61,101 +52,28 @@ function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsS
         }));
     };
 
-    const handleCloseViewConfirmation = () => {
-        setShowViewConfirmation(false);
-    };
-
-    const handleInputChange = (taskIndex, rowIndex, field, value) => {
-        setBeneficiaries((prevBeneficiaries) => {
-            return prevBeneficiaries.map((beneficiary) => ({
-                ...beneficiary,
-                components: beneficiary.components.map((component) => ({
-                    ...component,
-                    activities: component.activities.map((activity) => ({
-                        ...activity,
-                        tasks: activity.tasks.map((task) => {
-                            if (task.id === taskIndex) {
-                                const updatedTaskUpdates = [...task.taskUpdates];
-                                const updatedRow = {
-                                    ...updatedTaskUpdates[rowIndex],
-                                    [field]: value,
-                                };
-                                console.log(field)
-
-                                updatedTaskUpdates[rowIndex] = updatedRow;
-
-                                return { ...task, taskUpdates: updatedTaskUpdates };
-                            }
-                            return task;
-                        })
-                    }))
-                }))
-            }));
-        });
-    };
-
-    const handleSave = async (action, taskId, rowId, rowIndex) => {
-        const task = beneficiaries
-            .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
-            .find((t, i) => t.id === taskId);
-        const changedData = task.taskUpdates[rowIndex];
-        console.log(taskId)
-        if (action === 'Approve') {
-            try {
-                await approveDomainDetails(userId, rowId, changedData.remarks);
-                setIsSucess(true);
-                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
-                alert("Tasks have been approved successfully");
-            } catch (error) {
-                console.error("Error approving tasks:", error);
-                setIsSucess(true);
-                alert("An error occurred while approving the tasks. Please try again.");
-            }
-        } else {
-            try {
-                await rejectDomainDetails(userId, rowId, changedData.remarks);
-                setIsSucess(true);
-                console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
-                alert("Tasks have been rejected successfully");
-            } catch (error) {
-                console.error("Error tasks:", error);
-                setIsSucess(true);
-                const backendErrors = error.response?.data || 'An error occurred while rejecting the tasks. Please try again.';
-                alert(backendErrors);
-            }
-        }
-    };
-
-    const toggleViewMode = (comments) => {
-        setShowViewConfirmation(true);
-        setComments(comments);
-    };
-
-    const handleReview = async (action, taskId, rowId, rowIndex) => {
-        const task = beneficiaries
-            .flatMap((b) => b.components.flatMap((c) => c.activities.flatMap((a) => a.tasks)))
-            .find((t, i) => t.id === taskId);
-        const changedData = task.taskUpdates[rowIndex];
-        console.log(taskId)
-
+    const exportToExcel = async () => {
         try {
-            await updatedResubmitSubTask(userId, rowId, changedData.remarks);
-            console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
-            setIsSucess(true);
-            alert("Tasks have been approved successfully");
+            console.log("ok");
+            const data = await exportFinalPreviewDetails(userId, value);
+            alert(data);
+            console.log(beneficiaries);
+            console.log(beneficiaries);
         } catch (error) {
-            console.error("Error approving tasks:", error);
-            setIsSucess(true);
-            const backendErrors = error.response?.data || 'An error occurred while approving the tasks. Please try again.';
-            alert(backendErrors);
+            console.error('Error fetching activities:', error);
         }
     };
+
+
     return (
         <div style={{ padding: '20px' }} className='listContainer'>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom style={{ color: '#888' }}>
-                    Task List
+                    Preview List
                 </Typography>
+                <IconButton onClick={exportToExcel} >
+                    <DownloadIcon />
+                </IconButton>
             </div>
             <TableContainer component={Paper}>
                 <Table aria-label="beneficiary table">
@@ -255,7 +173,7 @@ function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsS
                                                                                                             <Button
                                                                                                                 variant="outlined"
                                                                                                                 color="primary"
-                                                                                                                onClick={() => toggleTaskDetails(taskIndex)}
+                                                                                                                onClick={() => toggleTaskDetails(task.id)}
 
                                                                                                             >
                                                                                                                 View
@@ -265,7 +183,7 @@ function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsS
                                                                                                     <TableRow>
                                                                                                         <TableCell colSpan={9} style={{ padding: 0 }}>
                                                                                                             <Collapse
-                                                                                                                in={taskDetailsOpen[taskIndex]}
+                                                                                                                in={taskDetailsOpen[task.id]}
                                                                                                                 timeout="auto"
                                                                                                                 unmountOnExit
                                                                                                             >
@@ -283,14 +201,13 @@ function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsS
                                                                                                                                     <TableCell>Account details</TableCell>
                                                                                                                                     <TableCell>Passbook Copy</TableCell>
                                                                                                                                     <TableCell>Other Document</TableCell>
-                                                                                                                                    {/*<TableCell>Domain Expert</TableCell>*/}
-                                                                                                                                    <TableCell>Reviews</TableCell>
-                                                                                                                                    <TableCell>Remarks</TableCell>
-                                                                                                                                    <TableCell>Actions</TableCell>
+                                                                                                                                    {/*{!isReview && <TableCell>Domain Expert</TableCell>}*/}
+                                                                                                                                    {isReview && <TableCell>Pending With</TableCell>}
+                                                                                                                                    {isReview && <TableCell>Payment Status</TableCell>}
                                                                                                                                 </TableRow>
                                                                                                                             </TableHead>
                                                                                                                             <TableBody>
-                                                                                                                                {(task.taskUpdates || []).map((row, rowIndex) => (
+                                                                                                                                {(task.taskUpdates || [])?.map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
                                                                                                                                         <TableCell>{row.achievementUnit}</TableCell>
                                                                                                                                         <TableCell>{row.revisedRatePerUnit}</TableCell>
@@ -304,22 +221,20 @@ function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsS
                                                                                                                                         </TableCell>
                                                                                                                                         <TableCell>{row.payeeName}</TableCell>
                                                                                                                                         <TableCell>{row.accountNumber}</TableCell>
-                                                                                                                                        <TableCell>
-                                                                                                                                            {row.passbookDoc ? (
-                                                                                                                                                <a
-                                                                                                                                                    href={row.passbookDoc.downloadUrl}
-                                                                                                                                                    download={row.passbookDoc.fileName}
-                                                                                                                                                    style={{
-                                                                                                                                                        textDecoration: 'underline',
-                                                                                                                                                        color: 'blue',
-                                                                                                                                                    }}
-                                                                                                                                                >
-                                                                                                                                                    {row.passbookDoc.fileName}
-                                                                                                                                                </a>
-                                                                                                                                            ) : (
-                                                                                                                                                <Typography>No Image</Typography>
-                                                                                                                                            )}
-                                                                                                                                        </TableCell>
+                                                                                                                                        <TableCell>{row.passbookDoc ? (<a
+                                                                                                                                            href={row.passbookDoc.downloadUrl}
+                                                                                                                                            download={row.passbookDoc.downloadUrl}
+                                                                                                                                            style={{
+                                                                                                                                                textDecoration: 'underline',
+                                                                                                                                                color: 'blue',
+                                                                                                                                            }}
+
+                                                                                                                                        >
+                                                                                                                                            {row.passbookDoc.fileName}
+                                                                                                                                        </a>
+                                                                                                                                        ) : (
+                                                                                                                                            <Typography>No Image</Typography>
+                                                                                                                                        )}</TableCell>
                                                                                                                                         <TableCell>
                                                                                                                                             {row.otherDocs &&
                                                                                                                                                 row.otherDocs.length > 0 ? (
@@ -341,51 +256,9 @@ function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsS
                                                                                                                                                 <Typography>No File Uploaded</Typography>
                                                                                                                                             )}
                                                                                                                                         </TableCell>
-                                                                                                                                        {/*<TableCell>{row.domainExpertEmpId}</TableCell>*/}
-                                                                                                                                        <TableCell>
-                                                                                                                                            <IconButton
-                                                                                                                                                color={
-                                                                                                                                                    'primary'
-                                                                                                                                                }
-                                                                                                                                                onClick={() => toggleViewMode(row.comments)}
-                                                                                                                                            >
-                                                                                                                                                <RemoveRedEyeOutlinedIcon />
-                                                                                                                                            </IconButton>
-                                                                                                                                        </TableCell>
-                                                                                                                                        <TableCell><TextField
-                                                                                                                                            variant="outlined"
-                                                                                                                                            size="small"
-                                                                                                                                            name="remarks"
-                                                                                                                                            value={row.remarks || ''}
-                                                                                                                                            onChange={(e) =>
-                                                                                                                                                handleInputChange(
-                                                                                                                                                    task.id,
-                                                                                                                                                    rowIndex,
-                                                                                                                                                    'remarks',
-                                                                                                                                                    e.target.value
-                                                                                                                                                )
-                                                                                                                                            }
-
-                                                                                                                                        /></TableCell>
-                                                                                                                                        <TableCell>
-                                                                                                                                            <Box sx={{ display: 'flex', gap: 0.5 }} >
-                                                                                                                                                <Button
-                                                                                                                                                    variant="contained"
-                                                                                                                                                    color="success"
-                                                                                                                                                    onClick={() => { isReview ? handleReview('Approve', task.id, row.id, rowIndex) : handleSave('Approve', task.id, row.id, rowIndex) }}
-                                                                                                                                                >
-                                                                                                                                                    Approve
-                                                                                                                                                </Button>
-                                                                                                                                                {!isCEO &&
-                                                                                                                                                    <Button
-                                                                                                                                                        variant="contained"
-                                                                                                                                                        color="error"
-                                                                                                                                                        onClick={() => handleSave('Reject', task.id, row.id, rowIndex)}
-                                                                                                                                                    >
-                                                                                                                                                        Reject
-                                                                                                                                                    </Button>}
-                                                                                                                                            </Box>
-                                                                                                                                        </TableCell>
+                                                                                                                                        {/*{!isReview && <TableCell>{row.domainExpertEmpId}</TableCell>}*/}
+                                                                                                                                        {isReview && <TableCell>{row.pendingWith}</TableCell>}
+                                                                                                                                        {isReview && <TableCell>{row.paymentStatus}</TableCell>}
                                                                                                                                     </TableRow>
                                                                                                                                 ))}
                                                                                                                             </TableBody>
@@ -419,99 +292,10 @@ function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsS
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Modal
-                open={showViewConfirmation}
-                onClose={handleCloseViewConfirmation}
-                aria-labelledby="confirmation-modal"
-                aria-describedby="confirmation-modal-description"
-            >
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 500,
-                        bgcolor: 'background.paper',
-                        boxShadow: 24,
-                        p: 4,
-                        borderRadius: '12px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 2,
-                    }}
-                >
-                    <Typography
-                        variant="h6"
-                        component="h2"
-                        sx={{ mb: 2, textAlign: 'center', fontWeight: 'bold' }}
-                    >
-                        Comments
-                    </Typography>
-                    <div
-                        className="comment-section"
-                        style={{
-                            maxHeight: '300px',
-                            overflowY: 'auto',
-                            padding: '8px',
-                            border: '1px solid #e0e0e0',
-                            borderRadius: '8px',
-                            background: '#f9f9f9',
-                        }}
-                    >
-                        {comments !== null ? <>
-                            {comments?.map((comment, id) => (
-                                <div
-                                    key={id}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'flex-start',
-                                        marginBottom: '16px',
-                                    }}
-                                >
-                                    <Avatar
-                                        sx={{
-                                            bgcolor: comment.role === 'Admin' ? 'primary.main' : 'secondary.main',
-                                            mr: 2,
-                                        }}
-                                    >
-                                        {comment.role.charAt(0)}
-                                    </Avatar>
-                                    <div>
-                                        <Typography
-                                            variant="subtitle1"
-                                            sx={{ fontWeight: 'bold', color: 'text.primary' }}
-                                        >
-                                            {comment.role}
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                            {comment.message}
-                                        </Typography>
-                                    </div>
-                                </div>
-                            ))}
-                        </> : <>No Remarks found</>}
-                    </div>
-                    <Divider sx={{ my: 2 }} />
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                        <button
-                            style={{
-                                padding: '8px 16px',
-                                backgroundColor: '#d32f2f',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                            }}
-                            onClick={handleCloseViewConfirmation}
-                        >
-                            Close
-                        </button>
-                    </Box>
-                </Box>
-            </Modal>
-        </div>
-    )
-}
 
-export default TrainingReviewTable;
+
+        </div >
+    );
+};
+
+export default TrainingFinalPreviewList;
