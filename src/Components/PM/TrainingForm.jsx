@@ -386,7 +386,6 @@ const TrainingForm = ({ isTraining, isExpenditure }) => {
                         margin="normal"
                         label="Type of Unit"
                         name="typeOfUnit"
-                        type="number"
                         value={formData.typeOfUnit}
                         onChange={handleChange}
                         error={!!errors.typeOfUnit}

@@ -343,7 +343,19 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
                                                                                                     />
                                                                                                 </TableCell>
 
-                                                                                                <TableCell>{task.units}</TableCell>
+                                                                                                                                                                                                {/* Editable Units */}
+                                                                                                <TableCell>
+                                                                                                    <TextField
+                                                                                                        variant="outlined"
+                                                                                                        size="small"
+                                                                                                        name="units"
+                                                                                                        value={task.units || ''}
+                                                                                                        onChange={(e) =>
+                                                                                                            handleActivityInputChange(beneficiaryIndex, componentIndex, activityIndex, taskIndex, e)
+                                                                                                        }
+                                                                                                    />
+                                                                                                </TableCell>
+
 
                                                                                                 {/* Auto-calculated Total Cost (readonly or computed) */}
                                                                                                 <TableCell>
