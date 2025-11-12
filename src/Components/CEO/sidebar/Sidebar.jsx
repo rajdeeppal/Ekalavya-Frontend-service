@@ -29,6 +29,7 @@ const Sidebar = ({ isSuccess }) => {
   const [openMenu, setOpenMenu] = useState({
     approve: false,
     reject: false,
+    dashboard: false,
   });
 
   useEffect(() => {
@@ -153,7 +154,19 @@ const Sidebar = ({ isSuccess }) => {
             </ul>
           )}
 
-          {renderSubLink("/CEO/dashboard-list", <DashboardIcon className="icon" />, "Dashboard")}
+          <li className="menu-header" onClick={() => toggleMenu("dashboard")}>
+            <div className="menu-title">
+              <DashboardIcon className="icon" />
+              <span>Dashboard</span>
+            </div>
+            {openMenu.dashboard ? <ExpandLess /> : <ExpandMore />}
+          </li>
+          {openMenu.dashboard && (
+            <ul className="submenu">
+              {renderSubLink("/CEO/dashboard-list", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Beneficiary Records")}
+              {renderSubLink("/CEO/dashboard/training-records", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Training/Other Exp Records")}
+            </ul>
+          )}
 
           {renderSubLink("/CEO/payment-list", <PaymentsIcon className="icon" />, "Payment Report")}
 

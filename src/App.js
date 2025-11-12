@@ -51,6 +51,7 @@ import TrainingCEOReviewPage from "./Components/CEO/TrainingCEOReviewPage";
 import TrainingCEORejectPage from "./Components/CEO/TrainingCEORejectPage";
 import TrainingRejectIframe from "./Components/PM/TrainingRejectIframe";
 import TrainingFinalPreview from "./Components/PM/TrainingFinalPreview";
+import TrainingCEODashboard from "./Components/CEO/TrainingCEODashboard";
 
 function App() {
   const { userRole } = useAuth();
@@ -323,6 +324,14 @@ console.log(userRole);
         element={
           <PrivateRoute requiredRoles={['CEO']}>
             <CEODashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/CEO/dashboard/training-records"
+        element={
+          <PrivateRoute requiredRoles={['CEO']}>
+            <TrainingCEODashboard />
           </PrivateRoute>
         }
       />
