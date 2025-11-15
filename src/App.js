@@ -52,6 +52,8 @@ import TrainingCEORejectPage from "./Components/CEO/TrainingCEORejectPage";
 import TrainingRejectIframe from "./Components/PM/TrainingRejectIframe";
 import TrainingFinalPreview from "./Components/PM/TrainingFinalPreview";
 import TrainingCEODashboard from "./Components/CEO/TrainingCEODashboard";
+import TrainingDomainExpertReviewPage from "./Components/DomainExpert/TrainingDomainExpertReviewPage";
+import TrainingDomainExpertRejectPage from "./Components/DomainExpert/TrainingDomainExpertRejectPage";
 
 function App() {
   const { userRole } = useAuth();
@@ -189,6 +191,24 @@ console.log(userRole);
         element={
           <PrivateRoute requiredRoles={['DOMAIN EXPERT', 'PROCUREMENT']}>
             <RejectPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/training/inprogress-list"
+        element={
+          <PrivateRoute requiredRoles={['DOMAIN EXPERT', 'PROCUREMENT']}>
+            <TrainingDomainExpertReviewPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/training/review-list"
+        element={
+          <PrivateRoute requiredRoles={['DOMAIN EXPERT', 'PROCUREMENT']}>
+            <TrainingDomainExpertRejectPage />
           </PrivateRoute>
         }
       />

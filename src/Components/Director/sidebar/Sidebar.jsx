@@ -59,8 +59,8 @@ const Sidebar = ({ isSuccess }) => {
         {icon}
         {badgeContent !== null ? (
           <Badge
-            badgeContent={badgeContent}
-            color={badgeColor}
+            // badgeContent={badgeContent}
+            // color={badgeColor}
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             sx={{
               "& .MuiBadge-badge": {
