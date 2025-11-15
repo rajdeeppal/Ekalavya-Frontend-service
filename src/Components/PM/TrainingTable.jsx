@@ -202,7 +202,7 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
                                 <TableRow>
                                     <TableCell>{beneficiary.projectName}</TableCell>
                                     {showTraining === 'TRAINING_FORM' && <TableCell>{beneficiary.beneficiaryName}</TableCell>}
-                                    <TableCell>{beneficiary.components[0].activities[0].tasks[0].activityCode}</TableCell>
+                                    <TableCell>{beneficiary.activityCode}</TableCell>
                                     <TableCell>
                                         <Button
                                             variant="contained"
@@ -244,7 +244,7 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
                                                                                         </>}
                                                                                     {showTraining === 'COMMON_EXP_FORM' && <TableCell>Type of Unit</TableCell>}
                                                                                     <TableCell>Unit Rate</TableCell>
-                                                                                    <TableCell>Unit Balance (1)</TableCell>
+                                                                                    <TableCell>Unit Balance</TableCell>
                                                                                     <TableCell>Total Cost</TableCell>
                                                                                     {showEdit && <TableCell>Actions</TableCell>}
                                                                                 </TableRow>
