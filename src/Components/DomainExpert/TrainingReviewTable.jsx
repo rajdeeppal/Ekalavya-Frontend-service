@@ -250,7 +250,7 @@ function TrainingReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsS
                                                                                                         {showTraining === 'COMMON_EXP_FORM' &&
                                                                                                             <TableCell>{task.typeOfUnit}</TableCell>}
                                                                                                         <TableCell>{task.ratePerUnit}</TableCell>
-                                                                                                        <TableCell>{task.units}</TableCell>
+                                                                                                        <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
                                                                                                         <TableCell>{task.balanceRemaining}</TableCell>
                                                                                                         <TableCell>
