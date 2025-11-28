@@ -299,7 +299,7 @@ const TrainingInProgressTable = ({ beneficiaries, value, setBeneficiaries, isRej
             accountNumber: parseInt(changedData.accountNumber, 10),
             revisedRatePerUnit: parseFloat(changedData.revisedRatePerUnit),
             benContribution: parseFloat(changedData.currentBeneficiaryContribution),
-            achievementUnit: parseInt(changedData.achievementUnit, 10),
+            achievementUnit: parseFloat(changedData.achievementUnit),
             currentCost: parseFloat(changedData.currentCost),
             procurementCheck: changedData.procurementCheck === true,
             ...(isReject && { remark: changedData.remarks }),
