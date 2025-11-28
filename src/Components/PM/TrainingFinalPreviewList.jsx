@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSnackbar } from 'notistack';
 import {
     Table,
     TableBody,
@@ -29,6 +30,7 @@ import { exportFinalPreviewDetails } from '../DataCenter/apiService';
 
 const TrainingFinalPreviewList = ({ beneficiaries, value, isReview, showTraining }) => {
     const { userId } = useAuth();
+    const { enqueueSnackbar } = useSnackbar();
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
@@ -56,7 +58,7 @@ const TrainingFinalPreviewList = ({ beneficiaries, value, isReview, showTraining
         try {
             console.log("ok");
             const data = await exportFinalPreviewDetails(userId, value);
-            alert(data);
+            enqueueSnackbar(data, { variant: 'success' });
             console.log(beneficiaries);
             console.log(beneficiaries);
         } catch (error) {

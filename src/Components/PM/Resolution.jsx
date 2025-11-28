@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSnackbar } from 'notistack';
 import { Box, Button, Grid, Container, FormControl, InputLabel, Select, MenuItem, Alert, IconButton } from '@mui/material';
 import Sidebar from './sidebar/Sidebar';
 import { useAuth } from '../PrivateRoute';
@@ -9,6 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 function Resolution() {
     const { userId } = useAuth();
+    const { enqueueSnackbar } = useSnackbar();
     const [selectedProject, setSelectedProject] = useState('');
     const [projects, setProjects] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -51,7 +53,7 @@ function Resolution() {
         try {
             console.log("ok");
             await uploadDetails(userId, formData);
-            alert("Resolution files are uploaded successfully");
+            enqueueSnackbar("Resolution files are uploaded successfully", { variant: 'success' });
             setSelectedProject("");
             setSelectedFiles([]);
         } catch (error) {

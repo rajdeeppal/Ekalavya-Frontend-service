@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSnackbar } from 'notistack';
 import { Box, TextField, Button, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
 import { saveProjectConfiguration, getVerticals } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 
 const ProjectForm = ({ addProject }) => {
   const { userId } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   const [project, setProject] = useState({
     projectName: '',
     verticalName: ''
@@ -43,13 +45,13 @@ const ProjectForm = ({ addProject }) => {
   const handleSubmit = async () => {
     try {
       await saveProjectConfiguration(userId, project);
-      alert('Project saved successfully!');
+      enqueueSnackbar('Project saved successfully!', { variant: 'success' });
       addProject(project); // Call addProject only after successful save
       setProject({ projectName: '', verticalName: '' }); // Reset form
 
     } catch (error) {
       console.error('Error saving beneficiary and task:', error);
-      alert('Failed to save. Please try again.');
+      enqueueSnackbar('Failed to save. Please try again.', { variant: 'error' });
     }
     addProject(project);
     console.log(project);

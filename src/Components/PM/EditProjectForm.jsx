@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useSnackbar } from 'notistack';
 import { Box, TextField, Button } from '@mui/material';
 import { updateProjectConfiguration } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 
 const EditProjectForm = ({ onClose }) => {
   const { userId } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   const [formData, setFormData] = useState({
     projectId: '',
     updatedProjectName: '',
@@ -29,11 +31,11 @@ const EditProjectForm = ({ onClose }) => {
 
     try {
       await updateProjectConfiguration(userId, formData);
-      alert('Project updated successfully!');
+      enqueueSnackbar('Project updated successfully!', { variant: 'success' });
       onClose(); // Close the modal after success
     } catch (error) {
       console.error('Error updating project:', error);
-      alert('Failed to update project. Please try again.');
+      enqueueSnackbar('Failed to update project. Please try again.', { variant: 'error' });
     }
   };
 

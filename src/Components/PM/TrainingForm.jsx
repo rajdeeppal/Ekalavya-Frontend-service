@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSnackbar } from 'notistack';
 import {
     Box,
     Container,
@@ -23,6 +24,7 @@ import { useAuth } from '../PrivateRoute';
 
 const TrainingForm = ({ isTraining, isExpenditure }) => {
     const { userId } = useAuth();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [projects, setProjects] = useState([]);
     const [components, setComponents] = useState([]);
@@ -179,16 +181,16 @@ const TrainingForm = ({ isTraining, isExpenditure }) => {
             let response;
             if (isTraining) {
                 response = await saveTrainingConfiguration(payload);
-                alert('Training data saved successfully!');
+                enqueueSnackbar('Training data saved successfully!', { variant: 'success' });
             } else {
                 response = await saveCommonExpenditureConfiguration(payload);
-                alert('Common expenditure data saved successfully!');
+                enqueueSnackbar('Common expenditure data saved successfully!', { variant: 'success' });
             }
             console.log('Saved data:', response);
             handleReset();
         } catch (error) {
             console.error('Error saving training data:', error);
-            alert('Failed to save. Please try again.');
+            enqueueSnackbar('Failed to save. Please try again.', { variant: 'error' });
         }
     };
 

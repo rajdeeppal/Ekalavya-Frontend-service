@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSnackbar } from 'notistack';
 import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
 import ActivityIframe from './ActivityIframe';
 import { getAadharDetails, getStateDetails, getDistrictDetails, getUserProjects, getComponentsByProject, getActivities, getTasks, saveBeneficiaryConfiguration } from '../DataCenter/apiService';
@@ -6,6 +7,7 @@ import { useAuth } from '../PrivateRoute';
 
 const BeneficiaryForm = ({ addBeneficiary }) => {
   const { userId } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   const [beneficiary, setBeneficiary] = useState({
     beneficiaryName: '',
     guardianName: '',
@@ -247,11 +249,11 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
     console.log(projectConfig);
     try {
       const response  = await saveBeneficiaryConfiguration(projectConfig);
-      alert('Beneficiary and Task saved successfully!');
+      enqueueSnackbar('Beneficiary and Task saved successfully!', { variant: 'success' });
       setTaskDetails({});
     } catch (error) {
       console.error('Error saving beneficiary and task:', error);
-      alert('Failed to save. Please try again.');
+      enqueueSnackbar('Failed to save. Please try again.', { variant: 'error' });
     }
   };
 

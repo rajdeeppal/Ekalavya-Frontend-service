@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSnackbar } from 'notistack';
 import { Button, Table, Collapse, TableContainer, Accordion, AccordionSummary, AccordionDetails, TextField, Modal, Box, Typography, TableHead, TableBody, TableCell, TableRow, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
@@ -9,6 +10,7 @@ import { useAuth } from '../PrivateRoute';
 
 const BeneficiaryTable = ({ beneficiaries, value, setBeneficiaries, setIsSucess }) => {
   const { userId } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = useState({});
   const [editActivityMode, setEditActivityMode] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -105,7 +107,7 @@ const BeneficiaryTable = ({ beneficiaries, value, setBeneficiaries, setIsSucess 
       const data = await updateActivityTask(taskId, criteria);
       // setBeneficiaries(Array.isArray(data) ? data : []);
       setIsSucess(true)
-      alert("Activites are submitted successfully");
+      enqueueSnackbar('Activities are submitted successfully', { variant: 'success' });
     } catch (error) {
       setIsSucess(true);
       console.error('Error fetching activities:', error);
@@ -132,7 +134,7 @@ const BeneficiaryTable = ({ beneficiaries, value, setBeneficiaries, setIsSucess 
       console.log("submit", data);
       await submitDetails(data);
       setIsSucess(true);
-      alert("Beneficiary have been submitted successfully");
+      enqueueSnackbar('Beneficiary have been submitted successfully', { variant: 'success' });
       setShowConfirmation(false);
     } catch (error) {
       setIsSucess(true);
@@ -148,7 +150,7 @@ const BeneficiaryTable = ({ beneficiaries, value, setBeneficiaries, setIsSucess 
       }
       await bulkSubmitDetails(data);
       setIsSucess(true);
-      alert("Beneficiary have been submitted successfully");
+      enqueueSnackbar('Beneficiary have been submitted successfully', { variant: 'success' });
       setShowConfirmation(false);
     } catch (error) {
       setIsSucess(true);
@@ -164,7 +166,7 @@ const BeneficiaryTable = ({ beneficiaries, value, setBeneficiaries, setIsSucess 
     try {
       console.log("ok");
       const data = await exportSanctionDetails(userId, value);
-      alert(data);
+      enqueueSnackbar(data, { variant: 'success' });
       console.log(beneficiaries);
       console.log(beneficiaries);
     } catch (error) {

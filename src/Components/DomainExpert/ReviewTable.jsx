@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSnackbar } from 'notistack';
 import {
     Table,
     TableBody,
@@ -35,6 +36,7 @@ import { updatedResubmitSubTask, approveDomainDetails, rejectDomainDetails } fro
 
 function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, isCEO }) {
     const { userId } = useAuth();
+    const { enqueueSnackbar } = useSnackbar();
     const [remarks, setRemarks] = useState('');
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
@@ -109,7 +111,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
             } catch (error) {
                 console.error("Error approving tasks:", error);
                 setIsSucess(true);
-                alert("An error occurred while approving the tasks. Please try again.");
+                enqueueSnackbar('An error occurred while approving the tasks. Please try again.', { variant: 'error' });
             }
         } else {
             try {
@@ -142,12 +144,12 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
             await updatedResubmitSubTask(userId, rowId, changedData.remarks);
             console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
             setIsSucess(true);
-            alert("Tasks have been approved successfully");
+            enqueueSnackbar('Tasks have been approved successfully', { variant: 'success' });
         } catch (error) {
             console.error("Error approving tasks:", error);
             setIsSucess(true);
             const backendErrors = error.response?.data || 'An error occurred while approving the tasks. Please try again.';
-            alert(backendErrors);
+            enqueueSnackbar(backendErrors, { variant: 'error' });
         }
     };
     return (

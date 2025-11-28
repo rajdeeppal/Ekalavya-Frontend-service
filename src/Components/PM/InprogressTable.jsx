@@ -35,6 +35,7 @@ import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import Checkbox from '@mui/material/Checkbox';
 import { useAuth } from '../PrivateRoute';
 import { exportInProgressDetails } from '../DataCenter/apiService';
+import { useSnackbar } from 'notistack';
 
 const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, setIsSucess }) => {
     const { userId } = useAuth();
@@ -53,6 +54,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
     const [comments, setComments] = useState([]);
     const [id, setId] = useState([]);
     const [isBulk, setIsBulk] = useState(false);
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         async function fetchDomain() {
@@ -153,11 +155,11 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
             console.log("submit", filteredData);
             await submitInProgressDetails(filteredData);
             setIsSucess(true);
-            alert("Beneficiary have been submitted successfully");
+            enqueueSnackbar('Beneficiary have been submitted successfully', { variant: 'success' });
             setShowConfirmation(false);
         } catch (error) {
             setIsSucess(true);
-            alert(error);
+            enqueueSnackbar(error.message || 'Error fetching activities:', { variant: 'error' });
             console.error('Error fetching activities:', error);
         }
     };
@@ -256,12 +258,12 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
     const handleDeleteConfirmSubmit = async () => {
         try {
             await deletedBeneficiaryTask(deleteId);
-            alert('Beneficiary deleted successfully!');
+            enqueueSnackbar('Beneficiary deleted successfully!', { variant: 'success' });
             setShowDeleteConfirmation(false);
         } catch (error) {
             const backendErrors = error.response?.data || 'Error registering user. Please try again.';
             console.error(backendErrors);
-            alert(backendErrors);
+            enqueueSnackbar(backendErrors, { variant: 'error' });
         }
     }
 
@@ -331,7 +333,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                 setNewTask(false);
                 firstTask = false;
                 setIsSucess(true);
-                alert('Project saved successfully!');
+                enqueueSnackbar('Project saved successfully!', { variant: 'success' });
 
             } else {
                 if (isReject) {
@@ -339,13 +341,13 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                     console.log(formData);
                     await updatedResubmitBeneficiarySubTask(row, formData);
                     setIsSucess(true);
-                    alert('Project saved successfully!');
+                    enqueueSnackbar('Project saved successfully!', { variant: 'success' });
                 } else {
                     console.log(task.taskUpdates[rowIndex].passbookDoc);
                     console.log(formData);
                     await updatedBeneficiarySubTask(row, formData);
                     setIsSucess(true);
-                    alert('Project saved successfully!');
+                    enqueueSnackbar('Project saved successfully!', { variant: 'success' });
                 }
             }
 
@@ -354,7 +356,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
             console.error("Error submitting task update:", error);
             setIsSucess(true);
             const backendErrors = error.response?.data || 'An error occurred while updating the task.';
-            alert(backendErrors);
+            enqueueSnackbar(backendErrors, { variant: 'error' });
         }
 
     };
@@ -445,7 +447,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                         // Add new files to the existing array
                         task.taskUpdates[rowIndex].otherDocs.push(...pdfFileURLs);
                     } else {
-                        alert('Only PDF format is allowed for other documents.');
+                        enqueueSnackbar('Only PDF format is allowed for other documents.', { variant: 'warning' });
                     }
                     console.log(pdfFiles)
                 }
@@ -460,7 +462,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
         try {
             console.log("ok");
             const data = await exportInProgressDetails(userId, value);
-            alert(data);
+            enqueueSnackbar(data, { variant: 'success' });
             console.log(beneficiaries);
             console.log(beneficiaries);
         } catch (error) {

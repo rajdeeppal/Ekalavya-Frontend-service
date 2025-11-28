@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
 import { Button, Modal, Typography, Box, Grid } from '@mui/material';
 import SearchBar from './SearchBar';
 import ProjectForm from './ProjectForm';
@@ -13,6 +14,7 @@ import { useAuth } from '../PrivateRoute';
 
 const MainApp = () => {
   const { userId } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
   const [isSuccess, setIsSucess] = useState(false);
   const [projects, setProjects] = useState([]);
   const [showEditProjectModal, setShowEditProjectModal] = useState(false);
@@ -57,7 +59,7 @@ const MainApp = () => {
       console.log(isSuccess);
     } catch (error) {
       setShowTable(false);
-      alert(error);
+      enqueueSnackbar(error.message || 'Error fetching activities', { variant: 'error' });
       console.error('Error fetching activities:', error);
     }
   };
@@ -84,18 +86,18 @@ const MainApp = () => {
 
   const handleUploadTemplate = async () => {
     if (!selectedFile) {
-      alert("Please select a file first.");
+      enqueueSnackbar('Please select a file first.', { variant: 'warning' });
       return;
     }
 
     try {
       const responseMessage = await uploadTemplate(userId, selectedFile);
-      alert(`Upload Successful: ${responseMessage}`);
+      enqueueSnackbar(`Upload Successful: ${responseMessage}`, { variant: 'success' });
       setShowUploadModal(false);
       setSelectedFile(null);
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("File upload failed. Please try again.");
+      enqueueSnackbar("File upload failed. Please try again.", { variant: 'error' });
     }
   };
 

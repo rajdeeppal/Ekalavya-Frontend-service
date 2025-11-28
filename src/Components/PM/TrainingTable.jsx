@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSnackbar } from 'notistack';
 import { Button, Table, Collapse, TableContainer, Accordion, AccordionSummary, AccordionDetails, TextField, Modal, Box, Typography, TableHead, TableBody, TableCell, TableRow, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
@@ -9,6 +10,7 @@ import { useAuth } from '../PrivateRoute';
 
 const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, showTraining }) => {
     const { userId } = useAuth();
+    const { enqueueSnackbar } = useSnackbar();
     const [open, setOpen] = useState({});
     const [editActivityMode, setEditActivityMode] = useState({});
     const [showConfirmation, setShowConfirmation] = useState(false);
@@ -103,10 +105,10 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
             console.log("Updating task:", taskId);
             if (showTraining === 'TRAINING_FORM') {
                 data = await updateTrainingTask(taskId, criteria);
-                alert("Updating Training Form Task");
+                enqueueSnackbar('Training Form Task updated successfully', { variant: 'success' });
             } else {
                 data = await updateCommonExpTask(taskId, criteria);
-                alert("Updating Common Expenditure Form Task");
+                enqueueSnackbar('Common Expenditure Form Task updated successfully', { variant: 'success' });
             }
 
             setIsSuccess(true);
@@ -138,7 +140,7 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
             console.log("submit", data);
             await submitDetails(data);
             setIsSuccess(true);
-            alert("Beneficiary have been submitted successfully");
+            enqueueSnackbar('Beneficiary have been submitted successfully', { variant: 'success' });
             setShowConfirmation(false);
         } catch (error) {
             setIsSuccess(false);
@@ -154,7 +156,7 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
             }
             await bulkSubmitDetails(data);
             setIsSuccess(true);
-            alert("Beneficiary have been submitted successfully");
+            enqueueSnackbar('Beneficiary have been submitted successfully', { variant: 'success' });
             setShowConfirmation(false);
         } catch (error) {
             setIsSuccess(false);
@@ -170,7 +172,7 @@ const TrainingTable = ({ beneficiaries, value, setBeneficiaries, setIsSuccess, s
         try {
             console.log("ok");
             const data = await exportSanctionDetails(userId, value);
-            alert(data);
+            enqueueSnackbar(data, { variant: 'success' });
             console.log(beneficiaries);
             console.log(beneficiaries);
         } catch (error) {
