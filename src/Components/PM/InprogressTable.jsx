@@ -564,6 +564,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                 <TableCell>Type of Unit</TableCell>
                                                                                                 <TableCell>Unit Rate</TableCell>
                                                                                                 <TableCell>Financial Extension</TableCell>
+                                                                                                <TableCell>Sanction Units</TableCell>
                                                                                                 <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
                                                                                                 <TableCell>Beneficiary Contribution Balance</TableCell>
@@ -582,6 +583,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                         <TableCell>
                                                                                                             {task.financialExtension ? 'Y' : 'N'}
                                                                                                         </TableCell>
+                                                                                                        <TableCell>{task.units}</TableCell>
                                                                                                         <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
                                                                                                         <TableCell>{task.beneficiaryContributionRemain}</TableCell>
