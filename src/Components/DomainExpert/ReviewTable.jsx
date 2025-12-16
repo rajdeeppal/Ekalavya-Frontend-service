@@ -232,6 +232,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
                                                                                                 <TableCell>Type of Unit</TableCell>
                                                                                                 <TableCell>Unit Rate</TableCell>
                                                                                                 <TableCell>Financial Extension</TableCell>
+                                                                                                <TableCell>Sanction Units</TableCell>
                                                                                                 <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
                                                                                                 <TableCell>Beneficiary Contribution Balance</TableCell>
@@ -250,6 +251,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
                                                                                                         <TableCell>
                                                                                                             {task.financialExtension ? 'Y' : 'N'}
                                                                                                         </TableCell>
+                                                                                                        <TableCell>{task.units}</TableCell>
                                                                                                         <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
                                                                                                         <TableCell>{task.beneficiaryContributionRemain}</TableCell>
