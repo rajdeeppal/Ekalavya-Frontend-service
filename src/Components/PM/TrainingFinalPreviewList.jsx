@@ -53,6 +53,18 @@ const TrainingFinalPreviewList = ({ beneficiaries, value, isReview, showTraining
             [taskIndex]: !prevState[taskIndex],
         }));
     };
+const formatDateTime = (value) => {
+    if (!value) return '-';
+
+    return new Date(value).toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+    });
+};
 
     const exportToExcel = async () => {
         try {
@@ -84,7 +96,8 @@ const TrainingFinalPreviewList = ({ beneficiaries, value, isReview, showTraining
                             <TableCell>Project Name</TableCell>
                             {showTraining === 'TRAINING_FORM' &&
                                 <TableCell>Resource Person Name</TableCell>}
-                            <TableCell>Activity Code</TableCell>
+                            {showTraining ===  'TRAINING_FORM' && <TableCell>Training Name</TableCell>}
+                            {showTraining ===  'COMMON_EXP_FORM' && <TableCell>Description</TableCell>}
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -131,57 +144,120 @@ const TrainingFinalPreviewList = ({ beneficiaries, value, isReview, showTraining
                                                                                 <Typography>{activity.activityName}</Typography>
                                                                             </AccordionSummary>
                                                                             <AccordionDetails>
-                                                                                <TableContainer component={Paper} sx={{ mb: 2 }}>
+                                                                                <TableContainer
+                                                                                    component={Paper}
+                                                                                    sx={{
+                                                                                        mb: 2,
+                                                                                        overflowX: 'auto',
+                                                                                        maxWidth: '100%',
+                                                                                    }}
+                                                                                >
+
                                                                                     <Table size="small" aria-label="tasks table">
-                                                                                        <TableHead>
-                                                                                            <TableRow>
-                                                                                                <TableCell>Name of the Work</TableCell>
-                                                                                                {showTraining === 'TRAINING_FORM' &&
-                                                                                                    <>
 
-                                                                                                        <TableCell>Male count</TableCell>
-                                                                                                        <TableCell>Female count</TableCell>
-                                                                                                        <TableCell>Other count</TableCell>
-                                                                                                        <TableCell>Expert Subject Name</TableCell>
-                                                                                                    </>}
-                                                                                                {showTraining === 'COMMON_EXP_FORM' && <TableCell>Type of Unit</TableCell>}
-                                                                                                <TableCell>Unit Rate</TableCell>
-                                                                                                <TableCell>No of Units </TableCell>
-                                                                                                <TableCell>Total Cost</TableCell>
-                                                                                                <TableCell>Remain Amount</TableCell>
-                                                                                                <TableCell>Actions</TableCell>
-                                                                                            </TableRow>
-                                                                                        </TableHead>
                                                                                         <TableBody>
-                                                                                            {activity.tasks?.map((task, taskIndex) => (
-                                                                                                <React.Fragment key={task.id}>
-                                                                                                    <TableRow>
-                                                                                                        <TableCell>{task.taskName}</TableCell>
-                                                                                                        {showTraining === 'TRAINING_FORM' &&
-                                                                                                            <>
+                                                                                          {activity.tasks?.map((task, taskIndex) => (
+                                                                                            <React.Fragment key={task.id}>
 
-                                                                                                                <TableCell>{task.maleCount}</TableCell>
-                                                                                                                <TableCell>{task.femaleCount}</TableCell>
-                                                                                                                <TableCell>{task.otherCount}</TableCell>
-                                                                                                                <TableCell>{task.expertSubject}</TableCell>
-                                                                                                            </>}
-                                                                                                        {showTraining === 'COMMON_EXP_FORM' &&
-                                                                                                            <TableCell>{task.typeOfUnit}</TableCell>}
-                                                                                                        <TableCell>{task.ratePerUnit}</TableCell>
-                                                                                                        <TableCell>{task.unitRemain}</TableCell>
-                                                                                                        <TableCell>{task.totalCost}</TableCell>
-                                                                                                        <TableCell>{task.balanceRemaining}</TableCell>
-                                                                                                        <TableCell>
-                                                                                                            <Button
-                                                                                                                variant="outlined"
-                                                                                                                color="primary"
-                                                                                                                onClick={() => toggleTaskDetails(task.id)}
+                                                                                              {/* ================= TRAINING FORM ================= */}
+                                                                                              {showTraining === 'TRAINING_FORM' && (
+                                                                                                <>
+                                                                                                  {/* HEADER 1 */}
+                                                                                                  <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                                                                                                    <TableCell>Name of the Work</TableCell>
+                                                                                                    <TableCell>Male</TableCell>
+                                                                                                    <TableCell>Female</TableCell>
+                                                                                                    <TableCell>Other</TableCell>
+                                                                                                    <TableCell>Duration</TableCell>
+                                                                                                    <TableCell>Category</TableCell>
+                                                                                                    <TableCell>Venue</TableCell>
+                                                                                                    <TableCell>Time From</TableCell>
+                                                                                                    <TableCell>Time To</TableCell>
+                                                                                                  </TableRow>
 
-                                                                                                            >
-                                                                                                                View
-                                                                                                            </Button>
-                                                                                                        </TableCell>
-                                                                                                    </TableRow>
+                                                                                                  {/* VALUE 1 */}
+                                                                                                  <TableRow>
+                                                                                                    <TableCell>{task.taskName}</TableCell>
+                                                                                                    <TableCell>{task.maleCount}</TableCell>
+                                                                                                    <TableCell>{task.femaleCount}</TableCell>
+                                                                                                    <TableCell>{task.otherCount}</TableCell>
+                                                                                                    <TableCell>{task.trainingDuration}</TableCell>
+                                                                                                    <TableCell>{task.participantCategory}</TableCell>
+                                                                                                    <TableCell>{task.venue}</TableCell>
+                                                                                                    <TableCell>{formatDateTime(task.timeFrom)}</TableCell>
+                                                                                                    <TableCell>{formatDateTime(task.timeTo)}</TableCell>
+                                                                                                  </TableRow>
+
+                                                                                                  {/* HEADER 2 */}
+                                                                                                  <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                                                                                                    <TableCell>Expert Subject</TableCell>
+                                                                                                    <TableCell>Unit Rate</TableCell>
+                                                                                                    <TableCell>Sanction Units</TableCell>
+                                                                                                    <TableCell>Unit Balance</TableCell>
+                                                                                                    <TableCell>Total Cost</TableCell>
+                                                                                                    <TableCell>Remain Amount</TableCell>
+                                                                                                    <TableCell colSpan={3}>Actions</TableCell>
+                                                                                                  </TableRow>
+
+                                                                                                  {/* VALUE 2 */}
+                                                                                                  <TableRow>
+                                                                                                    <TableCell>{task.expertSubject}</TableCell>
+                                                                                                    <TableCell>{task.ratePerUnit}</TableCell>
+                                                                                                    <TableCell>{task.units}</TableCell>
+                                                                                                    <TableCell>{task.unitRemain}</TableCell>
+                                                                                                    <TableCell>{task.totalCost}</TableCell>
+                                                                                                    <TableCell>{task.balanceRemaining}</TableCell>
+                                                                                                    <TableCell colSpan={3}>
+                                                                                                      <Button
+                                                                                                        variant="outlined"
+                                                                                                        color="primary"
+                                                                                                        onClick={() => toggleTaskDetails(task.id)}
+                                                                                                      >
+                                                                                                        View
+                                                                                                      </Button>
+                                                                                                    </TableCell>
+                                                                                                  </TableRow>
+                                                                                                </>
+                                                                                              )}
+
+                                                                                              {/* ================= COMMON EXP FORM ================= */}
+                                                                                              {showTraining === 'COMMON_EXP_FORM' && (
+                                                                                                <>
+                                                                                                  {/* HEADER */}
+                                                                                                  <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                                                                                                    <TableCell>Name of the Work</TableCell>
+                                                                                                    <TableCell>Type of Unit</TableCell>
+                                                                                                    <TableCell>Unit Rate</TableCell>
+                                                                                                    <TableCell>Sanction Units</TableCell>
+                                                                                                    <TableCell>Unit Balance</TableCell>
+                                                                                                    <TableCell>Total Cost</TableCell>
+                                                                                                    <TableCell>Community Contribution Balance</TableCell>
+                                                                                                    <TableCell>Remain Amount</TableCell>
+                                                                                                    <TableCell>Actions</TableCell>
+                                                                                                  </TableRow>
+
+                                                                                                  {/* VALUE */}
+                                                                                                  <TableRow>
+                                                                                                    <TableCell>{task.taskName}</TableCell>
+                                                                                                    <TableCell>{task.typeOfUnit}</TableCell>
+                                                                                                    <TableCell>{task.ratePerUnit}</TableCell>
+                                                                                                    <TableCell>{task.units}</TableCell>
+                                                                                                    <TableCell>{task.unitRemain}</TableCell>
+                                                                                                    <TableCell>{task.totalCost}</TableCell>
+                                                                                                    <TableCell>{task.beneficiaryContributionRemain}</TableCell>
+                                                                                                    <TableCell>{task.balanceRemaining}</TableCell>
+                                                                                                    <TableCell>
+                                                                                                      <Button
+                                                                                                        variant="outlined"
+                                                                                                        color="primary"
+                                                                                                        onClick={() => toggleTaskDetails(task.id)}
+                                                                                                      >
+                                                                                                        View
+                                                                                                      </Button>
+                                                                                                    </TableCell>
+                                                                                                  </TableRow>
+                                                                                                </>
+                                                                                              )}
                                                                                                     <TableRow>
                                                                                                         <TableCell colSpan={9} style={{ padding: 0 }}>
                                                                                                             <Collapse
@@ -190,40 +266,65 @@ const TrainingFinalPreviewList = ({ beneficiaries, value, isReview, showTraining
                                                                                                                 unmountOnExit
                                                                                                             >
                                                                                                                 <div style={{ padding: '10px' }}>
-                                                                                                                    <TableContainer component={Paper} sx={{ mb: 2 }}>
-                                                                                                                        <Table size="small" aria-label="task details table">
-                                                                                                                            <TableHead>
+                                                                                                                    <TableContainer
+                                                                                                                        component={Paper}
+                                                                                                                        sx={{
+                                                                                                                            mb: 2,
+                                                                                                                            overflowX: 'auto',
+                                                                                                                            maxWidth: '100%',
+                                                                                                                        }}
+                                                                                                                    >
+                                                                                                                        <Table
+                                                                                                                            size="small"
+                                                                                                                            aria-label="task details table"
+                                                                                                                            sx={{
+                                                                                                                                tableLayout: 'fixed',
+                                                                                                                                minWidth: 1200,
+                                                                                                                            }}
+                                                                                                                        >
+                                                                                                                            <TableHead sx={{
+                                                                                                                                           position: 'sticky',
+                                                                                                                                           top: 0,
+                                                                                                                                           backgroundColor: '#fafafa',
+                                                                                                                                           zIndex: 1,
+                                                                                                                                       }}>
                                                                                                                                 <TableRow>
-                                                                                                                                    <TableCell>Unit Achievement</TableCell>
-                                                                                                                                    <TableCell>Discounted Rate</TableCell>
-                                                                                                                                    <TableCell>Beneficiary Contribution</TableCell>
-                                                                                                                                    <TableCell>Current Cost</TableCell>
-                                                                                                                                    <TableCell>Procurement Check</TableCell>
-                                                                                                                                    <TableCell>Payee Name</TableCell>
-                                                                                                                                    <TableCell>Account details</TableCell>
-                                                                                                                                    <TableCell>Passbook Copy</TableCell>
-                                                                                                                                    <TableCell>Other Document</TableCell>
-                                                                                                                                    {/*{!isReview && <TableCell>Domain Expert</TableCell>}*/}
-                                                                                                                                    {isReview && <TableCell>Pending With</TableCell>}
-                                                                                                                                    {isReview && <TableCell>Payment Status</TableCell>}
+                                                                                                                                    <TableCell sx={{ minWidth: 120 }}>Unit Achievement</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 130 }}>Discounted Rate</TableCell>
+
+                                                                                                                                    {showTraining === 'COMMON_EXP_FORM' && (
+                                                                                                                                        <TableCell sx={{ minWidth: 160 }}>
+                                                                                                                                            Community Contribution
+                                                                                                                                        </TableCell>
+                                                                                                                                    )}
+
+                                                                                                                                    <TableCell sx={{ minWidth: 120 }}>Current Cost</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 150 }}>Procurement Check</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 140 }}>Payee Name</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 160 }}>Account Details</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 160 }}>Passbook Copy</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 180 }}>Other Document</TableCell>
+
+                                                                                                                                    {isReview && <TableCell sx={{ minWidth: 140 }}>Pending With</TableCell>}
+                                                                                                                                    {isReview && <TableCell sx={{ minWidth: 140 }}>Payment Status</TableCell>}
                                                                                                                                 </TableRow>
                                                                                                                             </TableHead>
                                                                                                                             <TableBody>
                                                                                                                                 {(task.taskUpdates || [])?.map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
-                                                                                                                                        <TableCell>{row.achievementUnit}</TableCell>
-                                                                                                                                        <TableCell>{row.revisedRatePerUnit}</TableCell>
-                                                                                                                                        <TableCell>{row.currentBeneficiaryContribution}</TableCell>
-                                                                                                                                        <TableCell>{row.currentCost}</TableCell>
-                                                                                                                                        <TableCell>
+                                                                                                                                        <TableCell sx={{ minWidth: 120 }}>{row.achievementUnit}</TableCell>
+                                                                                                                                        <TableCell sx={{ minWidth: 130 }}>{row.revisedRatePerUnit}</TableCell>
+                                                                                                                                        {showTraining === 'COMMON_EXP_FORM' && <TableCell sx={{ minWidth: 160 }}>{row.currentBeneficiaryContribution}</TableCell>}
+                                                                                                                                        <TableCell sx={{ minWidth: 120 }}>{row.currentCost}</TableCell>
+                                                                                                                                        <TableCell sx={{ minWidth: 150 }}>
                                                                                                                                             <Checkbox
                                                                                                                                                 checked={row.procurementCheck || false}
                                                                                                                                                 disabled
                                                                                                                                             />
                                                                                                                                         </TableCell>
-                                                                                                                                        <TableCell>{row.payeeName}</TableCell>
-                                                                                                                                        <TableCell>{row.accountNumber}</TableCell>
-                                                                                                                                        <TableCell>{row.passbookDoc ? (<a
+                                                                                                                                        <TableCell sx={{ minWidth: 140 }}>{row.payeeName}</TableCell>
+                                                                                                                                        <TableCell sx={{ minWidth: 160 }}>{row.accountNumber}</TableCell>
+                                                                                                                                        <TableCell sx={{ minWidth: 160 }}l>{row.passbookDoc ? (<a
                                                                                                                                             href={row.passbookDoc.downloadUrl}
                                                                                                                                             download={row.passbookDoc.downloadUrl}
                                                                                                                                             style={{
@@ -237,7 +338,7 @@ const TrainingFinalPreviewList = ({ beneficiaries, value, isReview, showTraining
                                                                                                                                         ) : (
                                                                                                                                             <Typography>No Image</Typography>
                                                                                                                                         )}</TableCell>
-                                                                                                                                        <TableCell>
+                                                                                                                                        <TableCell sx={{ minWidth: 180 }}>
                                                                                                                                             {row.otherDocs &&
                                                                                                                                                 row.otherDocs.length > 0 ? (
                                                                                                                                                 row.otherDocs.map((file, idx) => (

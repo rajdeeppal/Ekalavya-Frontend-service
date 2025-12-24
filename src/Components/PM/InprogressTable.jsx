@@ -559,7 +559,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                 <TableContainer component={Paper} sx={{ mb: 2 }}>
                                                                                     <Table size="small" aria-label="tasks table">
                                                                                         <TableHead>
-                                                                                            <TableRow>
+                                                                                            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
                                                                                                 <TableCell>Name of the Work</TableCell>
                                                                                                 <TableCell>Type of Unit</TableCell>
                                                                                                 <TableCell>Unit Rate</TableCell>
@@ -608,22 +608,41 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                 unmountOnExit
                                                                                                             >
                                                                                                                 <div style={{ padding: '10px' }}>
-                                                                                                                    <TableContainer component={Paper} sx={{ mb: 2 }}>
-                                                                                                                        <Table size="small" aria-label="task details table">
-                                                                                                                            <TableHead>
+                                                                                                                    <TableContainer
+                                                                                                                                                                                                                                            component={Paper}
+                                                                                                                                                                                                                                            sx={{
+                                                                                                                                                                                                                                                mb: 2,
+                                                                                                                                                                                                                                                overflowX: 'auto',
+                                                                                                                                                                                                                                                maxWidth: '100%',
+                                                                                                                                                                                                                                            }}
+                                                                                                                                                                                                                                        >
+                                                                                                                        <Table
+                                                                                                                                                                                                                                                    size="small"
+                                                                                                                                                                                                                                                    aria-label="task details table"
+                                                                                                                                                                                                                                                    sx={{
+                                                                                                                                                                                                                                                        tableLayout: 'fixed',
+                                                                                                                                                                                                                                                        minWidth: 1200,
+                                                                                                                                                                                                                                                    }}
+                                                                                                                                                                                                                                                >
+                                                                                                                            <TableHead sx={{
+                                                                                                                                                                                                                                                                                  position: 'sticky',
+                                                                                                                                                                                                                                                                                  top: 0,
+                                                                                                                                                                                                                                                                                  backgroundColor: '#fafafa',
+                                                                                                                                                                                                                                                                                  zIndex: 1,
+                                                                                                                                                                                                                                                                              }}>
                                                                                                                                 <TableRow>
-                                                                                                                                    <TableCell>Unit Achievement</TableCell>
-                                                                                                                                    <TableCell>Discounted Rate</TableCell>
-                                                                                                                                    <TableCell>Beneficiary Contribution</TableCell>
-                                                                                                                                    <TableCell>Current Cost</TableCell>
-                                                                                                                                    <TableCell>Procurement Check</TableCell>
-                                                                                                                                    <TableCell>Payee Name</TableCell>
-                                                                                                                                    <TableCell>Account details</TableCell>
-                                                                                                                                    <TableCell>Passbook Copy</TableCell>
-                                                                                                                                    <TableCell>Other Document</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 120 }}>Unit Achievement</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 130 }}>Discounted Rate</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 140 }}>Beneficiary Contribution</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 120 }}>Current Cost</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 150 }}>Procurement Check</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 140 }}>Payee Name</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 160 }}>Account Details</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 160 }}>Passbook Copy</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 160 }}>Other Document</TableCell>
                                                                                                                                     {/*<TableCell>Domain Expert</TableCell>*/}
                                                                                                                                     {isReject && <TableCell>Reviews</TableCell>}
-                                                                                                                                    <TableCell>Actions</TableCell>
+                                                                                                                                    <TableCell sx={{ minWidth: 160 }}>Actions</TableCell>
                                                                                                                                 </TableRow>
                                                                                                                             </TableHead>
                                                                                                                             <TableBody>

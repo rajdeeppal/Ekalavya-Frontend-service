@@ -3,6 +3,8 @@ import { TextField, Button, Box, Typography, Grid, Paper, CircularProgress } fro
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import LoginRedirect from './LoginRedirect';
+import Snowfall from './Snowfall';
+import ChristmasLights from './ChristmasLights';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -11,6 +13,22 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [token, setToken] = React.useState(null);
+
+const isWinterSeason = () => {
+  const today = new Date();
+  const month = today.getMonth(); // 0 = Jan, 11 = Dec
+  const date = today.getDate();
+
+  // Dec 25 – Dec 31
+  if (month === 11 && date >= 20) return true;
+
+  // Jan 1 – Jan 5
+  if (month === 0 && date <= 5) return true;
+
+  return false;
+};
+
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -54,9 +72,53 @@ const LoginForm = () => {
     navigate('/forgot-password');
   };
 
-  return (
-    <Grid container component="main" sx={{ height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-      <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+const isNightTime = () => {
+  const hour = new Date().getHours();
+  return hour >= 18 || hour < 6;
+};
+
+
+return (
+  <Box
+    sx={{
+      position: 'relative',
+      minHeight: '100vh',
+      width: '100%',
+      background: isNightTime()
+        ? 'linear-gradient(to bottom, #0d1b2a 0%, #1b263b 55%, #415a77 100%)'
+        : 'linear-gradient(to bottom, #e3f2fd 0%, #f5faff 45%, #ffffff 100%)',
+      overflow: 'hidden',
+    }}
+  >
+    {/* ❄️ Background snow (behind everything) */}
+    {isWinterSeason() && <Snowfall followMouse />}
+
+
+    {/* 🔐 Login UI */}
+    <Grid
+      container
+      component="main"
+      sx={{
+        height: '100vh',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        zIndex: 1, // 👈 LOGIN ABOVE SNOW
+      }}
+    >
+      <Grid
+        item
+        xs={12}
+        sm={8}
+        md={5}
+        component={Paper}
+        elevation={6}
+        square
+        sx={{
+          backdropFilter: 'blur(6px)',
+          backgroundColor: 'rgba(255,255,255,0.92)',
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -172,6 +234,8 @@ const LoginForm = () => {
         </motion.div>
       </Grid>
     </Grid>
+    {isWinterSeason() && <ChristmasLights />}
+    </Box>
   );
 };
 
