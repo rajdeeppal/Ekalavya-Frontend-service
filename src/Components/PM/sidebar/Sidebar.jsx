@@ -14,15 +14,18 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import { NavLink, useNavigate } from "react-router-dom";
+// import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../PrivateRoute";
 import logo from "../../images/logo.png";
 import { getPendingCounts } from "../../DataCenter/apiService";
 import Badge from "@mui/material/Badge";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+
 
 const Sidebar = ({ isSuccess }) => {
   const navigate = useNavigate();
   const { userId } = useAuth();
+  const location = useLocation();
   const [pendingCount, setPendingCount] = useState({});
   const [openMenu, setOpenMenu] = useState({
     sanction: false,
@@ -30,6 +33,29 @@ const Sidebar = ({ isSuccess }) => {
     final: false,
     rejection: false,
   });
+
+
+useEffect(() => {
+  const path = location.pathname;
+
+  setOpenMenu({
+    sanction:
+      path.startsWith("/beneficiary") ||
+      path === "/training",
+
+    inprogress:
+      path.startsWith("/inprogress") ||
+      path.startsWith("/training-in-progress"),
+
+    final:
+      path.startsWith("/finalpreview") ||
+      path.startsWith("/training-final-preview"),
+
+    rejection:
+      path.startsWith("/rejectedList") ||
+      path.startsWith("/training-rejected"),
+  });
+}, [location.pathname]);
 
   useEffect(() => {
     async function fetchCounts() {
@@ -168,6 +194,24 @@ const Sidebar = ({ isSuccess }) => {
               {renderSubLink("/training-rejected", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Training/Other Exp Records")}
             </ul>
           )}
+
+<li>
+            <NavLink
+              to="/resolution"
+              style={({ isActive }) => ({
+                textDecoration: "none",
+                // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
+                backgroundColor: isActive ? '#ece8ff' : 'transparent',
+                borderRadius: "10px 0px 0px 10px ",
+                padding: "10px 4px",
+                width: "100%",
+                margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+              })}
+            >
+              <CloudUploadIcon className="icon" />
+              <span>Resolution Upload</span>
+            </NavLink>
+          </li>
 
           {renderSubLink("/myprofile", <AccountCircleOutlinedIcon className="icon" />, "Profile")}
 

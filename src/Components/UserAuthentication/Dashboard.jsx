@@ -6,6 +6,37 @@ import axios from "axios";
 import { Box } from "@mui/material";
 import SnowDots from './SnowDots';
 
+const useAnimatedCounter = (target, duration = 3000) => {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (target === 0) return;
+
+    const frameRate = 30; // 30 frames per second (smooth)
+    const totalFrames = Math.round((duration / 1000) * frameRate);
+
+    let currentFrame = 0;
+
+    const counter = setInterval(() => {
+      currentFrame++;
+
+      const progress = currentFrame / totalFrames;
+      const currentValue = Math.round(target * progress);
+
+      setValue(currentValue);
+
+      if (currentFrame >= totalFrames) {
+        clearInterval(counter);
+        setValue(target); // ensure exact final value
+      }
+    }, 1000 / frameRate);
+
+    return () => clearInterval(counter);
+  }, [target, duration]);
+
+  return value;
+};
+
 const isNightTime = () => {
   const hour = new Date().getHours();
   return hour >= 18 || hour < 6;
@@ -50,7 +81,8 @@ const Dashboard = () => {
         setLoading(false);
       });
   }, []);
-
+const animatedProjects = useAnimatedCounter(projectsCount);
+const animatedFamilies = useAnimatedCounter(familiesCount);
   const getProgressColor = (progress) => {
     if (progress <= 30) {
       return "#e57373"; // Red for low progress
@@ -152,14 +184,8 @@ const Dashboard = () => {
               OUR ON-GOING PROJECTS
             </Typography>
 
-            <Typography
-              variant="h3"
-              sx={{
-                color: "#fff",
-                fontWeight: 800
-              }}
-            >
-              {projectsCount}
+            <Typography variant="h3" sx={{ color: "#fff", fontWeight: 800 }}>
+              {animatedProjects}
             </Typography>
           </Card>
         </Grid>
@@ -186,14 +212,8 @@ const Dashboard = () => {
                           FAMILY BENEFITED
                         </Typography>
 
-                        <Typography
-                          variant="h3"
-                          sx={{
-                            color: "#fff",
-                            fontWeight: 800
-                          }}
-                        >
-                          {familiesCount}
+                        <Typography variant="h3" sx={{ color: "#fff", fontWeight: 800 }}>
+                          {animatedFamilies}
                         </Typography>
                       </Card>
         </Grid>
