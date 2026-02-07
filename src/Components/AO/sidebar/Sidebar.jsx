@@ -130,8 +130,8 @@ const Sidebar = ({ isSuccess }) => {
               <div style={{ display: "flex", alignItems: "center" }}>
                 <ReportGmailerrorredIcon className="icon" style={{ color: "black" }} />
                 <Badge
-                  badgeContent={pendingCount.rejectionCount}
-                  color="success"
+                  badgeContent={pendingCount.rejectedVoucher}
+                  color="error"
                   anchorOrigin={{
                     vertical: "top",
                     horizontal: "right"
