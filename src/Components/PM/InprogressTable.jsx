@@ -298,7 +298,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
         const taskUpdateDTO = {
             /*domainExpertEmpId: changedData.domainExpertEmpId,*/
             payeeName: changedData.payeeName,
-            accountNumber: parseInt(changedData.accountNumber, 10),
+            accountNumber: changedData.accountNumber,
             revisedRatePerUnit: parseFloat(changedData.revisedRatePerUnit),
             benContribution: parseFloat(changedData.currentBeneficiaryContribution),
             achievementUnit: parseFloat(changedData.achievementUnit, 10),
