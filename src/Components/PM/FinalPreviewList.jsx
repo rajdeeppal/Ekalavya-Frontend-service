@@ -151,10 +151,11 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                 <TableCell>Unit Rate</TableCell>
                                                                                                 <TableCell>Financial Extension</TableCell>
                                                                                                 <TableCell>Sanction Units</TableCell>
-                                                                                                <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
+                                                                                                <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Beneficiary Contribution Balance</TableCell>
-                                                                                                <TableCell>Remain Amount</TableCell>
+                                                                                                <TableCell>Grand Balance</TableCell>
+                                                                                                <TableCell>Total Balance</TableCell>
                                                                                                 <TableCell>Year of Sanction</TableCell>
                                                                                                 <TableCell>Actions</TableCell>
                                                                                             </TableRow>
@@ -170,10 +171,11 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                             {task.financialExtension ? 'Y' : 'N'}
                                                                                                         </TableCell>
                                                                                                         <TableCell>{task.units}</TableCell>
-                                                                                                        <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
+                                                                                                        <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.beneficiaryContributionRemain}</TableCell>
                                                                                                         <TableCell>{task.balanceRemaining}</TableCell>
+                                                                                                        <TableCell>{task.balanceRemaining + task.beneficiaryContributionRemain}</TableCell>
                                                                                                         <TableCell>{task.yearOfSanction}</TableCell>
                                                                                                         <TableCell>
                                                                                                             <Button
@@ -198,6 +200,7 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                         <Table size="small" aria-label="task details table">
                                                                                                                             <TableHead>
                                                                                                                                 <TableRow>
+                                                                                                                                <TableCell>Job Id</TableCell>
                                                                                                                                     <TableCell>Unit Achievement</TableCell>
                                                                                                                                     <TableCell>Discounted Rate</TableCell>
                                                                                                                                     <TableCell>Beneficiary Contribution</TableCell>
@@ -215,6 +218,7 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                             <TableBody>
                                                                                                                                 {(task.taskUpdates || [])?.map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
+                                                                                                                                    <TableCell>{row.id}</TableCell>
                                                                                                                                         <TableCell>{row.achievementUnit}</TableCell>
                                                                                                                                         <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         <TableCell>{row.currentBeneficiaryContribution}</TableCell>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSnackbar } from 'notistack';
-import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
+import { Box, Container, Dialog, DialogTitle, DialogContent, Button, TextField, FormControl, InputLabel, Select, MenuItem, Alert, Autocomplete, CircularProgress } from '@mui/material';
 import ActivityIframe from './ActivityIframe';
-import { getAadharDetails, getStateDetails, getDistrictDetails, getUserProjects, getComponentsByProject, getActivities, getTasks, saveBeneficiaryConfiguration } from '../DataCenter/apiService';
+import { getAadharDetails, getStateDetails, getDistrictDetails, getUserProjects, getComponentsByProject, getActivities, getTasks, saveBeneficiaryConfiguration, searchBeneficiariesByAadhar } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 
 const BeneficiaryForm = ({ addBeneficiary }) => {
@@ -45,6 +45,10 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
   const [district, setDistrict] = useState([]);
   const [errors, setErrors] = useState({}); 
   const [aadharDetails, setAadharDetails] = useState({});
+  const [beneficiarySearchResults, setBeneficiarySearchResults] = useState([]);
+  const [beneficiarySearchLoading, setBeneficiarySearchLoading] = useState(false);
+  const [showEditFields, setShowEditFields] = useState(false);
+  const [aadharSearchCompleted, setAadharSearchCompleted] = useState(false);
 
   useEffect(() => {
     async function fetchProjects() {
@@ -117,34 +121,103 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
     const { name, value } = e.target;
     setBeneficiary({ ...beneficiary, [name]: value });
 
-    // Clear the specific error when input value changes
     setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
-  const handleAadharSearch = async (aadharNumber) => {
-    if (!aadharNumber) {
-      setErrors((prevErrors) => ({ ...prevErrors, aadharNumber: 'Aadhaar number is required' }));
+  const handleAadharSearch = async (searchValue) => {
+    if (!searchValue || searchValue.length < 2) {
+      setBeneficiarySearchResults([]);
+      if (!searchValue) {
+        setBeneficiary({
+          beneficiaryName: '',
+          guardianName: '',
+          villageName: '',
+          mandalName: '',
+          districtName: '',
+          stateName: '',
+          aadharNumber: '',
+          surveyNumber: '',
+        });
+        setShowEditFields(false);
+        setAadharSearchCompleted(false);
+      }
       return;
     }
-  
+    
+    if (searchValue.length === 12) {
+      setAadharSearchCompleted(true);
+      setBeneficiary(prev => ({ ...prev, aadharNumber: searchValue }));
+      setBeneficiarySearchLoading(true);
+      try {
+        const response = await searchBeneficiariesByAadhar(searchValue, 0, 10);
+        setBeneficiarySearchResults(response.content || []);
+        if (!response.content || response.content.length === 0) {
+          setShowEditFields(true);
+        }
+      } catch (error) {
+        console.error('Error searching beneficiaries:', error);
+        setBeneficiarySearchResults([]);
+        setShowEditFields(true);
+      } finally {
+        setBeneficiarySearchLoading(false);
+      }
+    } else if (searchValue.length >= 2) {
+      setBeneficiarySearchLoading(true);
+      try {
+        const response = await searchBeneficiariesByAadhar(searchValue, 0, 10);
+        setBeneficiarySearchResults(response.content || []);
+      } catch (error) {
+        console.error('Error searching beneficiaries:', error);
+        setBeneficiarySearchResults([]);
+      } finally {
+        setBeneficiarySearchLoading(false);
+      }
+    }
+  };
+
+  const handleBeneficiarySelect = async (beneficiaryData) => {
+    if (!beneficiaryData) return;
+
+    setAadharSearchCompleted(true);
     try {
-      const data = await getAadharDetails(aadharNumber); // Assumes `getAadharDetails` is an async function
-  
-      // Set all beneficiary data except districtName initially
+      const fullData = await getAadharDetails(beneficiaryData.aadharNumber);
+      
+      const hasEmptyFields = !fullData.beneficiaryName || !fullData.guardianName || 
+                            !fullData.villageName || !fullData.mandalName || 
+                            !fullData.stateName || !fullData.districtName;
+
       setBeneficiary({
         ...beneficiary,
-        beneficiaryName: data.beneficiaryName,
-        guardianName: data.guardianName,
-        villageName: data.villageName,
-        mandalName: data.mandalName,
-        stateName: data.stateName,
-        aadharNumber: data.aadharNumber,
-        districtName:  data.districtName,
-        surveyNumber: data.surveyNumber
+        beneficiaryName: fullData.beneficiaryName || '',
+        guardianName: fullData.guardianName || '',
+        villageName: fullData.villageName || '',
+        mandalName: fullData.mandalName || '',
+        stateName: fullData.stateName || '',
+        districtName: fullData.districtName || '',
+        aadharNumber: fullData.aadharNumber || '',
+        surveyNumber: fullData.surveyNumber || ''
       });
-  
+
+      setShowEditFields(hasEmptyFields);
     } catch (error) {
-      console.error('Error fetching Aadhaar details:', error);
+      console.error('Error fetching full beneficiary details:', error);
+      const hasEmptyFields = !beneficiaryData.beneficiaryName || !beneficiaryData.guardianName || 
+                            !beneficiaryData.villageName || !beneficiaryData.mandalName || 
+                            !beneficiaryData.stateName || !beneficiaryData.districtName;
+
+      setBeneficiary({
+        ...beneficiary,
+        beneficiaryName: beneficiaryData.beneficiaryName || '',
+        guardianName: beneficiaryData.guardianName || '',
+        villageName: beneficiaryData.villageName || '',
+        mandalName: beneficiaryData.mandalName || '',
+        stateName: beneficiaryData.stateName || '',
+        districtName: beneficiaryData.districtName || '',
+        aadharNumber: beneficiaryData.aadharNumber || '',
+        surveyNumber: beneficiaryData.surveyNumber || ''
+      });
+
+      setShowEditFields(hasEmptyFields);
     }
   };
   
@@ -186,6 +259,9 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
     setShowActivityDropdown(false);
     setShowTaskDropdown(false);
     setShowIframe(false);
+    setShowEditFields(false);
+    setBeneficiarySearchResults([]);
+    setAadharSearchCompleted(false);
 
   };
 
@@ -281,6 +357,49 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           {errors.selectedProject && <Alert severity="error">{errors.selectedProject}</Alert>}
         </FormControl>
 
+        <Box display="flex" alignItems="center" gap={1} mt={2}>
+          <Autocomplete
+            fullWidth
+            freeSolo
+            options={beneficiarySearchResults}
+            loading={beneficiarySearchLoading}
+            getOptionLabel={(option) => option.aadharNumber || ''}
+            onInputChange={(event, value) => handleAadharSearch(value)}
+            onChange={(event, value) => handleBeneficiarySelect(value)}
+            renderOption={(props, option) => (
+              <li {...props}>
+                <div>
+                  <div><strong>{option.aadharNumber}</strong></div>
+                  <div style={{ fontSize: '0.85em', color: '#666' }}>
+                    {option.beneficiaryName} - {option.villageName}
+                  </div>
+                </div>
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Aadhar Number"
+                name="aadharNumber"
+                placeholder="Search Aadhar Number"
+                margin="normal"
+                required
+                error={!!errors.aadharNumber}
+                helperText={errors.aadharNumber}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {beneficiarySearchLoading ? <CircularProgress size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+          />
+        </Box>
+
         <TextField
           fullWidth
           label="Beneficiary Name"
@@ -292,6 +411,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           required
           error={!!errors.beneficiaryName}
           helperText={errors.beneficiaryName}
+          disabled={!aadharSearchCompleted || (beneficiary.beneficiaryName && !showEditFields)}
         />
 
         <TextField
@@ -305,6 +425,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           required
           error={!!errors.guardianName}
           helperText={errors.guardianName}
+          disabled={!aadharSearchCompleted || (beneficiary.guardianName && !showEditFields)}
         />
 
         <TextField
@@ -318,6 +439,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           required
           error={!!errors.villageName}
           helperText={errors.villageName}
+          disabled={!aadharSearchCompleted || (beneficiary.villageName && !showEditFields)}
         />
 
         <TextField
@@ -331,6 +453,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           required
           error={!!errors.mandalName}
           helperText={errors.mandalName}
+          disabled={!aadharSearchCompleted || (beneficiary.mandalName && !showEditFields)}
         />
 
         <FormControl fullWidth margin="normal">
@@ -338,11 +461,9 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           <Select
             name="stateName"
             value={beneficiary.stateName}
-            onChange={
-              handleChange
-              // setErrors((prevErrors) => ({ ...prevErrors, selectedVertical: '' }));
-            }
+            onChange={handleChange}
             required
+            disabled={!aadharSearchCompleted || (beneficiary.stateName && !showEditFields)}
           >
             <MenuItem value="">Select State</MenuItem>
             {states.map((state) => (
@@ -359,11 +480,9 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           <Select
             name="districtName"
             value={beneficiary.districtName}
-            onChange={
-              handleChange
-              // setErrors((prevErrors) => ({ ...prevErrors, selectedVertical: '' }));
-            }
+            onChange={handleChange}
             required
+            disabled={!aadharSearchCompleted || (beneficiary.districtName && !showEditFields)}
           >
             <MenuItem value="">Select District</MenuItem>
             {district.map((district) => (
@@ -374,28 +493,6 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           </Select>
           {/* {errors.selectedProject && <Alert severity="error">{errors.selectedProject}</Alert>} */}
         </FormControl>
-
-        <Box display="flex" alignItems="center" gap={1} mt={2}>
-          <TextField
-            fullWidth
-            label="aadharNumber"
-            name="aadharNumber"
-            placeholder="aadharNumber"
-            value={beneficiary.aadharNumber}
-            onChange={handleChange}
-            margin="normal"
-            required
-            error={!!errors.aadharNumber}
-            helperText={errors.aadharNumber}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleAadharSearch(beneficiary.aadharNumber)} // Call your search function here
-          >
-            Find
-          </Button>
-        </Box>
 
         <TextField
           fullWidth
@@ -408,6 +505,7 @@ const BeneficiaryForm = ({ addBeneficiary }) => {
           required
           error={!!errors.surveyNumber}
           helperText={errors.surveyNumber}
+          disabled={!aadharSearchCompleted}
         />
 
         <FormControl fullWidth margin="normal">

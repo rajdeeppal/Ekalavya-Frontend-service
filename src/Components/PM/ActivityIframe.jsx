@@ -133,6 +133,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           type="number"
           value={activity.noOfUnits}
           onChange={handleChange}
+          onWheel={(e) => e.target.blur()}
           variant="outlined"
           fullWidth
           margin="normal"
@@ -187,6 +188,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           name="totalCost"
           type="number"
           value={activity.totalCost}
+          onWheel={(e) => e.target.blur()}
           variant="outlined"
           fullWidth
           margin="normal"
@@ -205,6 +207,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           type="number"
           value={activity.beneficiaryContribution}
           onChange={handleChange}
+          onWheel={(e) => e.target.blur()}
           variant="outlined"
           fullWidth
           margin="normal"
@@ -222,6 +225,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           name="grantAmount"
           type="number"
           value={activity.grantAmount}
+          onWheel={(e) => e.target.blur()}
           variant="outlined"
           fullWidth
           margin="normal"
@@ -240,6 +244,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
           type="number"
           value={activity.yearOfSanction}
           onChange={handleChange}
+          onWheel={(e) => e.target.blur()}
           variant="outlined"
           fullWidth
           margin="normal"

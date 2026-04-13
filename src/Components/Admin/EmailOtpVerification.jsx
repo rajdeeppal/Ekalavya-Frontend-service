@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Grid, TextField, Button, Typography, useMediaQuery, CircularProgress, Modal, Box, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -9,6 +9,7 @@ const EmailOtpVerification = ({ username }) => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false); // Loading state for spinner
+  const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
 
   const theme = useTheme();
@@ -18,19 +19,42 @@ const EmailOtpVerification = ({ username }) => {
   const errorColor = theme.palette.error.main;
    const [loginMethod, setLoginMethod] = useState('email');
 
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
   // Handle form submission to request OTP
   const handleRequestOtp = async (e) => {
     e.preventDefault();
     setLoading(true); // Start loading spinner
 
     try {
+
       const response = await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username, loginMethod });
       setIsOtpSent(true);
       setMessage(response.data);
+      setCountdown(60);
     } catch (error) {
       setMessage('Error sending OTP. Please try again.');
     } finally {
       setLoading(false); // Stop loading spinner
+    }
+  };
+
+  // Handle resend OTP
+  const handleResendOtp = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post('https://projects.ekalavya.net/api/admin/sendOtp', { username, loginMethod });
+      setMessage(response.data);
+      setCountdown(60);
+    } catch (error) {
+      setMessage('Error sending OTP. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,6 +184,21 @@ const EmailOtpVerification = ({ username }) => {
                     }}
                   >
                     Verify OTP
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    onClick={handleResendOtp}
+                    disabled={countdown > 0 || loading}
+                    sx={{
+                      borderColor: theme.palette.primary.main,
+                      color: theme.palette.primary.main,
+                      '&:hover': { borderColor: theme.palette.primary.dark },
+                    }}
+                  >
+                    {countdown > 0 ? `Resend OTP in ${countdown}s` : 'Resend OTP'}
                   </Button>
                 </Grid>
               </Grid>

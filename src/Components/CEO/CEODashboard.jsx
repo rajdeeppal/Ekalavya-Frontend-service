@@ -5,6 +5,7 @@ import SearchBar from '../PM/SearchBar';
 import { getBeneficiary } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import FinalPreviewList from '../PM/FinalPreviewList';
+import Pagination from '../Common/Pagination';
 
 
 function CEODashboard() {
@@ -13,18 +14,39 @@ function CEODashboard() {
     const [isReview, setIsReview] = useState(true);
     const [beneficiaries, setBeneficiaries] = useState([
     ]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [value, setValue] = useState(null);
 
-    const handleSearch = async (criteria) => {
+    const handleSearch = async (criteria, page = 0, size = pageSize) => {
         if (!criteria) return;
         try {
             console.log("ok");
-            const data = await getBeneficiary(userId, criteria, 'generic');
-            setBeneficiaries(Array.isArray(data) ? data : []);
-            setShowTable(true)
+            const data = await getBeneficiary(userId, criteria, 'generic', page, size);
+            setBeneficiaries(Array.isArray(data.beneficiaries) ? data.beneficiaries : []);
+            setCurrentPage(data.currentPage || 0);
+            setTotalPages(data.totalPages || 0);
+            setTotalElements(data.totalElements || 0);
+            setPageSize(data.pageSize || size);
+            setShowTable(true);
+            setValue(criteria);
             console.log(beneficiaries);
         } catch (error) {
             console.error('Error fetching activities:', error);
         }
+    };
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        handleSearch(value, newPage, pageSize);
+    };
+
+    const handlePageSizeChange = (newSize) => {
+        setPageSize(newSize);
+        setCurrentPage(0);
+        handleSearch(value, 0, newSize);
     };
 
     return (
@@ -42,8 +64,18 @@ function CEODashboard() {
                 <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', pb: 3 }}>
                     <SearchBar onSearch={handleSearch} />
                 </Box>
-                {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-                <FinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview}/>
+                {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', mt: 3 }}>
+                <Box sx={{ pb: 3 }}>
+                  <FinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview}/>
+                </Box>
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageSize={pageSize}
+                    totalElements={totalElements}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                />
                 </Box>}
             </Box>
         </Box>

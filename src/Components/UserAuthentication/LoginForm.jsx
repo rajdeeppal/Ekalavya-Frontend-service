@@ -48,7 +48,7 @@ const isWinterSeason = () => {
       if (response.ok) {
         localStorage.setItem('jwtToken', data.jwt);
         setToken(data.jwt);
-        console.log('Login successful, JWT token:', data.jwt);
+//         console.log('Login successful, JWT token:', data.jwt);
       } else {
         setErrorMessage(data.message || 'Login failed. Please try again.');
       }

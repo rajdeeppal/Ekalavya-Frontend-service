@@ -289,6 +289,7 @@ const formatDateTime = (value) => {
                                                                                                                                            zIndex: 1,
                                                                                                                                        }}>
                                                                                                                                 <TableRow>
+                                                                                                                                <TableCell sx={{ minWidth: 120 }}>Job Id</TableCell>
                                                                                                                                     <TableCell sx={{ minWidth: 120 }}>Unit Achievement</TableCell>
                                                                                                                                     <TableCell sx={{ minWidth: 130 }}>Discounted Rate</TableCell>
 
@@ -312,6 +313,7 @@ const formatDateTime = (value) => {
                                                                                                                             <TableBody>
                                                                                                                                 {(task.taskUpdates || [])?.map((row, rowIndex) => (
                                                                                                                                     <TableRow key={rowIndex}>
+                                                                                                                                    <TableCell sx={{ minWidth: 120 }}>{row.id}</TableCell>
                                                                                                                                         <TableCell sx={{ minWidth: 120 }}>{row.achievementUnit}</TableCell>
                                                                                                                                         <TableCell sx={{ minWidth: 130 }}>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         {showTraining === 'COMMON_EXP_FORM' && <TableCell sx={{ minWidth: 160 }}>{row.currentBeneficiaryContribution}</TableCell>}

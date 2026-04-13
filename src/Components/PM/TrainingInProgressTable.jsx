@@ -18,7 +18,7 @@ import {
     Alert,
     Box,
     Modal,
-    FormControl, Select, MenuItem, Divider
+    FormControl, Select, MenuItem, Divider, Autocomplete
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -29,7 +29,7 @@ import Avatar from '@mui/material/Avatar';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask } from '../DataCenter/apiService';
+import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask, searchPayeeAccounts } from '../DataCenter/apiService';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import Checkbox from '@mui/material/Checkbox';
@@ -55,6 +55,8 @@ const TrainingInProgressTable = ({ beneficiaries, value, setBeneficiaries, isRej
     const [comments, setComments] = useState([]);
     const [id, setId] = useState([]);
     const [isBulk, setIsBulk] = useState(false);
+    const [payeeAccounts, setPayeeAccounts] = useState({});
+    const [payeeAccountLoading, setPayeeAccountLoading] = useState({});
 
     useEffect(() => {
         async function fetchDomain() {
@@ -213,6 +215,12 @@ const formatDateTime = (value) => {
                                     [field]: value,
                                 };
 
+                                // Reset payee name and passbook doc when account number is cleared
+                                if (field === 'accountNumber' && !value) {
+                                    updatedRow.payeeName = '';
+                                    updatedRow.passbookDocFromPayee = null;
+                                }
+
                                 if (
                                     //                                 /* field === 'currentBeneficiaryContribution' || */
                                     field === 'achievementUnit' ||
@@ -227,6 +235,57 @@ const formatDateTime = (value) => {
 
                                 updatedTaskUpdates[rowIndex] = updatedRow;
 
+                                return { ...task, taskUpdates: updatedTaskUpdates };
+                            }
+                            return task;
+                        })
+                    }))
+                }))
+            }));
+        });
+    };
+
+    const handleAccountNumberSearch = async (taskIndex, rowIndex, searchValue) => {
+        if (!searchValue || searchValue.length < 2) {
+            setPayeeAccounts(prev => ({ ...prev, [`${taskIndex}-${rowIndex}`]: [] }));
+            return;
+        }
+        const key = `${taskIndex}-${rowIndex}`;
+        setPayeeAccountLoading(prev => ({ ...prev, [key]: true }));
+        try {
+            const response = await searchPayeeAccounts(searchValue, 0, 10);
+            setPayeeAccounts(prev => ({ ...prev, [key]: response.content || [] }));
+        } catch (error) {
+            console.error('Error searching payee accounts:', error);
+            setPayeeAccounts(prev => ({ ...prev, [key]: [] }));
+        } finally {
+            setPayeeAccountLoading(prev => ({ ...prev, [key]: false }));
+        }
+    };
+
+    const handlePayeeAccountSelect = (taskIndex, rowIndex, payeeAccount) => {
+        if (!payeeAccount) return;
+        
+        setBeneficiaries((prevBeneficiaries) => {
+            return prevBeneficiaries.map((beneficiary) => ({
+                ...beneficiary,
+                components: beneficiary.components.map((component) => ({
+                    ...component,
+                    activities: component.activities.map((activity) => ({
+                        ...activity,
+                        tasks: activity.tasks.map((task) => {
+                            if (task.id === taskIndex) {
+                                const updatedTaskUpdates = [...task.taskUpdates];
+                                updatedTaskUpdates[rowIndex] = {
+                                    ...updatedTaskUpdates[rowIndex],
+                                    accountNumber: payeeAccount.accountNumber,
+                                    payeeName: payeeAccount.payeeName,
+                                    passbookDocFromPayee: payeeAccount.passbookDocName && payeeAccount.url ? {
+                                        fileName: payeeAccount.passbookDocName,
+                                        downloadUrl: payeeAccount.url,
+                                        protected: payeeAccount.protectPassbookDoc
+                                    } : null
+                                };
                                 return { ...task, taskUpdates: updatedTaskUpdates };
                             }
                             return task;
@@ -685,6 +744,7 @@ const formatDateTime = (value) => {
                                                                                                                                                                                                                                                                                   zIndex: 1,
                                                                                                                                                                                                                                                                               }}>
                                                                                                                                 <TableRow>
+                                                                                                                                <TableCell>Job Id</TableCell>
                                                                                                                                     <TableCell>Unit Achievement</TableCell>
                                                                                                                                     <TableCell>Discounted Rate</TableCell>
                                                                                                                                     {showTraining === 'COMMON_EXP_FORM' && <TableCell>Community Contribution</TableCell>}
@@ -704,11 +764,23 @@ const formatDateTime = (value) => {
                                                                                                                                     <TableRow key={rowIndex}>
                                                                                                                                         {editMode[`${task.id}-${rowIndex}`] ? (
                                                                                                                                             <>
+<TableCell>
+                                                                                                                                                    <TextField
+                                                                                                                                                        variant="outlined"
+                                                                                                                                                        size="small"
+                                                                                                                                                        value={row.id || ''}
+
+                                                                                                                                                        readonly
+                                                                                                                                                    />
+                                                                                                                                                </TableCell>
                                                                                                                                                 <TableCell>
                                                                                                                                                     <TextField
                                                                                                                                                         variant="outlined"
                                                                                                                                                         size="small"
                                                                                                                                                         value={row.achievementUnit || ''}
+                                                                                                                                                        required
+                                                                                                                                                        error={!row.achievementUnit}
+                                                                                                                                                        helperText={!row.achievementUnit ? 'Required' : ''}
                                                                                                                                                         onChange={(e) =>
                                                                                                                                                             handleInputChange(
                                                                                                                                                                 task.id,
@@ -771,33 +843,114 @@ const formatDateTime = (value) => {
                                                                                                                                                         variant="outlined"
                                                                                                                                                         size="small"
                                                                                                                                                         value={row.payeeName || ''}
-                                                                                                                                                        onChange={(e) =>
-                                                                                                                                                            handleInputChange(
-                                                                                                                                                                task.id,
-                                                                                                                                                                rowIndex,
-                                                                                                                                                                'payeeName',
-                                                                                                                                                                e.target.value
-                                                                                                                                                            )
-                                                                                                                                                        }
+                                                                                                                                                        required
+                                                                                                                                                        disabled
+                                                                                                                                                        error={!row.payeeName}
+                                                                                                                                                        helperText={!row.payeeName ? 'Required' : ''}
+                                                                                                                                                        InputProps={{
+                                                                                                                                                            readOnly: true,
+                                                                                                                                                        }}
                                                                                                                                                     />
                                                                                                                                                 </TableCell>
                                                                                                                                                 <TableCell>
-                                                                                                                                                    <TextField
-                                                                                                                                                        variant="outlined"
+                                                                                                                                                    <Autocomplete
+                                                                                                                                                        freeSolo
                                                                                                                                                         size="small"
+                                                                                                                                                        options={payeeAccounts[`${task.id}-${rowIndex}`] || []}
+                                                                                                                                                        getOptionLabel={(option) => typeof option === 'string' ? option : option.accountNumber || ''}
+                                                                                                                                                        loading={payeeAccountLoading[`${task.id}-${rowIndex}`]}
                                                                                                                                                         value={row.accountNumber || ''}
-                                                                                                                                                        onChange={(e) =>
-                                                                                                                                                            handleInputChange(
-                                                                                                                                                                task.id,
-                                                                                                                                                                rowIndex,
-                                                                                                                                                                'accountNumber',
-                                                                                                                                                                e.target.value
-                                                                                                                                                            )
-                                                                                                                                                        }
+                                                                                                                                                        onInputChange={(e, value) => {
+                                                                                                                                                            handleInputChange(task.id, rowIndex, 'accountNumber', value);
+                                                                                                                                                            handleAccountNumberSearch(task.id, rowIndex, value);
+                                                                                                                                                        }}
+                                                                                                                                                        onChange={(e, value) => {
+                                                                                                                                                            if (value && typeof value === 'object') {
+                                                                                                                                                                handlePayeeAccountSelect(task.id, rowIndex, value);
+                                                                                                                                                            }
+                                                                                                                                                        }}
+                                                                                                                                                        renderInput={(params) => (
+                                                                                                                                                            <TextField
+                                                                                                                                                                {...params}
+                                                                                                                                                                variant="outlined"
+                                                                                                                                                                placeholder="Search account"
+                                                                                                                                                                required
+                                                                                                                                                                error={!row.accountNumber}
+                                                                                                                                                                helperText={!row.accountNumber ? 'Required' : ''}
+                                                                                                                                                            />
+                                                                                                                                                        )}
+                                                                                                                                                        renderOption={(props, option) => (
+                                                                                                                                                            <li {...props}>
+                                                                                                                                                                <Box>
+                                                                                                                                                                    <Typography variant="body2">{option.accountNumber}</Typography>
+                                                                                                                                                                    <Typography variant="caption" color="text.secondary">
+                                                                                                                                                                        {option.payeeName} - {option.bankName}
+                                                                                                                                                                    </Typography>
+                                                                                                                                                                </Box>
+                                                                                                                                                            </li>
+                                                                                                                                                        )}
                                                                                                                                                     />
                                                                                                                                                 </TableCell>
                                                                                                                                                 <TableCell>
-                                                                                                                                                    {!row.passbookDoc ?
+                                                                                                                                                    {row.passbookDocFromPayee ? (
+                                                                                                                                                        <Box>
+                                                                                                                                                            <Alert severity="success" sx={{ mb: 1 }}>
+                                                                                                                                                                <a
+                                                                                                                                                                    href={row.passbookDocFromPayee.downloadUrl}
+                                                                                                                                                                    target="_blank"
+                                                                                                                                                                    rel="noopener noreferrer"
+                                                                                                                                                                    style={{ textDecoration: 'underline', color: 'blue' }}
+                                                                                                                                                                >
+                                                                                                                                                                    {row.passbookDocFromPayee.fileName}
+                                                                                                                                                                </a>
+                                                                                                                                                            </Alert>
+                                                                                                                                                            {!row.passbookDocFromPayee.protected && (
+                                                                                                                                                                !row.passbookDoc ? (
+                                                                                                                                                                    <Button
+                                                                                                                                                                        variant="contained"
+                                                                                                                                                                        component="label"
+                                                                                                                                                                        size="small"
+                                                                                                                                                                    >
+                                                                                                                                                                        Replace
+                                                                                                                                                                        <input
+                                                                                                                                                                            type="file"
+                                                                                                                                                                            hidden
+                                                                                                                                                                            onChange={(e) =>
+                                                                                                                                                                                handleFileChange(
+                                                                                                                                                                                    task.id,
+                                                                                                                                                                                    rowIndex,
+                                                                                                                                                                                    'passbookDoc',
+                                                                                                                                                                                    e
+                                                                                                                                                                                )
+                                                                                                                                                                            }
+                                                                                                                                                                        />
+                                                                                                                                                                    </Button>
+                                                                                                                                                                ) : (
+                                                                                                                                                                    <Alert
+                                                                                                                                                                        severity="info"
+                                                                                                                                                                        action={
+                                                                                                                                                                            <IconButton
+                                                                                                                                                                                aria-label="remove file"
+                                                                                                                                                                                color="inherit"
+                                                                                                                                                                                size="small"
+                                                                                                                                                                                onClick={() =>
+                                                                                                                                                                                    handleRemoveFile(task.id, rowIndex, 'passbookDoc', 0)}
+                                                                                                                                                                            >
+                                                                                                                                                                                <CloseIcon fontSize="inherit" />
+                                                                                                                                                                            </IconButton>
+                                                                                                                                                                        }
+                                                                                                                                                                    >{row.passbookDoc.name}
+                                                                                                                                                                    </Alert>
+                                                                                                                                                                )
+                                                                                                                                                            )}
+                                                                                                                                                            {row.passbookDocFromPayee.protected && (
+                                                                                                                                                                <Typography variant="caption" color="text.secondary">
+                                                                                                                                                                    Protected - Upload disabled
+                                                                                                                                                                </Typography>
+                                                                                                                                                            )}
+                                                                                                                                                        </Box>
+                                                                                                                                                    ) : (
+                                                                                                                                                        !row.passbookDoc ?
                                                                                                                                                         (<Button
                                                                                                                                                             variant="contained"
                                                                                                                                                             component="label"
@@ -832,7 +985,8 @@ const formatDateTime = (value) => {
 
                                                                                                                                                         >{newTask ? (<>{row.passbookDoc.name}</>) : (!isEdit ? <>{row.passbookDoc.fileName}</> : <>{row.passbookDoc.name}</>)}
 
-                                                                                                                                                        </Alert>)}
+                                                                                                                                                        </Alert>)
+                                                                                                                                                    )}
                                                                                                                                                 </TableCell>
 
                                                                                                                                                 <TableCell>
@@ -1040,7 +1194,7 @@ const formatDateTime = (value) => {
                                                     onClick={() => handleSubmit(beneficiary.id)}
                                                     style={{ marginTop: '10px' }}
                                                 >
-                                                    Save
+                                                    Submit
                                                 </Button>
                                             </div>
                                         </Collapse>

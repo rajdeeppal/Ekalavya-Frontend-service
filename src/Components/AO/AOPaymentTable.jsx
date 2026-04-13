@@ -9,8 +9,14 @@ import {
     Select,
     MenuItem,
     Alert,
+    IconButton,
+    Popover,
+    Typography,
+    Link,
 } from '@mui/material';
-import { getVoucherDetails, generatedPaymentDetails, getVoucherDetailsUsingId } from '../DataCenter/apiService';
+import InfoIcon from '@mui/icons-material/Info';
+import { getVoucherDetails, generatedPaymentDetails, getVoucherDetailsUsingId, getVoucherJobIds, getTaskUpdateDetails } from '../DataCenter/apiService';
+import JobDetailsDialog from '../Common/JobDetailsDialog';
 
 function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher, isPay }) {
     const [formValues, setFormValues] = useState({
@@ -29,6 +35,10 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher, 
     const [showForm, setShowFrom] = useState(false);
     const [errors, setErrors] = useState({});
     const [backendMessage, setBackendMessage] = useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [jobIds, setJobIds] = useState([]);
+    const [selectedJobData, setSelectedJobData] = useState(null);
+    const [jobDialogOpen, setJobDialogOpen] = useState(false);
     const status = ['SUCCESS', 'FAILED', 'ONHOLD'];
     const modes = ['Online', 'Cheque', 'Cash'];
 
@@ -37,6 +47,34 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher, 
         setFormValues({ ...formValues, [name]: value });
         setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
     };
+
+    const handleInfoClick = async (event) => {
+        setAnchorEl(event.currentTarget);
+        try {
+            const ids = await getVoucherJobIds(formValues.voucherId);
+            setJobIds(Array.isArray(ids) ? ids : []);
+        } catch (error) {
+            console.error('Error fetching job IDs:', error);
+            setJobIds([]);
+        }
+    };
+
+    const handlePopoverClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleJobIdClick = async (jobId) => {
+        handlePopoverClose();
+        try {
+            const data = await getTaskUpdateDetails(jobId);
+            setSelectedJobData(data);
+            setJobDialogOpen(true);
+        } catch (error) {
+            console.error('Error fetching job details:', error);
+        }
+    };
+
+    const open = Boolean(anchorEl);
 
     useEffect(() => {
         handleSearch(voucher);
@@ -148,18 +186,65 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher, 
                 {/* Conditionally Render Form */}
 
                 <Box>
-                    <TextField
-                        fullWidth
-                        label="Payee Name"
-                        name="payeeName"
-                        placeholder="Payee Name"
-                        value={formValues.payeeName}
-                        margin="normal"
-                        required
-                        error={!!errors.payeeName}
-                        helperText={errors.payeeName}
-                        InputProps={{ readOnly: true }}
-                    />
+                    <Box display="flex" alignItems="center" gap={1}>
+                        <TextField
+                            fullWidth
+                            label="Payee Name"
+                            name="payeeName"
+                            placeholder="Payee Name"
+                            value={formValues.payeeName}
+                            margin="normal"
+                            required
+                            error={!!errors.payeeName}
+                            helperText={errors.payeeName}
+                            InputProps={{ readOnly: true }}
+                        />
+                        <IconButton
+                            color="primary"
+                            onMouseEnter={handleInfoClick}
+                            sx={{ mt: 1 }}
+                        >
+                            <InfoIcon />
+                        </IconButton>
+                    </Box>
+                    <Popover
+                        open={open}
+                        anchorEl={anchorEl}
+                        onClose={handlePopoverClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                        disableRestoreFocus
+                    >
+                        <Box sx={{ p: 2, minWidth: 200 }}>
+                            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                                Associated Job IDs
+                            </Typography>
+                            {jobIds.length > 0 ? (
+                                jobIds.map((jobId, index) => (
+                                    <Box key={index}>
+                                        <Link
+                                            component="button"
+                                            variant="body2"
+                                            onClick={() => handleJobIdClick(jobId)}
+                                            sx={{ display: 'block', mb: 0.5, textAlign: 'left' }}
+                                        >
+                                            Job ID: {jobId}
+                                        </Link>
+                                    </Box>
+                                ))
+                            ) : (
+                                <Typography variant="body2" color="text.secondary">
+                                    No job IDs found
+                                </Typography>
+                            )}
+                        </Box>
+                    </Popover>
 
                     <TextField
                         fullWidth
@@ -270,6 +355,11 @@ function AOPaymentTable({ setShowViewPaymentConfirmation, setIsSucess, voucher, 
                 </Box>
 
             </Box>
+            <JobDetailsDialog
+                open={jobDialogOpen}
+                onClose={() => setJobDialogOpen(false)}
+                jobData={selectedJobData}
+            />
         </Container>
     );
 }

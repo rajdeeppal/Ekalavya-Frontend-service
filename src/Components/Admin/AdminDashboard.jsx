@@ -3,8 +3,12 @@ import { AppBar, Toolbar, Button, Typography, Container, Box, Fade, IconButton, 
 import PendingRequests from './PendingRequests';
 import RoleManagement from './RoleManagement';
 import TaskIframe from './TaskIframe';
+import AddPayeeAccount from './AddPayeeAccount';
+import DeleteBeneficiary from './DeleteBeneficiary';
 import { useNavigate } from 'react-router-dom';
-import LogoutIcon from '@mui/icons-material/Logout'; // Icon for logout
+import LogoutIcon from '@mui/icons-material/Logout';
+import VoucherPortal from './VoucherPortal';
+import DeleteJobPortal from './DeleteJobPortal';
 
 const AdminDashboard = () => {
   const [activeComponent, setActiveComponent] = useState('PendingRequests');
@@ -12,24 +16,21 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [pendingCount, setPendingCount] = useState(0);
 
-  // Handle switching components with fade animation
   const handleComponentSwitch = (component) => {
     if (activeComponent !== component) {
       setFadeIn(false);
       setTimeout(() => {
         setActiveComponent(component);
         setFadeIn(true);
-      }, 300); // Set timeout to match the transition duration
+      }, 300);
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem('jwtToken'); // Remove JWT token from localStorage
-    navigate('/'); // Redirect to the login page
+    localStorage.removeItem('jwtToken');
+    navigate('/');
   };
 
-  // Render the selected component
   const renderComponent = () => {
     switch (activeComponent) {
       case 'PendingRequests':
@@ -38,6 +39,14 @@ const AdminDashboard = () => {
         return <RoleManagement />;
       case 'TaskIframe':
         return <TaskIframe />;
+      case 'AddPayeeAccount':
+        return <AddPayeeAccount />;
+      case 'DeleteBeneficiary':
+        return <DeleteBeneficiary />;
+      case 'VoucherPortal':
+        return <VoucherPortal />;
+      case 'DeleteJobPortal':
+        return <DeleteJobPortal />;
       default:
         return <PendingRequests />;
     }
@@ -45,19 +54,16 @@ const AdminDashboard = () => {
 
   return (
     <div>
-      {/* Navigation Header */}
       <AppBar position="static" sx={{ backgroundColor: '#3f51b5' }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
             Admin Dashboard
           </Typography>
 
-          {/* Updated navigation buttons with dynamic styling */}
           <Button
-            color={activeComponent === 'PendingRequests' ? 'inherit' : 'inherit'}
             sx={{
               fontWeight: activeComponent === 'PendingRequests' ? 'bold' : 'normal',
-              color: activeComponent === 'PendingRequests' ? '#8ce0f5' : 'inherit', // Light blue color
+              color: activeComponent === 'PendingRequests' ? '#8ce0f5' : 'inherit',
               borderBottom: activeComponent === 'PendingRequests' ? '2px solid #8ce0f5' : 'none',
             }}
             onClick={() => handleComponentSwitch('PendingRequests')}
@@ -67,10 +73,9 @@ const AdminDashboard = () => {
             </Badge>
           </Button>
           <Button
-            color={activeComponent === 'RoleManagement' ? 'inherit' : 'inherit'}
             sx={{
               fontWeight: activeComponent === 'RoleManagement' ? 'bold' : 'normal',
-              color: activeComponent === 'RoleManagement' ? '#8ce0f5' : 'inherit', // Light blue color
+              color: activeComponent === 'RoleManagement' ? '#8ce0f5' : 'inherit',
               borderBottom: activeComponent === 'RoleManagement' ? '2px solid #8ce0f5' : 'none',
             }}
             onClick={() => handleComponentSwitch('RoleManagement')}
@@ -78,22 +83,62 @@ const AdminDashboard = () => {
             Role Management
           </Button>
           <Button
-            color={activeComponent === 'TaskIframe' ? 'inherit' : 'inherit'}
             sx={{
               fontWeight: activeComponent === 'TaskIframe' ? 'bold' : 'normal',
-              color: activeComponent === 'TaskIframe' ? '#8ce0f5' : 'inherit', // Light blue color
+              color: activeComponent === 'TaskIframe' ? '#8ce0f5' : 'inherit',
               borderBottom: activeComponent === 'TaskIframe' ? '2px solid #8ce0f5' : 'none',
             }}
             onClick={() => handleComponentSwitch('TaskIframe')}
           >
             Project Configuration
           </Button>
+          <Button
+            sx={{
+              fontWeight: activeComponent === 'AddPayeeAccount' ? 'bold' : 'normal',
+              color: activeComponent === 'AddPayeeAccount' ? '#8ce0f5' : 'inherit',
+              borderBottom: activeComponent === 'AddPayeeAccount' ? '2px solid #8ce0f5' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('AddPayeeAccount')}
+          >
+            Add Bank Account
+          </Button>
+          <Button
+            sx={{
+              fontWeight: activeComponent === 'DeleteBeneficiary' ? 'bold' : 'normal',
+              color: activeComponent === 'DeleteBeneficiary' ? '#8ce0f5' : 'inherit',
+              borderBottom: activeComponent === 'DeleteBeneficiary' ? '2px solid #8ce0f5' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('DeleteBeneficiary')}
+          >
+            Delete Beneficiary
+          </Button>
 
-          {/* Logout Button with an Icon */}
+          <Button
+            sx={{
+              fontWeight: activeComponent === 'VoucherPortal' ? 'bold' : 'normal',
+              color: activeComponent === 'VoucherPortal' ? '#8ce0f5' : 'inherit',
+              borderBottom: activeComponent === 'VoucherPortal' ? '2px solid #8ce0f5' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('VoucherPortal')}
+          >
+            Voucher Portal
+          </Button>
+
+          <Button
+            sx={{
+              fontWeight: activeComponent === 'DeleteJobPortal' ? 'bold' : 'normal',
+              color: activeComponent === 'DeleteJobPortal' ? '#8ce0f5' : 'inherit',
+              borderBottom: activeComponent === 'DeleteJobPortal' ? '2px solid #8ce0f5' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('DeleteJobPortal')}
+          >
+            Delete Job
+          </Button>
+
           <IconButton
             color="inherit"
             onClick={handleLogout}
-            sx={{ marginLeft: 'auto', color: '#ffeb3b' }} // Yellow color for logout
+            sx={{ marginLeft: 'auto', color: '#ffeb3b' }}
           >
             <LogoutIcon />
             <Typography variant="body2" sx={{ marginLeft: 1 }}>
@@ -103,7 +148,6 @@ const AdminDashboard = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Main Content Area with Fade Transition */}
       <Container maxWidth={false} disableGutters>
         <Fade in={fadeIn} timeout={300}>
           <Box mt={4} sx={{ backgroundColor: '#f5f5f5', borderRadius: 2, p: 4, boxShadow: 3 }}>

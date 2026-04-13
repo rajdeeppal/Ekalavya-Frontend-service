@@ -19,8 +19,8 @@ import {
     Checkbox,
     Modal,
     Divider,
-    Box, FormControl, InputLabel, Select, MenuItem, FormControlLabel
-
+    Box, FormControl, InputLabel, Select, MenuItem, FormControlLabel,
+    Badge
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -29,7 +29,7 @@ import {
     Reviews,
 } from '@mui/icons-material';
 import { useAuth } from '../PrivateRoute';
-import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails, rejectVCPaymentDetails, approveVCPaymentDetails } from '../DataCenter/apiService';
+import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails, rejectVCPaymentDetails, approveVCPaymentDetails, getPayeeAccountByAccountNumber, updatePayeeAccount } from '../DataCenter/apiService';
 import AOPaymentTable from '../AO/AOPaymentTable';
 import DownloadIcon from '@mui/icons-material/Download';
 import Avatar from '@mui/material/Avatar';
@@ -44,7 +44,9 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         iFSCNo: '',
         branchName: '',
         isFullPayment: true,
-        partialPayment: ''
+        partialPayment: '',
+        saveDetails: false,
+        showSaveCheckbox: false
     });
     const [errors, setErrors] = useState('');
     const [benId, setBenId] = useState('');
@@ -124,7 +126,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         if (!formValues.bankName) formErrors.bankName = 'Bank name is required';
         if (!formValues.iFSCNo) formErrors.iFSCNo = 'IFSC No is required';
         if (!formValues.branchName) formErrors.branchName = 'Branch name is required';
- 
+
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
@@ -146,6 +148,31 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         }
 
         console.log(tasks)
+
+        // Save bank details if checkbox is checked and any field was manually entered or empty
+        if (formValues.saveDetails && beneficiary.accountNumber) {
+            try {
+                const payeeAccount = await getPayeeAccountByAccountNumber(beneficiary.accountNumber);
+
+                // Create FormData for update
+                const formData = new FormData();
+                const payeeAccountRequest = {
+                    accountNumber: beneficiary.accountNumber,
+                    payeeName: beneficiary.payeeName,
+                    bankName: formValues.bankName,
+                    ifscCode: formValues.iFSCNo,
+                    branchName: formValues.branchName,
+                    protectPassbookDoc: payeeAccount.protectPassbookDoc || false
+                };
+
+                formData.append('payeeAccountRequest', JSON.stringify(payeeAccountRequest));
+
+                await updatePayeeAccount(payeeAccount.id, formData);
+            } catch (error) {
+                console.error('Error updating payee account:', error);
+                // Continue with voucher generation even if update fails
+            }
+        }
 
         const component = Object.entries(tasks).map(([projectId, componentGroup]) => {
             const project = beneficiary.projects.find((p) => p.id === parseInt(projectId));
@@ -204,7 +231,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
             ifscCode: formValues.iFSCNo,
             branchName: formValues.branchName,
             passbookDocs: beneficiary.passbookDocs,
-            otherDocs: beneficiary.otherDocs
+            otherDocs: beneficiary.otherDocs,
+            saveDetails: formValues.saveDetails
         };
 
         console.log(totalAmount)
@@ -225,7 +253,9 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                 iFSCNo: '',
                 branchName: '',
                 isFullPayment: true,
-                partialPayment: ''
+                partialPayment: '',
+                saveDetails: false,
+                showSaveCheckbox: false
             });
             setShowViewConfirmation(false);
             setIsSucess(true);
@@ -242,6 +272,15 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
 
     const handleCloseViewConfirmation = () => {
         setShowViewConfirmation(false);
+        setFormValues({
+            bankName: '',
+            iFSCNo: '',
+            branchName: '',
+            isFullPayment: true,
+            partialPayment: '',
+            saveDetails: false,
+            showSaveCheckbox: false
+        });
     };
 
     const handleCloseViewCommentConfirmation = () => {
@@ -252,8 +291,49 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         setShowViewPaymentConfirmation(false);
     };
 
-    const handleSubmit = (id) => {
-        setBenId(id)
+    const handleSubmit = async (id) => {
+        setBenId(id);
+        const beneficiary = beneficiaries.find((b) => b.id === id);
+
+        if (beneficiary && beneficiary.accountNumber) {
+            try {
+                const payeeAccount = await getPayeeAccountByAccountNumber(beneficiary.accountNumber);
+                const bankName = payeeAccount.bankName || '';
+                const iFSCNo = payeeAccount.ifscCode || '';
+                const branchName = payeeAccount.branchName || '';
+                
+                const hasEmptyFields = !bankName || !iFSCNo || !branchName;
+                
+                setFormValues(prev => ({
+                    ...prev,
+                    bankName,
+                    iFSCNo,
+                    branchName,
+                    saveDetails: false,
+                    showSaveCheckbox: hasEmptyFields
+                }));
+            } catch (error) {
+                console.error('Error fetching payee account details:', error);
+                setFormValues(prev => ({
+                    ...prev,
+                    bankName: '',
+                    iFSCNo: '',
+                    branchName: '',
+                    saveDetails: false,
+                    showSaveCheckbox: true
+                }));
+            }
+        } else {
+            setFormValues(prev => ({
+                ...prev,
+                bankName: '',
+                iFSCNo: '',
+                branchName: '',
+                saveDetails: false,
+                showSaveCheckbox: true
+            }));
+        }
+
         setShowViewConfirmation(true);
     };
 
@@ -380,8 +460,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                 <>
 
                                     <TableCell style={{ fontWeight: 'bold' }}>Voucher</TableCell>
-                                    {(!isVC) &&
-                                        <TableCell style={{ fontWeight: 'bold' }}>Comments</TableCell>}
+                                    <TableCell style={{ fontWeight: 'bold' }}>Comments</TableCell>
                                 </>
                             }
                             <TableCell style={{ fontWeight: 'bold' }}>Actions</TableCell>
@@ -415,17 +494,37 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                     {beneficiary.voucherId}
                                                 </a>
                                             </TableCell>
-                                            {(!isVC) &&
-                                                <TableCell>
+                                            <TableCell>
+                                                {beneficiary?.comments && beneficiary.comments.length > 0 ? (
+                                                    <Badge badgeContent={beneficiary.comments.length} color="error">
+                                                        <IconButton
+                                                            color="primary"
+                                                            onClick={() => toggleViewMode(
+                                                                [...beneficiary.comments].sort(
+                                                                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                                                                )
+                                                            )}
+                                                            sx={{
+                                                                animation: 'pulse 2s infinite',
+                                                                '@keyframes pulse': {
+                                                                    '0%': { transform: 'scale(1)' },
+                                                                    '50%': { transform: 'scale(1.1)' },
+                                                                    '100%': { transform: 'scale(1)' },
+                                                                },
+                                                            }}
+                                                        >
+                                                            <RemoveRedEyeOutlinedIcon />
+                                                        </IconButton>
+                                                    </Badge>
+                                                ) : (
                                                     <IconButton
-                                                        color={
-                                                            'primary'
-                                                        }
-                                                        onClick={() => toggleViewMode(beneficiary?.comments)}
+                                                        color="default"
+                                                        disabled
                                                     >
                                                         <RemoveRedEyeOutlinedIcon />
                                                     </IconButton>
-                                                </TableCell>}
+                                                )}
+                                            </TableCell>
                                         </>
                                     )}
                                     <TableCell>
@@ -730,11 +829,16 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                         label="Bank Name"
                         name="bankName"
                         placeholder="Bank Name"
+                        value={formValues.bankName}
                         onChange={handleChange}
                         margin="normal"
                         required
                         error={!!errors.bankName}
                         helperText={errors.bankName}
+                        disabled={formValues.bankName && !formValues.showSaveCheckbox}
+                        InputProps={{
+                            readOnly: formValues.bankName && !formValues.showSaveCheckbox
+                        }}
                     />
 
                     <TextField
@@ -742,11 +846,16 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                         label="IFSC No."
                         name="iFSCNo"
                         placeholder="IFSC No"
+                        value={formValues.iFSCNo}
                         onChange={handleChange}
                         margin="normal"
                         required
                         error={!!errors.iFSCNo}
                         helperText={errors.iFSCNo}
+                        disabled={formValues.iFSCNo && !formValues.showSaveCheckbox}
+                        InputProps={{
+                            readOnly: formValues.iFSCNo && !formValues.showSaveCheckbox
+                        }}
                     />
 
                     <TextField
@@ -754,11 +863,16 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                         label="Branch Name"
                         name="branchName"
                         placeholder="Branch Name"
+                        value={formValues.branchName}
                         onChange={handleChange}
                         margin="normal"
                         required
                         error={!!errors.branchName}
                         helperText={errors.branchName}
+                        disabled={formValues.branchName && !formValues.showSaveCheckbox}
+                        InputProps={{
+                            readOnly: formValues.branchName && !formValues.showSaveCheckbox
+                        }}
                     />
 
                     <div style={{ marginTop: '16px' }}>
@@ -791,6 +905,26 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                             error={!!errors.partialPayment}
                             helperText={errors.partialPayment}
                         />
+                    )}
+
+                    {formValues.showSaveCheckbox && (
+                        <div style={{ marginTop: '16px' }}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    name="saveDetails"
+                                    checked={formValues.saveDetails || false}
+                                    onChange={(e) =>
+                                        setFormValues((prev) => ({
+                                            ...prev,
+                                            saveDetails: e.target.checked,
+                                        }))
+                                    }
+                                />
+                            }
+                            label="Save the details"
+                        />
+                        </div>
                     )}
 
                     <Button variant="contained" color="primary" onClick={() => handleGenerateVoucher(benId)} sx={{ mt: 2 }} >

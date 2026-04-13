@@ -5,6 +5,7 @@ import SearchBar from '../PM/SearchBar';
 import { getBeneficiary } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import ReviewTable from '../DomainExpert/ReviewTable';
+import Pagination from '../Common/Pagination';
 
 function CEOReviewPage() {
   const { userId } = useAuth();
@@ -14,6 +15,10 @@ function CEOReviewPage() {
   const [isSuccess, setIsSucess] = useState(false);
   const [value, setValue] = useState(false);
   const [isCEO, setIsCEO] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   useEffect(() => {
     console.log("isSuccess:", isSuccess);
@@ -23,12 +28,16 @@ function CEOReviewPage() {
     }
   }, [isSuccess]);
 
-  const handleSearch = async (criteria) => {
+  const handleSearch = async (criteria, page = 0, size = pageSize) => {
     if (!criteria) return;
     try {
       console.log("ok");
-      const data = await getBeneficiary(userId, criteria, 'inprogress');
-      setBeneficiaries(Array.isArray(data) ? data : []);
+      const data = await getBeneficiary(userId, criteria, 'inprogress', page, size);
+      setBeneficiaries(Array.isArray(data.beneficiaries) ? data.beneficiaries : []);
+      setCurrentPage(data.currentPage || 0);
+      setTotalPages(data.totalPages || 0);
+      setTotalElements(data.totalElements || 0);
+      setPageSize(data.pageSize || size);
       setShowTable(true);
       setIsSucess(false);
       setValue(criteria);
@@ -38,6 +47,17 @@ function CEOReviewPage() {
       alert(error);
       console.error('Error fetching activities:', error);
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    handleSearch(value, newPage, pageSize);
+  };
+
+  const handlePageSizeChange = (newSize) => {
+    setPageSize(newSize);
+    setCurrentPage(0);
+    handleSearch(value, 0, newSize);
   };
 
   return (
@@ -57,8 +77,18 @@ function CEOReviewPage() {
           <SearchBar onSearch={handleSearch} />
         </Box>
 
-        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-          <ReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} isCEO={isCEO}/>
+        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', mt: 3 }}>
+          <Box sx={{ pb: 3 }}>
+            <ReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} isCEO={isCEO}/>
+          </Box>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalElements={totalElements}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </Box>}
       </Box>
     </Box>

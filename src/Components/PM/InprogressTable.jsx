@@ -18,7 +18,7 @@ import {
     Alert,
     Box,
     Modal,
-    FormControl, Select, MenuItem, Divider
+    FormControl, Select, MenuItem, Divider, Autocomplete
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -29,7 +29,7 @@ import Avatar from '@mui/material/Avatar';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask } from '../DataCenter/apiService';
+import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask, searchPayeeAccounts } from '../DataCenter/apiService';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import Checkbox from '@mui/material/Checkbox';
@@ -54,6 +54,8 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
     const [comments, setComments] = useState([]);
     const [id, setId] = useState([]);
     const [isBulk, setIsBulk] = useState(false);
+    const [payeeAccounts, setPayeeAccounts] = useState({});
+    const [payeeAccountLoading, setPayeeAccountLoading] = useState({});
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
@@ -200,6 +202,12 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                     [field]: value,
                                 };
 
+                                // Reset payee name and passbook doc when account number is cleared
+                                if (field === 'accountNumber' && !value) {
+                                    updatedRow.payeeName = '';
+                                    updatedRow.passbookDocFromPayee = null;
+                                }
+
                                 if (
                                     //                                 /* field === 'currentBeneficiaryContribution' || */
                                     field === 'achievementUnit' ||
@@ -214,6 +222,57 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
 
                                 updatedTaskUpdates[rowIndex] = updatedRow;
 
+                                return { ...task, taskUpdates: updatedTaskUpdates };
+                            }
+                            return task;
+                        })
+                    }))
+                }))
+            }));
+        });
+    };
+
+    const handleAccountNumberSearch = async (taskIndex, rowIndex, searchValue) => {
+        if (!searchValue || searchValue.length < 2) {
+            setPayeeAccounts(prev => ({ ...prev, [`${taskIndex}-${rowIndex}`]: [] }));
+            return;
+        }
+        const key = `${taskIndex}-${rowIndex}`;
+        setPayeeAccountLoading(prev => ({ ...prev, [key]: true }));
+        try {
+            const response = await searchPayeeAccounts(searchValue, 0, 10);
+            setPayeeAccounts(prev => ({ ...prev, [key]: response.content || [] }));
+        } catch (error) {
+            console.error('Error searching payee accounts:', error);
+            setPayeeAccounts(prev => ({ ...prev, [key]: [] }));
+        } finally {
+            setPayeeAccountLoading(prev => ({ ...prev, [key]: false }));
+        }
+    };
+
+    const handlePayeeAccountSelect = (taskIndex, rowIndex, payeeAccount) => {
+        if (!payeeAccount) return;
+        
+        setBeneficiaries((prevBeneficiaries) => {
+            return prevBeneficiaries.map((beneficiary) => ({
+                ...beneficiary,
+                components: beneficiary.components.map((component) => ({
+                    ...component,
+                    activities: component.activities.map((activity) => ({
+                        ...activity,
+                        tasks: activity.tasks.map((task) => {
+                            if (task.id === taskIndex) {
+                                const updatedTaskUpdates = [...task.taskUpdates];
+                                updatedTaskUpdates[rowIndex] = {
+                                    ...updatedTaskUpdates[rowIndex],
+                                    accountNumber: payeeAccount.accountNumber,
+                                    payeeName: payeeAccount.payeeName,
+                                    passbookDocFromPayee: payeeAccount.passbookDocName && payeeAccount.url ? {
+                                        fileName: payeeAccount.passbookDocName,
+                                        downloadUrl: payeeAccount.url,
+                                        protected: payeeAccount.protectPassbookDoc
+                                    } : null
+                                };
                                 return { ...task, taskUpdates: updatedTaskUpdates };
                             }
                             return task;
@@ -565,10 +624,11 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                 <TableCell>Unit Rate</TableCell>
                                                                                                 <TableCell>Financial Extension</TableCell>
                                                                                                 <TableCell>Sanction Units</TableCell>
-                                                                                                <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Total Cost</TableCell>
+                                                                                                <TableCell>Unit Balance</TableCell>
                                                                                                 <TableCell>Beneficiary Contribution Balance</TableCell>
-                                                                                                <TableCell>Remain Amount</TableCell>
+                                                                                                <TableCell>Grand Balance</TableCell>
+                                                                                                <TableCell>Total Balance</TableCell>
                                                                                                 <TableCell>Year of Sanction</TableCell>
                                                                                                 <TableCell>Actions</TableCell>
                                                                                             </TableRow>
@@ -584,10 +644,11 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                             {task.financialExtension ? 'Y' : 'N'}
                                                                                                         </TableCell>
                                                                                                         <TableCell>{task.units}</TableCell>
-                                                                                                        <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.totalCost}</TableCell>
+                                                                                                        <TableCell>{task.unitRemain}</TableCell>
                                                                                                         <TableCell>{task.beneficiaryContributionRemain}</TableCell>
                                                                                                         <TableCell>{task.balanceRemaining}</TableCell>
+                                                                                                        <TableCell>{task.balanceRemaining + task.beneficiaryContributionRemain}</TableCell>
                                                                                                         <TableCell>{task.yearOfSanction}</TableCell>
                                                                                                         <TableCell>
                                                                                                             <Button
@@ -631,6 +692,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                                                                                                                                                                                   zIndex: 1,
                                                                                                                                                                                                                                                                               }}>
                                                                                                                                 <TableRow>
+                                                                                                                                <TableCell sx={{ minWidth: 120 }}>Job Id</TableCell>
                                                                                                                                     <TableCell sx={{ minWidth: 120 }}>Unit Achievement</TableCell>
                                                                                                                                     <TableCell sx={{ minWidth: 130 }}>Discounted Rate</TableCell>
                                                                                                                                     <TableCell sx={{ minWidth: 140 }}>Beneficiary Contribution</TableCell>
@@ -654,7 +716,18 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                                                     <TextField
                                                                                                                                                         variant="outlined"
                                                                                                                                                         size="small"
+                                                                                                                                                        value={row.id || ''}
+                                                                                                                                                        InputProps={{ readOnly: true }}
+                                                                                                                                                    />
+                                                                                                                                                </TableCell>
+                                                                                                                                                <TableCell>
+                                                                                                                                                    <TextField
+                                                                                                                                                        variant="outlined"
+                                                                                                                                                        size="small"
                                                                                                                                                         value={row.achievementUnit || ''}
+                                                                                                                                                        required
+                                                                                                                                                        error={!row.achievementUnit}
+                                                                                                                                                        helperText={!row.achievementUnit ? 'Required' : ''}
                                                                                                                                                         onChange={(e) =>
                                                                                                                                                             handleInputChange(
                                                                                                                                                                 task.id,
@@ -717,33 +790,114 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                                                         variant="outlined"
                                                                                                                                                         size="small"
                                                                                                                                                         value={row.payeeName || ''}
-                                                                                                                                                        onChange={(e) =>
-                                                                                                                                                            handleInputChange(
-                                                                                                                                                                task.id,
-                                                                                                                                                                rowIndex,
-                                                                                                                                                                'payeeName',
-                                                                                                                                                                e.target.value
-                                                                                                                                                            )
-                                                                                                                                                        }
+                                                                                                                                                        required
+                                                                                                                                                        disabled
+                                                                                                                                                        error={!row.payeeName}
+                                                                                                                                                        helperText={!row.payeeName ? 'Required' : ''}
+                                                                                                                                                        InputProps={{
+                                                                                                                                                            readOnly: true,
+                                                                                                                                                        }}
                                                                                                                                                     />
                                                                                                                                                 </TableCell>
                                                                                                                                                 <TableCell>
-                                                                                                                                                    <TextField
-                                                                                                                                                        variant="outlined"
+                                                                                                                                                    <Autocomplete
+                                                                                                                                                        freeSolo
                                                                                                                                                         size="small"
+                                                                                                                                                        options={payeeAccounts[`${task.id}-${rowIndex}`] || []}
+                                                                                                                                                        getOptionLabel={(option) => typeof option === 'string' ? option : option.accountNumber || ''}
+                                                                                                                                                        loading={payeeAccountLoading[`${task.id}-${rowIndex}`]}
                                                                                                                                                         value={row.accountNumber || ''}
-                                                                                                                                                        onChange={(e) =>
-                                                                                                                                                            handleInputChange(
-                                                                                                                                                                task.id,
-                                                                                                                                                                rowIndex,
-                                                                                                                                                                'accountNumber',
-                                                                                                                                                                e.target.value
-                                                                                                                                                            )
-                                                                                                                                                        }
+                                                                                                                                                        onInputChange={(e, value) => {
+                                                                                                                                                            handleInputChange(task.id, rowIndex, 'accountNumber', value);
+                                                                                                                                                            handleAccountNumberSearch(task.id, rowIndex, value);
+                                                                                                                                                        }}
+                                                                                                                                                        onChange={(e, value) => {
+                                                                                                                                                            if (value && typeof value === 'object') {
+                                                                                                                                                                handlePayeeAccountSelect(task.id, rowIndex, value);
+                                                                                                                                                            }
+                                                                                                                                                        }}
+                                                                                                                                                        renderInput={(params) => (
+                                                                                                                                                            <TextField
+                                                                                                                                                                {...params}
+                                                                                                                                                                variant="outlined"
+                                                                                                                                                                placeholder="Search account"
+                                                                                                                                                                required
+                                                                                                                                                                error={!row.accountNumber}
+                                                                                                                                                                helperText={!row.accountNumber ? 'Required' : ''}
+                                                                                                                                                            />
+                                                                                                                                                        )}
+                                                                                                                                                        renderOption={(props, option) => (
+                                                                                                                                                            <li {...props}>
+                                                                                                                                                                <Box>
+                                                                                                                                                                    <Typography variant="body2">{option.accountNumber}</Typography>
+                                                                                                                                                                    <Typography variant="caption" color="text.secondary">
+                                                                                                                                                                        {option.payeeName} - {option.bankName}
+                                                                                                                                                                    </Typography>
+                                                                                                                                                                </Box>
+                                                                                                                                                            </li>
+                                                                                                                                                        )}
                                                                                                                                                     />
                                                                                                                                                 </TableCell>
                                                                                                                                                 <TableCell>
-                                                                                                                                                    {!row.passbookDoc ?
+                                                                                                                                                    {row.passbookDocFromPayee ? (
+                                                                                                                                                        <Box>
+                                                                                                                                                            <Alert severity="success" sx={{ mb: 1 }}>
+                                                                                                                                                                <a
+                                                                                                                                                                    href={row.passbookDocFromPayee.downloadUrl}
+                                                                                                                                                                    target="_blank"
+                                                                                                                                                                    rel="noopener noreferrer"
+                                                                                                                                                                    style={{ textDecoration: 'underline', color: 'blue' }}
+                                                                                                                                                                >
+                                                                                                                                                                    {row.passbookDocFromPayee.fileName}
+                                                                                                                                                                </a>
+                                                                                                                                                            </Alert>
+                                                                                                                                                            {!row.passbookDocFromPayee.protected && (
+                                                                                                                                                                !row.passbookDoc ? (
+                                                                                                                                                                    <Button
+                                                                                                                                                                        variant="contained"
+                                                                                                                                                                        component="label"
+                                                                                                                                                                        size="small"
+                                                                                                                                                                    >
+                                                                                                                                                                        Replace
+                                                                                                                                                                        <input
+                                                                                                                                                                            type="file"
+                                                                                                                                                                            hidden
+                                                                                                                                                                            onChange={(e) =>
+                                                                                                                                                                                handleFileChange(
+                                                                                                                                                                                    task.id,
+                                                                                                                                                                                    rowIndex,
+                                                                                                                                                                                    'passbookDoc',
+                                                                                                                                                                                    e
+                                                                                                                                                                                )
+                                                                                                                                                                            }
+                                                                                                                                                                        />
+                                                                                                                                                                    </Button>
+                                                                                                                                                                ) : (
+                                                                                                                                                                    <Alert
+                                                                                                                                                                        severity="info"
+                                                                                                                                                                        action={
+                                                                                                                                                                            <IconButton
+                                                                                                                                                                                aria-label="remove file"
+                                                                                                                                                                                color="inherit"
+                                                                                                                                                                                size="small"
+                                                                                                                                                                                onClick={() =>
+                                                                                                                                                                                    handleRemoveFile(task.id, rowIndex, 'passbookDoc', 0)}
+                                                                                                                                                                            >
+                                                                                                                                                                                <CloseIcon fontSize="inherit" />
+                                                                                                                                                                            </IconButton>
+                                                                                                                                                                        }
+                                                                                                                                                                    >{row.passbookDoc.name}
+                                                                                                                                                                    </Alert>
+                                                                                                                                                                )
+                                                                                                                                                            )}
+                                                                                                                                                            {row.passbookDocFromPayee.protected && (
+                                                                                                                                                                <Typography variant="caption" color="text.secondary">
+                                                                                                                                                                    Protected - Upload disabled
+                                                                                                                                                                </Typography>
+                                                                                                                                                            )}
+                                                                                                                                                        </Box>
+                                                                                                                                                    ) : (
+                                                                                                                                                        !row.passbookDoc ?
                                                                                                                                                         (<Button
                                                                                                                                                             variant="contained"
                                                                                                                                                             component="label"
@@ -778,7 +932,8 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
 
                                                                                                                                                         >{newTask ? (<>{row.passbookDoc.name}</>) : (!isEdit ? <>{row.passbookDoc.fileName}</> : <>{row.passbookDoc.name}</>)}
 
-                                                                                                                                                        </Alert>)}
+                                                                                                                                                        </Alert>)
+                                                                                                                                                    )}
                                                                                                                                                 </TableCell>
 
                                                                                                                                                 <TableCell>
@@ -880,6 +1035,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                                                 </TableCell>
                                                                                                                                             </>) : (
                                                                                                                                             <>
+                                                                                                                                                <TableCell>{row.id}</TableCell>
                                                                                                                                                 <TableCell>{row.achievementUnit}</TableCell>
                                                                                                                                                 <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                                 <TableCell>{row.currentBeneficiaryContribution}</TableCell>
@@ -986,7 +1142,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                     onClick={() => handleSubmit(beneficiary.id)}
                                                     style={{ marginTop: '10px' }}
                                                 >
-                                                    Save
+                                                    Submit
                                                 </Button>
                                             </div>
                                         </Collapse>

@@ -234,9 +234,9 @@ export const getBeneficiaryByProjectName = async (projectName) => {
   }
 };
 
-export const getBeneficiary = async (userId, data, category) => {
+export const getBeneficiary = async (userId, data, category, page = 0, size = 10) => {
   try {
-    const { stateName, districtName, projectName, componentName } = data;
+    const { stateName, districtName, projectName, componentName, startDate, endDate } = data;
 
     // Use URLSearchParams to encode all query parameters
     const params = new URLSearchParams();
@@ -245,7 +245,11 @@ export const getBeneficiary = async (userId, data, category) => {
     if (stateName) params.append("stateName", stateName);
     if (districtName) params.append("districtName", districtName);
     if (projectName) params.append("projectName", projectName);
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
     if (category) params.append("stage", category);
+    params.append("page", page);
+    params.append("size", size);
 
     const url = `${BENEFICIARY_BASE_URL}/filter/${userId}?${params.toString()}`;
 
@@ -253,7 +257,7 @@ export const getBeneficiary = async (userId, data, category) => {
       headers: getAuthorizationHeader(),
     });
 
-    return response.data.beneficiaries;
+    return response.data;
   } catch (error) {
     console.error("Error fetching beneficiary:", error);
     throw error;
@@ -1136,7 +1140,7 @@ export const uploadTemplate = async (userId, file) => {
     formData.append("file", file);
 
     const response = await axios.post(
-      `https://projects.ekalavya.net/api/beneficiary/bulk-upload/${userId}`,
+      `http://localhost:61002/api/beneficiary/bulk-upload/${userId}`,
       formData,
       {
         headers: {
@@ -1182,5 +1186,176 @@ export const saveTrainingConfiguration = async (projectDto) => {
   }
 };
 
+export const createPayeeAccount = async (formData) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:61002/api/payee-accounts`,
+      formData,
+      {
+        headers: {
+          ...getAuthorizationHeader(),
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating payee account:', error);
+    throw error;
+  }
+};
 
 
+
+
+export const updatePayeeAccount = async (id, formData) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:61002/api/payee-accounts/${id}`,
+      formData,
+      {
+        headers: {
+          ...getAuthorizationHeader(),
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating payee account:', error);
+    throw error;
+  }
+};
+
+export const getPayeeAccountByAccountNumber = async (accountNumber) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/api/payee-accounts/${accountNumber}`,
+      {
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching payee account:', error);
+    throw error;
+  }
+};
+
+export const searchPayeeAccounts = async (keyword, page = 0, size = 5) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/api/payee-accounts/search`,
+      {
+        params: { keyword, page, size },
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error searching payee accounts:', error);
+    throw error;
+  }
+};
+
+export const searchBeneficiariesByAadhar = async (prefix, page = 0, size = 5) => {
+  try {
+    const response = await axios.get(
+      `${BENEFICIARY_BASE_URL}/search`,
+      {
+        params: { prefix, page, size },
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error searching beneficiaries by Aadhar:', error);
+    throw error;
+  }
+};
+
+export const deleteBeneficiaryByAadhar = async (aadharNumber) => {
+  try {
+    const response = await axios.delete(
+      `${BASE_URL}/beneficiary`,
+      {
+        params: { aadharNumber },
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting beneficiary:', error);
+    throw error;
+  }
+};
+
+export const getTaskUpdateDetails = async (taskUpdateId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/api/admin/task-update/${taskUpdateId}`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching task update details:', error);
+    throw error;
+  }
+};
+
+export const deleteTaskUpdate = async (taskUpdateId) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:61002/api/admin/task-update/${taskUpdateId}`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting task update:', error);
+    throw error;
+  }
+};
+
+export const getVoucherInfo = async (voucherId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/api/cfo/voucher/info/${voucherId}`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching voucher info:", error);
+    throw error;
+  }
+};
+
+export const revertVoucher = async (employeeId, voucherId, remarks) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:61002/api/admin/voucher/revert/${employeeId}/${voucherId}?remarks=${remarks}`,
+      null,
+      {
+        headers: {
+          ...getAuthorizationHeader()
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error reverting voucher:", error);
+    throw error;
+  }
+};
+
+export const getVoucherJobIds = async (voucherId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:61002/api/cfo/voucher/job-ids/${voucherId}`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching voucher job IDs:", error);
+    throw error;
+  }
+};
