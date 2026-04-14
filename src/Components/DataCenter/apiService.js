@@ -1140,7 +1140,7 @@ export const uploadTemplate = async (userId, file) => {
     formData.append("file", file);
 
     const response = await axios.post(
-      `http://localhost:61002/api/beneficiary/bulk-upload/${userId}`,
+      `https://projects.ekalavya.net/api/beneficiary/bulk-upload/${userId}`,
       formData,
       {
         headers: {
@@ -1189,7 +1189,7 @@ export const saveTrainingConfiguration = async (projectDto) => {
 export const createPayeeAccount = async (formData) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/payee-accounts`,
+      `https://projects.ekalavya.net/api/payee-accounts`,
       formData,
       {
         headers: {
@@ -1211,7 +1211,7 @@ export const createPayeeAccount = async (formData) => {
 export const updatePayeeAccount = async (id, formData) => {
   try {
     const response = await axios.put(
-      `http://localhost:61002/api/payee-accounts/${id}`,
+      `https://projects.ekalavya.net/api/payee-accounts/${id}`,
       formData,
       {
         headers: {
@@ -1230,7 +1230,7 @@ export const updatePayeeAccount = async (id, formData) => {
 export const getPayeeAccountByAccountNumber = async (accountNumber) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/payee-accounts/${accountNumber}`,
+      `https://projects.ekalavya.net/api/payee-accounts/${accountNumber}`,
       {
         headers: getAuthorizationHeader(),
       }
@@ -1245,7 +1245,7 @@ export const getPayeeAccountByAccountNumber = async (accountNumber) => {
 export const searchPayeeAccounts = async (keyword, page = 0, size = 5) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/payee-accounts/search`,
+      `https://projects.ekalavya.net/api/payee-accounts/search`,
       {
         params: { keyword, page, size },
         headers: getAuthorizationHeader(),
@@ -1293,7 +1293,7 @@ export const deleteBeneficiaryByAadhar = async (aadharNumber) => {
 export const getTaskUpdateDetails = async (taskUpdateId) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/admin/task-update/${taskUpdateId}`,
+      `https://projects.ekalavya.net/api/admin/task-update/${taskUpdateId}`,
       { headers: getAuthorizationHeader() }
     );
     return response.data;
@@ -1306,7 +1306,7 @@ export const getTaskUpdateDetails = async (taskUpdateId) => {
 export const deleteTaskUpdate = async (taskUpdateId) => {
   try {
     const response = await axios.delete(
-      `http://localhost:61002/api/admin/task-update/${taskUpdateId}`,
+      `https://projects.ekalavya.net/api/admin/task-update/${taskUpdateId}`,
       { headers: getAuthorizationHeader() }
     );
     return response.data;
@@ -1319,7 +1319,7 @@ export const deleteTaskUpdate = async (taskUpdateId) => {
 export const getVoucherInfo = async (voucherId) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/cfo/voucher/info/${voucherId}`,
+      `https://projects.ekalavya.net/api/cfo/voucher/info/${voucherId}`,
       { headers: getAuthorizationHeader() }
     );
     return response.data;
@@ -1332,7 +1332,7 @@ export const getVoucherInfo = async (voucherId) => {
 export const revertVoucher = async (employeeId, voucherId, remarks) => {
   try {
     const response = await axios.post(
-      `http://localhost:61002/api/admin/voucher/revert/${employeeId}/${voucherId}?remarks=${remarks}`,
+      `https://projects.ekalavya.net/api/admin/voucher/revert/${employeeId}/${voucherId}?remarks=${remarks}`,
       null,
       {
         headers: {
@@ -1350,7 +1350,7 @@ export const revertVoucher = async (employeeId, voucherId, remarks) => {
 export const getVoucherJobIds = async (voucherId) => {
   try {
     const response = await axios.get(
-      `http://localhost:61002/api/cfo/voucher/job-ids/${voucherId}`,
+      `https://projects.ekalavya.net/api/cfo/voucher/job-ids/${voucherId}`,
       { headers: getAuthorizationHeader() }
     );
     return response.data;
