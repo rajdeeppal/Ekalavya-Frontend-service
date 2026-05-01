@@ -1,53 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Modal, Typography, Box } from '@mui/material';
-import Sidebar from '../Director/sidebar/Sidebar';
-import SearchBar from '../PM/SearchBar';
-import { getBeneficiary } from '../DataCenter/apiService';
+import React, { useState } from 'react';
+import { Box } from '@mui/material';
+import Sidebar from './sidebar/Sidebar';
+import { getTraining } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
-import ReviewTable from '../DomainExpert/ReviewTable';
+import TrainingSearchBar from '../PM/TrainingSearchBar';
+import TrainingFinalPreviewList from '../PM/TrainingFinalPreviewList';
 import Pagination from '../Common/Pagination';
 import { useNotification } from '../Common/useNotification';
 
-function DirectorReviewPage() {
+function DirectorTrainingDashboard() {
   const { userId } = useAuth();
   const { showError } = useNotification();
   const [showTable, setShowTable] = useState(false);
-  const [isReview, setIsReview] = useState(false);
-  const [isSuccess, setIsSucess] = useState(false);
-  const [value, setValue] = useState(false);
+  const [isReview, setIsReview] = useState(true);
+  const [value, setValue] = useState(true);
   const [beneficiaries, setBeneficiaries] = useState([]);
+  const [showTraining, setShowTraining] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
-  useEffect(() => {
-    console.log("isSuccess:", isSuccess);
-    if (isSuccess) {
-      console.log("Calling handleSearch...");
-      handleSearch(value);
-    }
-  }, [isSuccess]);
-
   const handleSearch = async (criteria, page = 0, size = pageSize) => {
     if (!criteria) return;
     try {
-      console.log("ok");
-      const data = await getBeneficiary(userId, criteria, 'inprogress', page, size);
+      const data = await getTraining(userId, criteria, 'generic', page, size);
       setBeneficiaries(Array.isArray(data.beneficiaries) ? data.beneficiaries : []);
       setCurrentPage(data.currentPage || 0);
       setTotalPages(data.totalPages || 0);
       setTotalElements(data.totalElements || 0);
       setPageSize(data.pageSize || size);
       setShowTable(true);
-      setIsSucess(false);
+      setShowTraining(criteria.formType);
       setValue(criteria);
-      console.log(beneficiaries);
     } catch (error) {
       setShowTable(false);
-      const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Error fetching activities.';
-      console.error('Error fetching activities:', errorMessage);
-      showError(errorMessage);
+      showError(error?.response?.data?.message || error?.message || 'Error fetching training data');
+      console.error('Error fetching activities:', error);
     }
   };
 
@@ -63,8 +52,8 @@ function DirectorReviewPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
-      <Sidebar isSuccess={isSuccess}/>
+    <Box sx={{ display: 'flex' }} style={{ backgroundColor: "#F0F5F9" }}>
+      <Sidebar isSuccess={false} />
       <Box
         component="main"
         sx={{
@@ -74,15 +63,12 @@ function DirectorReviewPage() {
           flexDirection: 'column',
         }}
       >
-
         <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', pb: 3 }}>
-          <SearchBar onSearch={handleSearch} />
+          <TrainingSearchBar onSearch={handleSearch} />
         </Box>
 
-        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', mt: 3 }}>
-          <Box sx={{ pb: 3 }}>
-            <ReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} />
-          </Box>
+        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
+          <TrainingFinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} value={value} showTraining={showTraining} />
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -97,4 +83,4 @@ function DirectorReviewPage() {
   )
 }
 
-export default DirectorReviewPage;
+export default DirectorTrainingDashboard;

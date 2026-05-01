@@ -4,13 +4,15 @@ import {
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import PendingIcon from "@mui/icons-material/Pending";
 import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { NavLink, useNavigate } from "react-router-dom";
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../images/logo.png";
 import { useAuth } from "../../PrivateRoute";
 import { getPendingCounts } from "../../DataCenter/apiService";
@@ -19,11 +21,24 @@ import Badge from "@mui/material/Badge";
 const Sidebar = ({ isSuccess }) => {
   const navigate = useNavigate();
   const { userId } = useAuth();
+  const location = useLocation();
   const [pendingCount, setPendingCount] = useState({});
   const [openMenu, setOpenMenu] = useState({
     approve: false,
     reject: false,
+    dashboard: false,
   });
+
+  useEffect(() => {
+    const path = location.pathname;
+    
+    // Auto-expand menus based on current path
+    setOpenMenu({
+      approve: path.includes('/Director/inprogress-list') || path.includes('/Director/training/inprogress-list'),
+      reject: path.includes('/Director/review-list') || path.includes('/Director/training/review-list'),
+      dashboard: path.includes('/Director/dashboard-list') || path.includes('/Director/dashboard/training-records'),
+    });
+  }, [location.pathname]);
 
   useEffect(() => {
     async function fetchCounts() {
@@ -42,25 +57,26 @@ const Sidebar = ({ isSuccess }) => {
     setOpenMenu((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const renderSubLink = (to, icon, text, badgeContent = null, badgeColor = "success") => (
+  const renderSubLink = (to, icon, text, badgeContent = null, badgeColor = "success", disabled = false) => (
     <li style={{ padding: "3px 6px" }}>
       <NavLink
         to={to}
         style={({ isActive }) => ({
           textDecoration: "none",
-          backgroundColor: isActive ? "#ece8ff" : "transparent",
+          backgroundColor: isActive ? "rgba(255, 255, 255, 0.25)" : "transparent",
           borderRadius: "8px 0px 0px 8px",
           padding: "8px 6px",
           width: "100%",
           display: "flex",
           alignItems: "center",
+          pointerEvents: disabled ? "none" : "auto",
+          opacity: disabled ? 0.5 : 1,
         })}
+        className={({ isActive }) => isActive ? "active-link" : ""}
       >
         {icon}
         {badgeContent !== null ? (
           <Badge
-            // badgeContent={badgeContent}
-            // color={badgeColor}
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             sx={{
               "& .MuiBadge-badge": {
@@ -149,7 +165,23 @@ const Sidebar = ({ isSuccess }) => {
             </ul>
           )}
 
-          {renderSubLink("/Director/resolution-list", <FormatListBulletedIcon className="icon" />, "Resolution View")}
+          <li className="menu-header" onClick={() => toggleMenu("dashboard")}>
+            <div className="menu-title">
+              <DashboardIcon className="icon" />
+              <span>Dashboard</span>
+            </div>
+            {openMenu.dashboard ? <ExpandLess /> : <ExpandMore />}
+          </li>
+          {openMenu.dashboard && (
+            <ul className="submenu">
+              {renderSubLink("/Director/dashboard-list", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Beneficiary Records")}
+              {renderSubLink("/Director/dashboard/training-records", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Training/Other Exp Records")}
+            </ul>
+          )}
+
+          {renderSubLink("/Director/report-list", <AssessmentIcon className="icon" />, "Report Tab")}
+
+          {renderSubLink("/Director/resolution-list", <FormatListBulletedIcon className="icon" />, "Resolution View", null, "success", true)}
 
           {renderSubLink("/myprofile", <AccountCircleOutlinedIcon className="icon" />, "Profile")}
 

@@ -54,6 +54,15 @@ import TrainingFinalPreview from "./Components/PM/TrainingFinalPreview";
 import TrainingCEODashboard from "./Components/CEO/TrainingCEODashboard";
 import TrainingDomainExpertReviewPage from "./Components/DomainExpert/TrainingDomainExpertReviewPage";
 import TrainingDomainExpertRejectPage from "./Components/DomainExpert/TrainingDomainExpertRejectPage";
+import PMDashboard from "./Components/PM/PMDashboard";
+import PMTrainingDashboard from "./Components/PM/PMTrainingDashboard";
+import PMReportPage from "./Components/PM/PMReportPage";
+import TrusteeDashboard from "./Components/Trustee/TrusteeDashboard";
+import TrusteeTrainingDashboard from "./Components/Trustee/TrusteeTrainingDashboard";
+import TrusteeReportPage from "./Components/Trustee/TrusteeReportPage";
+import DirectorDashboard from "./Components/Director/DirectorDashboard";
+import DirectorTrainingDashboard from "./Components/Director/DirectorTrainingDashboard";
+import DirectorReportPage from "./Components/Director/DirectorReportPage";
 
 function App() {
   const { userRole } = useAuth();
@@ -115,6 +124,33 @@ console.log(userRole);
           </PrivateRoute>
         }
       />
+      <Route
+        path="/dashboard-list"
+        element={
+          <PrivateRoute requiredRoles={['PM']}>
+            <PMDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/dashboard/training-records"
+        element={
+          <PrivateRoute requiredRoles={['PM']}>
+            <PMTrainingDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/report-list"
+        element={
+          <PrivateRoute requiredRoles={['PM']}>
+            <PMReportPage />
+          </PrivateRoute>
+        }
+      />
+
       <Route
         path="/inprogress"
         element={
@@ -268,6 +304,33 @@ console.log(userRole);
       />
 
       <Route
+        path="/Trustee/dashboard-list"
+        element={
+          <PrivateRoute requiredRoles={['TRUSTEE']}>
+            <TrusteeDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Trustee/dashboard/training-records"
+        element={
+          <PrivateRoute requiredRoles={['TRUSTEE']}>
+            <TrusteeTrainingDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Trustee/report-list"
+        element={
+          <PrivateRoute requiredRoles={['TRUSTEE']}>
+            <TrusteeReportPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
         path="/Trustee/inprogress-list"
         element={
           <PrivateRoute requiredRoles={['TRUSTEE']}>
@@ -414,6 +477,33 @@ console.log(userRole);
         element={
           <PrivateRoute requiredRoles={['CFO']}>
             <AOResolutionList />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Director/dashboard-list"
+        element={
+          <PrivateRoute requiredRoles={['PROJECT DIRECTOR']}>
+            <DirectorDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Director/dashboard/training-records"
+        element={
+          <PrivateRoute requiredRoles={['PROJECT DIRECTOR']}>
+            <DirectorTrainingDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/Director/report-list"
+        element={
+          <PrivateRoute requiredRoles={['PROJECT DIRECTOR']}>
+            <DirectorReportPage />
           </PrivateRoute>
         }
       />

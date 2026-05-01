@@ -41,6 +41,10 @@ function TrainingFinalPreview() {
       console.error('Error fetching activities:', error);
     }
   };
+
+  const handleRefresh = () => {
+    handleSearch(value);
+  };
   return (
     <Box sx={{ display: 'flex' }} style={{ backgroundColor: "#F0F5F9" }}>
       <Sidebar isSuccess={isSuccess} />
@@ -59,7 +63,7 @@ function TrainingFinalPreview() {
         </Box>
 
         {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-          <TrainingFinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} value={value} showTraining={showTraining} />
+          <TrainingFinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} value={value} showTraining={showTraining} onRefresh={handleRefresh} />
         </Box>}
       </Box>
     </Box>

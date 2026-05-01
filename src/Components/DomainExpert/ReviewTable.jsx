@@ -107,7 +107,7 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
                 await approveDomainDetails(userId, rowId, changedData.remarks);
                 setIsSucess(true);
                 console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
-                alert("Tasks have been approved successfully");
+                enqueueSnackbar("Tasks have been approved successfully", { variant: 'success' });
             } catch (error) {
                 console.error("Error approving tasks:", error);
                 setIsSucess(true);
@@ -118,12 +118,12 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
                 await rejectDomainDetails(userId, rowId, changedData.remarks);
                 setIsSucess(true);
                 console.log("User ID:", userId, "Row ID:", rowId, "Remarks:", changedData.remarks);
-                alert("Tasks have been rejected successfully");
+                enqueueSnackbar("Tasks have been rejected successfully", { variant: 'success' });
             } catch (error) {
                 console.error("Error tasks:", error);
                 setIsSucess(true);
                 const backendErrors = error.response?.data || 'An error occurred while rejecting the tasks. Please try again.';
-                alert(backendErrors);
+                enqueueSnackbar(backendErrors, { variant: 'error' });
             }
         }
     };

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Modal, Typography, Box } from '@mui/material';
-import Sidebar from '../CEO/sidebar/Sidebar';
+import React, { useState } from 'react';
+import { Box } from '@mui/material';
+import Sidebar from './sidebar/Sidebar';
 import SearchBar from '../PM/SearchBar';
 import { getBeneficiary } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
@@ -8,14 +8,12 @@ import FinalPreviewList from '../PM/FinalPreviewList';
 import Pagination from '../Common/Pagination';
 import { useNotification } from '../Common/useNotification';
 
-
-function CEODashboard() {
+function TrusteeDashboard() {
     const { userId } = useAuth();
     const { showError } = useNotification();
     const [showTable, setShowTable] = useState(false);
     const [isReview, setIsReview] = useState(true);
-    const [beneficiaries, setBeneficiaries] = useState([
-    ]);
+    const [beneficiaries, setBeneficiaries] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
@@ -25,7 +23,6 @@ function CEODashboard() {
     const handleSearch = async (criteria, page = 0, size = pageSize) => {
         if (!criteria) return;
         try {
-            console.log("ok");
             const data = await getBeneficiary(userId, criteria, 'generic', page, size);
             setBeneficiaries(Array.isArray(data.beneficiaries) ? data.beneficiaries : []);
             setCurrentPage(data.currentPage || 0);
@@ -34,11 +31,9 @@ function CEODashboard() {
             setPageSize(data.pageSize || size);
             setShowTable(true);
             setValue(criteria);
-            console.log(beneficiaries);
         } catch (error) {
-            const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Error fetching activities.';
-            console.error('Error fetching activities:', errorMessage);
-            showError(errorMessage);
+            showError(error?.response?.data?.message || error?.message || 'Error fetching beneficiary data');
+            console.error('Error fetching activities:', error);
         }
     };
 
@@ -86,4 +81,4 @@ function CEODashboard() {
     )
 }
 
-export default CEODashboard;
+export default TrusteeDashboard;

@@ -70,7 +70,7 @@ function ActivityIframe({ taskName, onSave, typeOfUnit, unitRate }) {
     if (!activity.financialExtension) {
       if (!activity.totalCost) formErrors.totalCost = 'Total Cost is required';
       if (!activity.beneficiaryContribution) formErrors.beneficiaryContribution = 'Beneficiary Contribution is required';
-      if (!activity.grantAmount) formErrors.grantAmount = 'Grant Amount is required';
+      if (activity.grantAmount === '' || activity.grantAmount === null || activity.grantAmount === undefined) formErrors.grantAmount = 'Grant Amount is required';
       if (!activity.yearOfSanction) formErrors.yearOfSanction = 'Year of Sanction is required';
     }
     setErrors(formErrors);

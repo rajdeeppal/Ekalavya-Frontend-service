@@ -4,6 +4,7 @@ import {
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ChecklistRtlIcon from "@mui/icons-material/ChecklistRtl";
 import PreviewIcon from "@mui/icons-material/Preview";
@@ -14,6 +15,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import AssessmentIcon from '@mui/icons-material/Assessment';
 // import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../PrivateRoute";
 import logo from "../../images/logo.png";
@@ -32,6 +34,7 @@ const Sidebar = ({ isSuccess }) => {
     inprogress: false,
     final: false,
     rejection: false,
+    dashboard: false,
   });
 
 
@@ -54,6 +57,10 @@ useEffect(() => {
     rejection:
       path.startsWith("/rejectedList") ||
       path.startsWith("/training-rejected"),
+
+    dashboard:
+      path.startsWith("/dashboard-list") ||
+      path.startsWith("/dashboard/training-records"),
   });
 }, [location.pathname]);
 
@@ -80,13 +87,14 @@ useEffect(() => {
         to={to}
         style={({ isActive }) => ({
           textDecoration: "none",
-          backgroundColor: isActive ? "#ece8ff" : "transparent",
+          backgroundColor: isActive ? "rgba(255, 255, 255, 0.25)" : "transparent",
           borderRadius: " 8px 0px 0px 8px ",
           padding: "8px 6px",
           width: "100%",
           display: "flex",
           alignItems: "center",
         })}
+        className={({ isActive }) => isActive ? "active-link" : ""}
       >
         {icon}
         <span style={{ marginLeft: "8px" }}>{text}</span>
@@ -195,6 +203,22 @@ useEffect(() => {
             </ul>
           )}
 
+          <li className="menu-header" onClick={() => toggleMenu("dashboard")}>
+            <div className="menu-title">
+              <DashboardIcon className="icon" />
+              <span>Dashboard</span>
+            </div>
+            {openMenu.dashboard ? <ExpandLess /> : <ExpandMore />}
+          </li>
+          {openMenu.dashboard && (
+            <ul className="submenu">
+              {renderSubLink("/dashboard-list", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Beneficiary Records")}
+              {renderSubLink("/dashboard/training-records", <FiberManualRecordIcon style={{ fontSize: '8px' }} className="icon" />, "Training/Other Exp Records")}
+            </ul>
+          )}
+
+          {renderSubLink("/report-list", <AssessmentIcon className="icon" />, "Report Tab")}
+
 <li>
             <NavLink
               to="/resolution"
@@ -206,6 +230,8 @@ useEffect(() => {
                 padding: "10px 4px",
                 width: "100%",
                 margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
+                pointerEvents: "none",
+                opacity: 0.5,
               })}
             >
               <CloudUploadIcon className="icon" />

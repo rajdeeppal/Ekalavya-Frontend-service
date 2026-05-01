@@ -12,7 +12,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import logo from '../../images/logo.png';
 import PendingIcon from '@mui/icons-material/Pending';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
@@ -25,12 +25,24 @@ import Badge from "@mui/material/Badge";
 const Sidebar = ({ isSuccess }) => {
   const navigate = useNavigate();
   const { userId } = useAuth();
+  const location = useLocation();
   const [pendingCount, setPendingCount] = useState({});
   const [openMenu, setOpenMenu] = useState({
     approve: false,
     reject: false,
     dashboard: false,
   });
+
+  useEffect(() => {
+    const path = location.pathname;
+    
+    // Auto-expand menus based on current path
+    setOpenMenu({
+      approve: path.includes('/inprogress-list') || path.includes('/training/inprogress-list'),
+      reject: path.includes('/review-list') || path.includes('/training/review-list'),
+      dashboard: path.includes('/dashboard-list') || path.includes('/dashboard/training-records'),
+    });
+  }, [location.pathname]);
 
   useEffect(() => {
     async function fetchCounts() {
@@ -49,25 +61,31 @@ const Sidebar = ({ isSuccess }) => {
     setOpenMenu((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const renderSubLink = (to, icon, text, badgeContent = null, badgeColor = "success") => (
+  const renderSubLink = (to, icon, text, badgeContent = null, badgeColor = "success", disabled = false) => (
     <li style={{ padding: "3px 6px" }}>
       <NavLink
         to={to}
         style={({ isActive }) => ({
           textDecoration: "none",
-          backgroundColor: isActive ? "#ece8ff" : "transparent",
+          backgroundColor: isActive ? "rgba(255, 255, 255, 0.25)" : "transparent",
           borderRadius: "8px 0px 0px 8px",
           padding: "8px 6px",
           width: "100%",
           display: "flex",
           alignItems: "center",
+          pointerEvents: disabled ? "none" : "auto",
+          opacity: disabled ? 0.5 : 1,
         })}
+        className={({ isActive }) => isActive ? "active-link" : ""}
       >
-        {icon}
+        {React.cloneElement(icon, {
+          style: { 
+            ...icon.props.style,
+            color: icon.props.className?.includes('active-link') ? '#1a1a1a' : 'white'
+          }
+        })}
         {badgeContent !== null ? (
           <Badge
-            // badgeContent={badgeContent}
-            // color={badgeColor}
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             sx={{
               "& .MuiBadge-badge": {
@@ -172,7 +190,7 @@ const Sidebar = ({ isSuccess }) => {
 
           {renderSubLink("/CEO/report-list", <AssessmentIcon className="icon" />, "Report Tab")}
 
-          {renderSubLink("/CEO/resolution-list", <FormatListBulletedIcon className="icon" />, "Resolution View")}
+          {renderSubLink("/CEO/resolution-list", <FormatListBulletedIcon className="icon" />, "Resolution View", null, "success", true)}
 
           {renderSubLink("/myprofile", <AccountCircleOutlinedIcon className="icon" />, "Profile")}
 

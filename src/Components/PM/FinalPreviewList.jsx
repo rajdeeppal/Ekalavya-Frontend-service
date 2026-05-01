@@ -15,6 +15,15 @@ import {
     TextField,
     IconButton,
     Typography,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    Snackbar,
+    Alert,
+    Box,
+    Chip,
 } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import {
@@ -22,17 +31,26 @@ import {
     Edit as EditIcon,
     Save as SaveIcon,
 } from '@mui/icons-material';
+import UndoIcon from '@mui/icons-material/Undo';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
 import { useAuth } from '../PrivateRoute';
-import { exportFinalPreviewDetails } from '../DataCenter/apiService';
+import { exportFinalPreviewDetails, rollbackTaskUpdateFromPreview, submitPreviewDetails } from '../DataCenter/apiService';
 
-const FinalReviewList = ({ beneficiaries, value, isReview }) => {
+const FinalReviewList = ({ beneficiaries, value, isReview, onRefresh }) => {
     const { userId } = useAuth();
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
     const [newTask, setNewTask] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [selectedTaskUpdate, setSelectedTaskUpdate] = useState(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
+    const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+
+    const showSnackbar = (message, severity) => setSnackbar({ open: true, message, severity });
 
     const toggleEditMode = (taskIndex, rowIndex) => {
         setEditMode((prevEditMode) => ({
@@ -62,6 +80,57 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
         } catch (error) {
             console.error('Error fetching activities:', error);
         }
+    };
+
+    const handleRollbackClick = (taskUpdate) => {
+        setSelectedTaskUpdate(taskUpdate);
+        setConfirmOpen(true);
+    };
+
+    const handleRollbackConfirm = async () => {
+        setConfirmOpen(false);
+        try {
+            const result = await rollbackTaskUpdateFromPreview(selectedTaskUpdate.id);
+            showSnackbar(result, 'success');
+            if (onRefresh) onRefresh();
+        } catch (error) {
+            const msg = error.response?.data;
+            showSnackbar(typeof msg === 'string' ? msg : error.message || 'Error rolling back task update', 'error');
+        }
+        setSelectedTaskUpdate(null);
+    };
+
+    const handleSubmitClick = (beneficiary) => {
+        setSelectedBeneficiary(beneficiary);
+        setSubmitConfirmOpen(true);
+    };
+
+    const handleSubmitConfirm = async () => {
+        setSubmitConfirmOpen(false);
+        try {
+            const filteredData = JSON.parse(JSON.stringify(selectedBeneficiary));
+            
+            // Remove unnecessary fields from taskUpdates
+            filteredData.components.forEach((component) => {
+                component.activities.forEach((activity) => {
+                    activity.tasks.forEach((task) => {
+                        task.taskUpdates?.forEach((update) => {
+                            delete update.otherDocs;
+                            delete update.passbookDoc;
+                            delete update.createdDate;
+                        });
+                    });
+                });
+            });
+
+            const result = await submitPreviewDetails(filteredData);
+            showSnackbar(result, 'success');
+            if (onRefresh) onRefresh();
+        } catch (error) {
+            const msg = error.response?.data;
+            showSnackbar(typeof msg === 'string' ? msg : error.message || 'Error submitting preview', 'error');
+        }
+        setSelectedBeneficiary(null);
     };
 
 
@@ -213,13 +282,46 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                                     {/*{!isReview && <TableCell>Domain Expert</TableCell>}*/}
                                                                                                                                     {isReview && <TableCell>Pending With</TableCell>}
                                                                                                                                     {isReview && <TableCell>Payment Status</TableCell>}
+                                                                                                                                    {!isReview && <TableCell>Actions</TableCell>}
                                                                                                                                 </TableRow>
                                                                                                                             </TableHead>
                                                                                                                             <TableBody>
                                                                                                                                 {(task.taskUpdates || [])?.map((row, rowIndex) => (
-                                                                                                                                    <TableRow key={rowIndex}>
+                                                                                                                                    <TableRow 
+                                                                                                                                        key={rowIndex}
+                                                                                                                                        sx={{
+                                                                                                                                            bgcolor: row.isRejectionOccurred 
+                                                                                                                                                ? 'rgba(211, 47, 47, 0.08)' 
+                                                                                                                                                : 'inherit',
+                                                                                                                                            borderLeft: row.isRejectionOccurred 
+                                                                                                                                                ? '3px solid #d32f2f' 
+                                                                                                                                                : 'none',
+                                                                                                                                            '&:hover': {
+                                                                                                                                                bgcolor: row.isRejectionOccurred 
+                                                                                                                                                    ? 'rgba(211, 47, 47, 0.12)' 
+                                                                                                                                                    : 'rgba(0, 0, 0, 0.04)',
+                                                                                                                                            },
+                                                                                                                                            transition: 'background-color 0.2s ease',
+                                                                                                                                        }}
+                                                                                                                                    >
                                                                                                                                     <TableCell>{row.id}</TableCell>
-                                                                                                                                        <TableCell>{row.achievementUnit}</TableCell>
+                                                                                                                                        <TableCell>
+                                                                                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                                                                                                {row.achievementUnit}
+                                                                                                                                                {row.isRejectionOccurred && (
+                                                                                                                                                    <Chip 
+                                                                                                                                                        label="Rejected" 
+                                                                                                                                                        size="small" 
+                                                                                                                                                        color="error" 
+                                                                                                                                                        sx={{ 
+                                                                                                                                                            height: 20, 
+                                                                                                                                                            fontSize: '0.7rem',
+                                                                                                                                                            fontWeight: 600
+                                                                                                                                                        }} 
+                                                                                                                                                    />
+                                                                                                                                                )}
+                                                                                                                                            </Box>
+                                                                                                                                        </TableCell>
                                                                                                                                         <TableCell>{row.revisedRatePerUnit}</TableCell>
                                                                                                                                         <TableCell>{row.currentBeneficiaryContribution}</TableCell>
                                                                                                                                         <TableCell>{row.currentCost}</TableCell>
@@ -269,6 +371,19 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                                                                                                         {/*{!isReview && <TableCell>{row.domainExpertEmpId}</TableCell>}*/}
                                                                                                                                         {isReview && <TableCell>{row.pendingWith}</TableCell>}
                                                                                                                                         {isReview && <TableCell>{row.paymentStatus}</TableCell>}
+                                                                                                                                        {!isReview && (
+                                                                                                                                            <TableCell>
+                                                                                                                                                <Button
+                                                                                                                                                    variant="outlined"
+                                                                                                                                                    color="warning"
+                                                                                                                                                    size="small"
+                                                                                                                                                    startIcon={<UndoIcon />}
+                                                                                                                                                    onClick={() => handleRollbackClick(row)}
+                                                                                                                                                >
+                                                                                                                                                    Rollback
+                                                                                                                                                </Button>
+                                                                                                                                            </TableCell>
+                                                                                                                                        )}
                                                                                                                                     </TableRow>
                                                                                                                                 ))}
                                                                                                                             </TableBody>
@@ -293,6 +408,16 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                                                     </div>
                                                 ))}
 
+                                                {!isReview && (
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        onClick={() => handleSubmitClick(beneficiary)}
+                                                        sx={{ mt: 2 }}
+                                                    >
+                                                        Submit
+                                                    </Button>
+                                                )}
                                             </div>
                                         </Collapse>
                                     </TableCell>
@@ -302,6 +427,54 @@ const FinalReviewList = ({ beneficiaries, value, isReview }) => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <Dialog open={submitConfirmOpen} onClose={() => setSubmitConfirmOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    Submit Confirmation
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        You are about to submit <strong>{selectedBeneficiary?.beneficiaryName}</strong>'s preview data to the Project Director for approval.
+                        <br /><br />
+                        Are you sure you want to proceed?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={() => setSubmitConfirmOpen(false)} variant="outlined">No</Button>
+                    <Button onClick={handleSubmitConfirm} variant="contained" color="primary">
+                        Yes, Submit
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'warning.main' }}>
+                    <WarningAmberIcon color="warning" /> Confirm Rollback
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        You are about to rollback <strong>Job ID: {selectedTaskUpdate?.id}</strong> from Preview back to PM.
+                        <br /><br />
+                        This will move the task update back to the PM stage. Are you sure you want to proceed?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={() => setConfirmOpen(false)} variant="outlined">Cancel</Button>
+                    <Button onClick={handleRollbackConfirm} variant="contained" color="warning" startIcon={<UndoIcon />}>
+                        Yes, Rollback
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+            >
+                <Alert severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
 
 
         </div >

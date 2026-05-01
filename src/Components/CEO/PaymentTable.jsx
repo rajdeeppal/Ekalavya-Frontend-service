@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSnackbar } from 'notistack';
+import { useNotification } from '../Common/useNotification';
 import {
     Table,
     TableBody,
@@ -37,6 +38,7 @@ import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 
 function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSucess, isApprove, isReject, isVC }) {
     const { userId } = useAuth();
+    const { showSuccess, showError } = useNotification();
     const [open, setOpen] = useState({});
     const [selectedTasks, setSelectedTasks] = useState({});
     const [formValues, setFormValues] = useState({
@@ -137,13 +139,13 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         if (!validateForm()) return;
 
         if (!beneficiary) {
-            alert(`Beneficiary not found for the provided ID: ${bId}`);
+            showError(`Beneficiary not found for the provided ID: ${bId}`);
             return;
         }
 
         const tasks = selectedTasks[bId];
         if (!tasks || Object.keys(tasks).length === 0) {
-            alert(`No tasks selected for the beneficiary: ${bId}`);
+            showError(`No tasks selected for the beneficiary: ${bId}`);
             return;
         }
 
@@ -363,10 +365,11 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         try {
             console.log("ok");
             const data = await exportCEOPaymentDetails(userId, date, selectedComponent);
-            alert(data);
+            showSuccess(data);
             console.log(beneficiaries);
             console.log(beneficiaries);
         } catch (error) {
+            showError(error?.response?.data?.message || error?.message || 'Error exporting payment details');
             console.error('Error fetching activities:', error);
         }
     }
@@ -377,23 +380,22 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                 await approveVCPaymentDetails(userId, beneficiaryId, remarks);
                 setIsSucess(true);
                 console.log("User ID:", userId, "Row ID:", beneficiaryId, "Remarks:", remarks);
-                alert("Tasks have been approved successfully");
+                showSuccess("Tasks have been approved successfully");
             } catch (error) {
                 console.error("Error approving tasks:", error);
                 setIsSucess(true);
-                alert("An error occurred while approving the tasks. Please try again.");
+                showError(error?.response?.data?.message || error?.message || "An error occurred while approving the tasks. Please try again.");
             }
         } else {
             try {
                 await rejectVCPaymentDetails(userId, beneficiaryId, remarks);
                 setIsSucess(true);
                 console.log("User ID:", userId, "Row ID:", beneficiaryId, "Remarks:", remarks);
-                alert("Tasks have been rejected successfully");
+                showSuccess("Tasks have been rejected successfully");
             } catch (error) {
                 console.error("Error tasks:", error);
                 setIsSucess(true);
-                const backendErrors = error.response?.data || 'An error occurred while rejecting the tasks. Please try again.';
-                alert(backendErrors);
+                showError(error?.response?.data?.message || error?.message || 'An error occurred while rejecting the tasks. Please try again.');
             }
         }
     }

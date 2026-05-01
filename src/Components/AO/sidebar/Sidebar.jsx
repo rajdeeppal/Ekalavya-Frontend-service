@@ -51,12 +51,12 @@ const Sidebar = ({ isSuccess }) => {
             <NavLink to="/AO/payment-list" style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
+              backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
               borderRadius: "10px 0px 0px 10px ",
               padding: "10px 4px",
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
+            })} className={({ isActive }) => isActive ? "active-link" : ""}>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <RateReviewOutlinedIcon className="icon" style={{ color: "black" }} />
                 <Badge
@@ -86,12 +86,12 @@ const Sidebar = ({ isSuccess }) => {
             <NavLink to="/AO/dashboard/payment-list/success" end style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
+              backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
               borderRadius: "10px 0px 0px 10px ",
               padding: "10px 4px",
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
+            })} className={({ isActive }) => isActive ? "active-link" : ""}>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <CheckCircleOutlineIcon className="icon" style={{ color: "black" }} />
                 <Badge
@@ -121,12 +121,12 @@ const Sidebar = ({ isSuccess }) => {
             <NavLink to="/AO/dashboard/payment-list/reject" end style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
+              backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
               borderRadius: "10px 0px 0px 10px ",
               padding: "10px 4px",
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
+            })} className={({ isActive }) => isActive ? "active-link" : ""}>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <ReportGmailerrorredIcon className="icon" style={{ color: "black" }} />
                 <Badge
@@ -157,12 +157,12 @@ const Sidebar = ({ isSuccess }) => {
             <NavLink to="/AO/dashboard/payment-list" end style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
+              backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
               borderRadius: "10px 0px 0px 10px ",
               padding: "10px 4px",
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
+            })} className={({ isActive }) => isActive ? "active-link" : ""}>
               <DashboardIcon className="icon" style={{ color: "black" }} />
               <span>Payment Dashboard</span>
             </NavLink>
@@ -172,12 +172,14 @@ const Sidebar = ({ isSuccess }) => {
             <NavLink to="/AO/resolution-list" style={({ isActive }) => ({
               textDecoration: "none",
               // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-              backgroundColor: isActive ? '#ece8ff' : 'transparent',
+              backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
               borderRadius: "10px 0px 0px 10px ",
               padding: "10px 4px",
               width: "100%",
               margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
-            })} >
+              pointerEvents: "none",
+              opacity: 0.5,
+            })} className={({ isActive }) => isActive ? "active-link" : ""}>
               <FormatListBulletedIcon className="icon" style={{ color: "black" }} />
               <span>Resolution View</span>
             </NavLink>
@@ -190,12 +192,13 @@ const Sidebar = ({ isSuccess }) => {
               style={({ isActive }) => ({
                 textDecoration: "none",
                 // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-                backgroundColor: isActive ? '#ece8ff' : 'transparent',
+                backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                 borderRadius: "10px 0px 0px 10px ",
                 padding: "10px 4px",
                 width: "100%",
                 margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
               })}
+              className={({ isActive }) => isActive ? "active-link" : ""}
             >
               <AccountCircleOutlinedIcon className="icon" style={{ color: "black" }} />
               <span>Profile</span>
@@ -208,12 +211,13 @@ const Sidebar = ({ isSuccess }) => {
               style={({ isActive }) => ({
                 textDecoration: "none",
                 // backgroundColor: isActive ? '#dcdcdc' : 'transparent',
-                backgroundColor: isActive ? '#ece8ff' : 'transparent',
+                backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                 borderRadius: "10px 0px 0px 10px ",
                 padding: "10px 4px",
                 width: "100%",
                 margin: isActive ? 'margin: 5px 0px 5px 5px' : "0px",
               })}
+              className={({ isActive }) => isActive ? "active-link" : ""}
             >
               <ExitToAppIcon className="icon" style={{ color: "black" }} />
               <span onClick={handleLogout}>Logout</span>

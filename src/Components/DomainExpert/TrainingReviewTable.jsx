@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useSnackbar } from "notistack";
+import { useNotification } from '../Common/useNotification';
 import {
   Table,
   TableBody,
@@ -48,6 +49,7 @@ function TrainingReviewTable({
 }) {
   const { userId } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+  const { showSuccess, showError } = useNotification();
   const [remarks, setRemarks] = useState("");
   const [open, setOpen] = useState({});
   const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
@@ -140,14 +142,11 @@ function TrainingReviewTable({
           "Remarks:",
           changedData.remarks
         );
-        alert("Tasks have been approved successfully");
+        showSuccess("Tasks have been approved successfully");
       } catch (error) {
         console.error("Error approving tasks:", error);
         setIsSucess(true);
-        enqueueSnackbar(
-          "An error occurred while approving the tasks. Please try again.",
-          { variant: "error" }
-        );
+        showError(error?.response?.data?.message || error?.message || "An error occurred while approving the tasks. Please try again.");
       }
     } else {
       try {
@@ -161,14 +160,11 @@ function TrainingReviewTable({
           "Remarks:",
           changedData.remarks
         );
-        alert("Tasks have been rejected successfully");
+        showSuccess("Tasks have been rejected successfully");
       } catch (error) {
         console.error("Error tasks:", error);
         setIsSucess(true);
-        const backendErrors =
-          error.response?.data ||
-          "An error occurred while rejecting the tasks. Please try again.";
-        alert(backendErrors);
+        showError(error?.response?.data?.message || error?.message || "An error occurred while rejecting the tasks. Please try again.");
       }
     }
   };
@@ -204,10 +200,7 @@ function TrainingReviewTable({
     } catch (error) {
       console.error("Error approving tasks:", error);
       setIsSucess(true);
-      const backendErrors =
-        error.response?.data ||
-        "An error occurred while approving the tasks. Please try again.";
-      alert(backendErrors);
+      showError(error?.response?.data?.message || error?.message || "An error occurred while approving the tasks. Please try again.");
     }
   };
   return (

@@ -6,9 +6,11 @@ import { getBeneficiary } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import ReviewTable from '../DomainExpert/ReviewTable';
 import Pagination from '../Common/Pagination';
+import { useNotification } from '../Common/useNotification';
 
 function CEOReviewPage() {
   const { userId } = useAuth();
+  const { showError } = useNotification();
   const [showTable, setShowTable] = useState(false);
   const [isReview, setIsReview] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
@@ -44,8 +46,9 @@ function CEOReviewPage() {
       console.log(beneficiaries);
     } catch (error) {
       setShowTable(false);
-      alert(error);
-      console.error('Error fetching activities:', error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Error fetching activities.';
+      console.error('Error fetching activities:', errorMessage);
+      showError(errorMessage);
     }
   };
 

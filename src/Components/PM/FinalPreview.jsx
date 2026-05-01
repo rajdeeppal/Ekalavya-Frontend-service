@@ -37,6 +37,10 @@ const FinalPreview = () => {
         }
       };
 
+    const handleRefresh = () => {
+      handleSearch(value, currentPage, pageSize);
+    };
+
     const handlePageChange = (newPage) => {
       setCurrentPage(newPage);
       handleSearch(value, newPage, pageSize);
@@ -65,7 +69,7 @@ const FinalPreview = () => {
                 </Box>
                 {showTable && <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper', mt: 3 }}>
                 <Box sx={{ pb: 3 }}>
-                  <FinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} value={value}/>
+                  <FinalPreviewList beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} value={value} onRefresh={handleRefresh}/>
                 </Box>
                 <Pagination
                   currentPage={currentPage}

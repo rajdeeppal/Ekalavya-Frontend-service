@@ -6,9 +6,11 @@ import { getBeneficiary } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import ReviewTable from './ReviewTable';
 import Pagination from '../Common/Pagination';
+import { useNotification } from '../Common/useNotification';
 
 function ReviewPage() {
   const { userId } = useAuth();
+  const { showError } = useNotification();
   const [isSuccess, setIsSucess] = useState(false);
   const [value, setValue] = useState(false);
   const [showTable, setShowTable] = useState(false);
@@ -43,7 +45,9 @@ function ReviewPage() {
       console.log(beneficiaries);
     } catch (error) {
       setShowTable(false);
-      console.error('Error fetching activities:', error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Error fetching activities.';
+      console.error('Error fetching activities:', errorMessage);
+      showError(errorMessage);
     }
   };
 

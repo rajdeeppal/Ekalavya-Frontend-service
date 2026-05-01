@@ -6,15 +6,22 @@ import { getTraining } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import TrainingReviewTable from './TrainingReviewTable';
 import TrainingSearchBar from '../PM/TrainingSearchBar';
+import Pagination from '../Common/Pagination';
+import { useNotification } from '../Common/useNotification';
 
 function TrainingDomainExpertReviewPage() {
   const { userId } = useAuth();
+  const { showError } = useNotification();
   const [showTable, setShowTable] = useState(false);
   const [isReview, setIsReview] = useState(false);
   const [isSuccess, setIsSucess] = useState(false);
   const [value, setValue] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [showTraining, setShowTraining] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   useEffect(() => {
     console.log("isSuccess:", isSuccess);
@@ -24,12 +31,16 @@ function TrainingDomainExpertReviewPage() {
     }
   }, [isSuccess]);
 
-  const handleSearch = async (criteria) => {
+  const handleSearch = async (criteria, page = 0, size = pageSize) => {
       if (!criteria) return;
       try {
         console.log("ok");
-        const data = await getTraining(userId, criteria, 'inprogress');
-        setBeneficiaries(Array.isArray(data) ? data : []);
+        const data = await getTraining(userId, criteria, 'inprogress', page, size);
+        setBeneficiaries(Array.isArray(data.beneficiaries) ? data.beneficiaries : []);
+        setCurrentPage(data.currentPage || 0);
+        setTotalPages(data.totalPages || 0);
+        setTotalElements(data.totalElements || 0);
+        setPageSize(data.pageSize || size);
         setShowTable(true);
         setShowTraining(criteria.formType);
         setValue(criteria);
@@ -37,10 +48,21 @@ function TrainingDomainExpertReviewPage() {
         console.log(beneficiaries);
       } catch (error) {
         setShowTable(false);
-        alert(error);
+        showError(error?.response?.data?.message || error?.message || 'Error fetching training data');
         console.error('Error fetching activities:', error);
       }
     };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    handleSearch(value, newPage, pageSize);
+  };
+
+  const handlePageSizeChange = (newSize) => {
+    setPageSize(newSize);
+    setCurrentPage(0);
+    handleSearch(value, 0, newSize);
+  };
 
   return (
     <Box sx={{ display: 'flex' }} style={{backgroundColor:"#F0F5F9"}}>
@@ -59,8 +81,18 @@ function TrainingDomainExpertReviewPage() {
           <TrainingSearchBar onSearch={handleSearch} />
         </Box>
 
-        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
-          <TrainingReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} showTraining={showTraining}/>
+        {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', mt: 3 }}>
+          <Box sx={{ pb: 3 }}>
+            <TrainingReviewTable beneficiaries={beneficiaries} setBeneficiaries={setBeneficiaries} isReview={isReview} setIsSucess={setIsSucess} showTraining={showTraining}/>
+          </Box>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalElements={totalElements}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </Box>}
       </Box>
     </Box>

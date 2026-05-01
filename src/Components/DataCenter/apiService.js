@@ -264,7 +264,7 @@ export const getBeneficiary = async (userId, data, category, page = 0, size = 10
   }
 };
 
-export const getTraining = async (userId, data, category) => {
+export const getTraining = async (userId, data, category, page = 0, size = 10) => {
   try {
     const {  projectName, formType } = data;
 
@@ -274,6 +274,8 @@ export const getTraining = async (userId, data, category) => {
     if (projectName) params.append("projectName", projectName);
     if (formType) params.append("formType", formType);
     if (category) params.append("stage", category);
+    params.append("page", page);
+    params.append("size", size);
 
     const url = `${BENEFICIARY_BASE_URL}/other/filter/${userId}?${params.toString()}`;
 
@@ -281,7 +283,7 @@ export const getTraining = async (userId, data, category) => {
       headers: getAuthorizationHeader(),
     });
 
-    return response.data.beneficiaries;
+    return response.data;
   } catch (error) {
     console.error("Error fetching beneficiary:", error);
     throw error;
@@ -392,7 +394,7 @@ export const updatedBeneficiarySubTask = async (rowId, object) => {
 export const updatedResubmitBeneficiarySubTask = async (rowId, object) => {
   try {
     const response = await axios.put(
-      `https://projects.ekalavya.net/api/ops/pm/resubmit/${rowId}`,
+      `https://projects.ekalavya.net/api/ops/pm/rejection/save/${rowId}`,
       object,
       {
         headers: {
@@ -1356,6 +1358,34 @@ export const getVoucherJobIds = async (voucherId) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching voucher job IDs:", error);
+    throw error;
+  }
+};
+
+export const rollbackTaskUpdateFromPreview = async (taskUpdateId) => {
+  try {
+    const response = await axios.post(
+      `https://projects.ekalavya.net/api/ops/pm/preview/rollback/${taskUpdateId}`,
+      null,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rolling back task update:", error);
+    throw error;
+  }
+};
+
+export const submitPreviewDetails = async (beneficiaryData) => {
+  try {
+    const response = await axios.post(
+      `https://projects.ekalavya.net/api/ops/pm/preview/submit`,
+      beneficiaryData,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting preview details:", error);
     throw error;
   }
 };

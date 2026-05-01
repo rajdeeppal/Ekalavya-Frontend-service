@@ -6,9 +6,11 @@ import { getBeneficiary } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
 import ReviewTable from '../DomainExpert/ReviewTable';
 import Pagination from '../Common/Pagination';
+import { useNotification } from '../Common/useNotification';
 
 function TrusteeReviewPage() {
   const { userId } = useAuth();
+  const { showError } = useNotification();
   const [showTable, setShowTable] = useState(false);
   const [isReview, setIsReview] = useState(false);
   const [isSuccess, setIsSucess] = useState(false);
@@ -43,10 +45,9 @@ function TrusteeReviewPage() {
       console.log(beneficiaries);
     } catch (error) {
         setShowTable(false);
-        const errorData = error.response?.data;
-        const errorMessage = errorData?.error || 'Error fetching activities.';
+        const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Error fetching activities.';
         console.error(errorMessage);
-        alert(errorMessage);
+        showError(errorMessage);
       }
   };
 

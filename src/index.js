@@ -11,7 +11,15 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <SnackbarProvider autoHideDuration={3000}>
+      <SnackbarProvider 
+        maxSnack={3}
+        autoHideDuration={4000}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        preventDuplicate
+      >
         <App />
       </SnackbarProvider>
     </BrowserRouter>
