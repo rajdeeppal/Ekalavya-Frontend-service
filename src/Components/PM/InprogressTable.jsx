@@ -363,6 +363,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
             achievementUnit: parseFloat(changedData.achievementUnit, 10),
             currentCost: parseFloat(changedData.currentCost),
             procurementCheck: changedData.procurementCheck === true,
+            useExistingPassbook: !!changedData.passbookDocFromPayee, // Flag to indicate using existing passbook from payee account
             ...(isReject && { remark: changedData.remarks }),
         };
         console.log(firstTask);
@@ -372,13 +373,11 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
         formData.append("taskUpdateDTO", JSON.stringify(taskUpdateDTO));
         
         // Handle passbook document
-        // Only send passbookDoc if:
-        // 1. A new file is uploaded (changedData.passbookDoc is a File object)
-        // 2. AND there's no passbookDocFromPayee (from account search)
+        // Only send passbookDoc if a new file is uploaded (not using existing from payee account)
         if (changedData.passbookDoc && !changedData.passbookDocFromPayee) {
             formData.append("passbookDoc", changedData.passbookDoc);
         }
-        // If passbookDocFromPayee exists, backend will use the existing passbook from that account
+        // If passbookDocFromPayee exists, backend will fetch it using the useExistingPassbook flag
         
         // Handle other documents - only send newly uploaded files
         if (changedData.otherDocs && changedData.otherDocs.length > 0) {
@@ -392,6 +391,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
         console.log('FormData contents:');
         console.log('passbookDoc:', changedData.passbookDoc);
         console.log('passbookDocFromPayee:', changedData.passbookDocFromPayee);
+        console.log('useExistingPassbook:', taskUpdateDTO.useExistingPassbook);
         console.log('otherDocs:', changedData.otherDocs);
 
 

@@ -376,6 +376,7 @@ const formatDateTime = (value) => {
             achievementUnit: parseFloat(changedData.achievementUnit),
             currentCost: parseFloat(changedData.currentCost),
             procurementCheck: changedData.procurementCheck === true,
+            useExistingPassbook: !!changedData.passbookDocFromPayee,
             ...(isReject && { remark: changedData.remarks }),
         };
         console.log(firstTask);
@@ -383,18 +384,23 @@ const formatDateTime = (value) => {
 
         const formData = new FormData();
         formData.append("taskUpdateDTO", JSON.stringify(taskUpdateDTO));
-        if (changedData.passbookDoc) {
+        
+        if (changedData.passbookDoc && !changedData.passbookDocFromPayee) {
             formData.append("passbookDoc", changedData.passbookDoc);
         }
+        
         if (changedData.otherDocs && changedData.otherDocs.length > 0) {
-            changedData.otherDocs.forEach((doc, index) => {
-                formData.append(`otherDocs`, doc.file);
+            changedData.otherDocs.forEach((doc) => {
+                if (doc.file) {
+                    formData.append(`otherDocs`, doc.file);
+                }
             });
-        } else {
-            formData.append(`otherDocs`, null);
         }
-        console.log(formData.otherDocs);
-        console.log(changedData.passbookDoc);
+        
+        console.log('FormData contents:');
+        console.log('passbookDoc:', changedData.passbookDoc);
+        console.log('passbookDocFromPayee:', changedData.passbookDocFromPayee);
+        console.log('useExistingPassbook:', taskUpdateDTO.useExistingPassbook);
 
 
         try {
