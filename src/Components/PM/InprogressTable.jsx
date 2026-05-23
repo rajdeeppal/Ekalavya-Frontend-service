@@ -370,18 +370,29 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
 
         const formData = new FormData();
         formData.append("taskUpdateDTO", JSON.stringify(taskUpdateDTO));
-        if (changedData.passbookDoc) {
+        
+        // Handle passbook document
+        // Only send passbookDoc if:
+        // 1. A new file is uploaded (changedData.passbookDoc is a File object)
+        // 2. AND there's no passbookDocFromPayee (from account search)
+        if (changedData.passbookDoc && !changedData.passbookDocFromPayee) {
             formData.append("passbookDoc", changedData.passbookDoc);
         }
+        // If passbookDocFromPayee exists, backend will use the existing passbook from that account
+        
+        // Handle other documents - only send newly uploaded files
         if (changedData.otherDocs && changedData.otherDocs.length > 0) {
-            changedData.otherDocs.forEach((doc, index) => {
-                formData.append(`otherDocs`, doc.file);
+            changedData.otherDocs.forEach((doc) => {
+                if (doc.file) {
+                    formData.append(`otherDocs`, doc.file);
+                }
             });
-        } else {
-            formData.append(`otherDocs`, null);
         }
-        console.log(formData.otherDocs);
-        console.log(changedData.passbookDoc);
+        
+        console.log('FormData contents:');
+        console.log('passbookDoc:', changedData.passbookDoc);
+        console.log('passbookDocFromPayee:', changedData.passbookDocFromPayee);
+        console.log('otherDocs:', changedData.otherDocs);
 
 
         try {
