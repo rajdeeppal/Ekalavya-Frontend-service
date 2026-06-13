@@ -62,6 +62,9 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
     const [voucher, setVoucher] = useState('');
     const [isPay, setIsPay] = useState('');
 
+    const getBeneficiaryKey = (beneficiary) =>
+        `${beneficiary.payeeName || ''}::${beneficiary.accountNumber || ''}`;
+
 
     useEffect(() => {
         async function fetchComponents() {
@@ -133,19 +136,19 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         return Object.keys(formErrors).length === 0;
     };
 
-    const handleGenerateVoucher = async (bId) => {
-        const beneficiary = beneficiaries.find((beneficiary) => beneficiary.id === bId);
+    const handleGenerateVoucher = async (beneficiaryKey) => {
+        const beneficiary = beneficiaries.find((beneficiary) => getBeneficiaryKey(beneficiary) === beneficiaryKey);
 
         if (!validateForm()) return;
 
         if (!beneficiary) {
-            showError(`Beneficiary not found for the provided ID: ${bId}`);
+            showError(`Beneficiary not found for the selected payment.`);
             return;
         }
 
-        const tasks = selectedTasks[bId];
+        const tasks = selectedTasks[beneficiaryKey];
         if (!tasks || Object.keys(tasks).length === 0) {
-            showError(`No tasks selected for the beneficiary: ${bId}`);
+            showError(`No tasks selected for the selected payment.`);
             return;
         }
 
@@ -260,6 +263,11 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                 showSaveCheckbox: false
             });
             setShowViewConfirmation(false);
+            setSelectedTasks((prev) => {
+                const updatedTasks = { ...prev };
+                delete updatedTasks[beneficiaryKey];
+                return updatedTasks;
+            });
             setIsSucess(true);
         } catch (error) {
             console.error('Error generating voucher:', error);
@@ -293,9 +301,9 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         setShowViewPaymentConfirmation(false);
     };
 
-    const handleSubmit = async (id) => {
-        setBenId(id);
-        const beneficiary = beneficiaries.find((b) => b.id === id);
+    const handleSubmit = async (beneficiaryKey) => {
+        setBenId(beneficiaryKey);
+        const beneficiary = beneficiaries.find((b) => getBeneficiaryKey(b) === beneficiaryKey);
 
         if (beneficiary && beneficiary.accountNumber) {
             try {
@@ -469,8 +477,11 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {beneficiaries?.map((beneficiary, beneficiaryIndex) => (
-                            <React.Fragment key={beneficiary.id}>
+                        {beneficiaries?.map((beneficiary, beneficiaryIndex) => {
+                            const beneficiaryKey = getBeneficiaryKey(beneficiary);
+
+                            return (
+                            <React.Fragment key={beneficiaryKey}>
                                 {/* Main Beneficiary Row */}
                                 <TableRow hover>
                                     <TableCell>{beneficiary.payeeName}</TableCell>
@@ -595,12 +606,12 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                                                                                         {(isReview && !isApprove && !isReject && !isVC) && <TableCell>
                                                                                                                             <Checkbox
                                                                                                                                 checked={
-                                                                                                                                    !!selectedTasks[beneficiary.id]?.[project.id]?.[component.id]?.[activity.id]?.[task.id]
+                                                                                                                                    !!selectedTasks[beneficiaryKey]?.[project.id]?.[component.id]?.[activity.id]?.[task.id]
                                                                                                                                 }
                                                                                                                                 onChange={() =>
-                                                                                                                                    handleCheckboxChange(beneficiary.id, project.id, component.id, activity.id, task.id, task)
+                                                                                                                                    handleCheckboxChange(beneficiaryKey, project.id, component.id, activity.id, task.id, task)
                                                                                                                                 }
-                                                                                                                            />
+                                                                                                                             />
                                                                                                                         </TableCell>}
                                                                                                                         <TableCell>{task.taskName}</TableCell>
                                                                                                                         <TableCell>{new Intl.NumberFormat('en-IN', {
@@ -753,7 +764,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                         <Button
                                                             variant="outlined"
                                                             color="primary"
-                                                            onClick={() => handleSubmit(beneficiary.id)}
+                                                            onClick={() => handleSubmit(beneficiaryKey)}
                                                             style={{ marginTop: '10px' }}
                                                         >
                                                             Generate Voucher
@@ -805,7 +816,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                     </TableCell>
                                 </TableRow>
                             </React.Fragment>
-                        ))}
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>
