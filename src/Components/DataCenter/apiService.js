@@ -181,28 +181,48 @@ export const saveBeneficiaryConfiguration = async (projectDto) => {
   }
 };
 
-export const saveProjectConfiguration = async (userId, projectDto) => {
+export const saveProjectConfiguration = async (userId, projectName, verticalName, logoFile = null) => {
   try {
+    const formData = new FormData();
+    formData.append('projectName', projectName);
+    formData.append('verticalName', verticalName);
+    if (logoFile) {
+      formData.append('logoFile', logoFile);
+    }
+    const token = localStorage.getItem('jwtToken');
     const response = await axios.post(
       `${PM_BASE_URL}/project/save/${userId}`,
-      projectDto,
+      formData,
       {
-        headers: getAuthorizationHeader(),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Do NOT set Content-Type here — axios sets it automatically with boundary for FormData
+        },
       }
     );
     return response.data;
   } catch (error) {
-    console.error("Error saving Project:", error);
+    console.error('Error saving Project:', error);
+    throw error;
   }
 };
 
-export const updateProjectConfiguration = async (userId, updatedProject) => {
+export const updateProjectConfiguration = async (userId, projectId, updatedProjectName, logoFile = null) => {
   try {
+    const formData = new FormData();
+    formData.append('projectId', projectId);
+    formData.append('updatedProjectName', updatedProjectName);
+    if (logoFile) {
+      formData.append('logoFile', logoFile);
+    }
+    const token = localStorage.getItem('jwtToken');
     const response = await axios.post(
       `${PM_BASE_URL}/project/edit/${userId}`,
-      updatedProject,
+      formData,
       {
-        headers: getAuthorizationHeader(),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
     return response.data;
@@ -211,6 +231,32 @@ export const updateProjectConfiguration = async (userId, updatedProject) => {
     throw error;
   }
 };
+
+/**
+ * Fetches the project logo from the backend (which proxies S3).
+ * Returns an object URL string suitable for use in <img src>.
+ * Returns null if no logo exists.
+ */
+export const getProjectLogo = async (projectId) => {
+  if (!projectId) return null;
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const response = await axios.get(
+      `${GENERIC_BASE_URL}/pm/project/logo/${projectId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob',
+      }
+    );
+    return URL.createObjectURL(response.data);
+  } catch (error) {
+    // 404 = no logo set, that's fine
+    if (error.response && error.response.status === 404) return null;
+    console.error('Error fetching project logo:', error);
+    return null;
+  }
+};
+
 // Update an existing task
 export const updateTask = async (taskId, updatedTask) => {
   try {

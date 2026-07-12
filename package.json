@@ -23,6 +23,7 @@
     "react-bootstrap": "^2.10.4",
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18.3.1",
+    "react-easy-crop": "^6.2.2",
     "react-router-dom": "^6.26.2",
     "react-scripts": "^5.0.1",
     "sass": "^1.79.1",
