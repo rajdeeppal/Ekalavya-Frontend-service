@@ -167,9 +167,11 @@ const MainApp = () => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: 400,
+              width: { xs: '95vw', sm: 580 },
+              maxHeight: '90vh',
+              overflowY: 'auto',
               bgcolor: 'background.paper',
-              borderRadius: 1,
+              borderRadius: 2,
               boxShadow: 24,
               p: 4,
             }}
@@ -177,7 +179,12 @@ const MainApp = () => {
             <Typography variant="h6" component="h2" gutterBottom>
               Edit Project
             </Typography>
-            <EditProjectForm onClose={() => setShowEditProjectModal(false)} />
+            {showEditProjectModal && (
+              <EditProjectForm
+                userId={userId}
+                onClose={() => setShowEditProjectModal(false)}
+              />
+            )}
           </Box>
         </Modal>
         <Modal
