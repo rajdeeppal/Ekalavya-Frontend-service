@@ -241,10 +241,11 @@ export const getProjectLogo = async (projectId) => {
   if (!projectId) return null;
   try {
     const token = localStorage.getItem('jwtToken');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const response = await axios.get(
       `${GENERIC_BASE_URL}/pm/project/logo/${projectId}`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
         responseType: 'blob',
       }
     );
