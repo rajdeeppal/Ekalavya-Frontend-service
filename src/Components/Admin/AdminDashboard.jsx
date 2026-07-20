@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Button, Typography, Container, Box, Fade, IconButton, Badge } from '@mui/material';
 import PendingRequests from './PendingRequests';
 import RoleManagement from './RoleManagement';
@@ -9,12 +9,21 @@ import { useNavigate } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
 import VoucherPortal from './VoucherPortal';
 import DeleteJobPortal from './DeleteJobPortal';
+import DeleteTaskRequests from './DeleteTaskRequests';
+import { getPendingTaskDeleteRequestCount } from '../DataCenter/apiService';
 
 const AdminDashboard = () => {
   const [activeComponent, setActiveComponent] = useState('PendingRequests');
   const [fadeIn, setFadeIn] = useState(true);
   const navigate = useNavigate();
   const [pendingCount, setPendingCount] = useState(0);
+  const [deleteTaskCount, setDeleteTaskCount] = useState(0);
+
+  useEffect(() => {
+    getPendingTaskDeleteRequestCount()
+      .then((count) => setDeleteTaskCount(Number(count) || 0))
+      .catch(() => {});
+  }, []);
 
   const handleComponentSwitch = (component) => {
     if (activeComponent !== component) {
@@ -47,6 +56,8 @@ const AdminDashboard = () => {
         return <VoucherPortal />;
       case 'DeleteJobPortal':
         return <DeleteJobPortal />;
+      case 'DeleteTaskRequests':
+        return <DeleteTaskRequests onCountChange={(count) => setDeleteTaskCount(count)} />;
       default:
         return <PendingRequests />;
     }
@@ -133,6 +144,19 @@ const AdminDashboard = () => {
             onClick={() => handleComponentSwitch('DeleteJobPortal')}
           >
             Delete Job
+          </Button>
+
+          <Button
+            sx={{
+              fontWeight: activeComponent === 'DeleteTaskRequests' ? 'bold' : 'normal',
+              color: activeComponent === 'DeleteTaskRequests' ? '#8ce0f5' : 'inherit',
+              borderBottom: activeComponent === 'DeleteTaskRequests' ? '2px solid #8ce0f5' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('DeleteTaskRequests')}
+          >
+            <Badge badgeContent={deleteTaskCount} color="error">
+              Task Delete Requests
+            </Badge>
           </Button>
 
           <IconButton

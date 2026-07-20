@@ -47,7 +47,7 @@ function TrainingReviewTable({
   isCEO,
   showTraining,
 }) {
-  const { userId } = useAuth();
+  const { userId, userRole } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const { showSuccess, showError } = useNotification();
   const [remarks, setRemarks] = useState("");
@@ -57,6 +57,10 @@ function TrainingReviewTable({
   const [editMode, setEditMode] = useState({});
   const [showViewConfirmation, setShowViewConfirmation] = useState(false);
   const [newTask, setNewTask] = useState(true);
+
+  // Roles that can bypass the deleteRequestPending restriction
+  const bypassRoles = ['CFO', 'VICE_CHAIRMAN', 'SECRETARY'];
+  const canBypass = bypassRoles.includes(userRole);
 
   const toggleEditMode = (taskIndex, rowIndex) => {
     setEditMode((prevEditMode) => ({
@@ -733,53 +737,60 @@ function TrainingReviewTable({
                                                                             }
                                                                           />
                                                                         </TableCell>
-                                                                        <TableCell>
-                                                                          <Box
-                                                                            sx={{
-                                                                              display:
-                                                                                "flex",
-                                                                              gap: 0.5,
-                                                                            }}
-                                                                          >
-                                                                            <Button
-                                                                              variant="contained"
-                                                                              color="success"
-                                                                              onClick={() => {
-                                                                                isReview
-                                                                                  ? handleReview(
-                                                                                      "Approve",
-                                                                                      task.id,
-                                                                                      row.id,
-                                                                                      rowIndex
-                                                                                    )
-                                                                                  : handleSave(
-                                                                                      "Approve",
-                                                                                      task.id,
-                                                                                      row.id,
-                                                                                      rowIndex
-                                                                                    );
-                                                                              }}
-                                                                            >
-                                                                              Approve
-                                                                            </Button>
-                                                                            {!isCEO && (
-                                                                              <Button
-                                                                                variant="contained"
-                                                                                color="error"
-                                                                                onClick={() =>
-                                                                                  handleSave(
-                                                                                    "Reject",
-                                                                                    task.id,
-                                                                                    row.id,
-                                                                                    rowIndex
-                                                                                  )
-                                                                                }
-                                                                              >
-                                                                                Reject
-                                                                              </Button>
-                                                                            )}
-                                                                          </Box>
-                                                                        </TableCell>
+<TableCell>
+                                                                           <Box
+                                                                             sx={{
+                                                                               display:
+                                                                                 "flex",
+                                                                               gap: 0.5,
+                                                                             }}
+                                                                           >
+                                                                             <Button
+                                                                               variant="contained"
+                                                                               color="success"
+                                                                               disabled={task.deleteRequestPending && !canBypass}
+                                                                               onClick={() => {
+                                                                                 isReview
+                                                                                   ? handleReview(
+                                                                                       "Approve",
+                                                                                       task.id,
+                                                                                       row.id,
+                                                                                       rowIndex
+                                                                                     )
+                                                                                   : handleSave(
+                                                                                       "Approve",
+                                                                                       task.id,
+                                                                                       row.id,
+                                                                                       rowIndex
+                                                                                     );
+                                                                               }}
+                                                                             >
+                                                                               Approve
+                                                                             </Button>
+                                                                             {!isCEO && (
+                                                                               <Button
+                                                                                 variant="contained"
+                                                                                 color="error"
+                                                                                 disabled={task.deleteRequestPending && !canBypass}
+                                                                                 onClick={() =>
+                                                                                   handleSave(
+                                                                                     "Reject",
+                                                                                     task.id,
+                                                                                     row.id,
+                                                                                     rowIndex
+                                                                                   )
+                                                                                 }
+                                                                               >
+                                                                                 Reject
+                                                                               </Button>
+                                                                             )}
+                                                                             {task.deleteRequestPending && !canBypass && (
+                                                                               <Typography variant="body2" color="text.secondary" sx={{ ml: 1, alignSelf: 'center' }}>
+                                                                                   ⏳ Pending Deletion - Actions Disabled
+                                                                               </Typography>
+                                                                             )}
+                                                                           </Box>
+                                                                         </TableCell>
                                                                       </TableRow>
                                                                     )
                                                                   )}

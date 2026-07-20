@@ -24,12 +24,14 @@ import {
     ExpandMore as ExpandMoreIcon,
     Edit as EditIcon,
     Save as SaveIcon,
+    DeleteForever as DeleteForeverIcon,
+    Restore as RestoreIcon,
 } from '@mui/icons-material';
 import Avatar from '@mui/material/Avatar';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
-import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask, searchPayeeAccounts } from '../DataCenter/apiService';
+import { updatedBeneficiarySubTask, newBeneficiarySubTask, updatedResubmitBeneficiarySubTask, submitInProgressDetails, domainDetails, deletedBeneficiaryTask, searchPayeeAccounts, requestTaskDeletion, revertTaskDeletion } from '../DataCenter/apiService';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import Checkbox from '@mui/material/Checkbox';
@@ -38,7 +40,7 @@ import { exportInProgressDetails } from '../DataCenter/apiService';
 import { useSnackbar } from 'notistack';
 
 const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, setIsSucess }) => {
-    const { userId } = useAuth();
+    const { userId, userRole } = useAuth();
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
@@ -56,7 +58,16 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
     const [isBulk, setIsBulk] = useState(false);
     const [payeeAccounts, setPayeeAccounts] = useState({});
     const [payeeAccountLoading, setPayeeAccountLoading] = useState({});
+    // Task-level delete workflow state
+    const [showTaskDeleteConfirmation, setShowTaskDeleteConfirmation] = useState(false);
+    const [pendingDeleteTaskId, setPendingDeleteTaskId] = useState(null);
+    const [showTaskRevertConfirmation, setShowTaskRevertConfirmation] = useState(false);
+    const [pendingRevertTaskId, setPendingRevertTaskId] = useState(null);
     const { enqueueSnackbar } = useSnackbar();
+
+    // Roles that can bypass the deleteRequestPending restriction
+    const bypassRoles = ['CFO', 'VICE_CHAIRMAN', 'SECRETARY'];
+    const canBypass = bypassRoles.includes(userRole);
 
     useEffect(() => {
         async function fetchDomain() {
@@ -329,8 +340,79 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
     const handleDelete = async (index) => {
         setShowDeleteConfirmation(true);
         setDeleteId(index);
-
     }
+
+    // Task-level delete request (freezes the task, sends to Admin for approval)
+    const handleTaskDeleteRequest = (taskId) => {
+        setPendingDeleteTaskId(taskId);
+        setShowTaskDeleteConfirmation(true);
+    };
+
+    const handleTaskDeleteConfirmSubmit = async () => {
+        setShowTaskDeleteConfirmation(false);
+        try {
+            await requestTaskDeletion(pendingDeleteTaskId, userId);
+            enqueueSnackbar('Task flagged for deletion. Awaiting Admin approval.', { variant: 'warning' });
+            // Optimistically mark the task as pending in local state
+            setBeneficiaries((prev) =>
+                prev.map((b) => ({
+                    ...b,
+                    components: b.components.map((c) => ({
+                        ...c,
+                        activities: c.activities.map((a) => ({
+                            ...a,
+                            tasks: a.tasks.map((t) =>
+                                t.id === pendingDeleteTaskId
+                                    ? { ...t, deleteRequestPending: true }
+                                    : t
+                            ),
+                        })),
+                    })),
+                }))
+            );
+        } catch (error) {
+            const backendErrors = error.response?.data || 'Error requesting task deletion.';
+            enqueueSnackbar(backendErrors, { variant: 'error' });
+        } finally {
+            setPendingDeleteTaskId(null);
+        }
+    };
+
+    // Task-level revert: PM cancels a pending delete request before Admin acts
+    const handleTaskRevertRequest = (taskId) => {
+        setPendingRevertTaskId(taskId);
+        setShowTaskRevertConfirmation(true);
+    };
+
+    const handleTaskRevertConfirmSubmit = async () => {
+        setShowTaskRevertConfirmation(false);
+        try {
+            await revertTaskDeletion(pendingRevertTaskId);
+            enqueueSnackbar('Delete request cancelled. Task is active again.', { variant: 'success' });
+            // Restore the task to active in local state
+            setBeneficiaries((prev) =>
+                prev.map((b) => ({
+                    ...b,
+                    components: b.components.map((c) => ({
+                        ...c,
+                        activities: c.activities.map((a) => ({
+                            ...a,
+                            tasks: a.tasks.map((t) =>
+                                t.id === pendingRevertTaskId
+                                    ? { ...t, deleteRequestPending: false }
+                                    : t
+                            ),
+                        })),
+                    })),
+                }))
+            );
+        } catch (error) {
+            const backendErrors = error.response?.data || 'Error reverting delete request.';
+            enqueueSnackbar(backendErrors, { variant: 'error' });
+        } finally {
+            setPendingRevertTaskId(null);
+        }
+    };
 
     const handleSaveRow = async (taskIndex, rowIndex, row) => {
         toggleEditMode(taskIndex, rowIndex);
@@ -647,8 +729,30 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                         <TableBody>
                                                                                             {activity.tasks?.map((task, taskIndex) => (
                                                                                                 <React.Fragment key={task.id}>
-                                                                                                    <TableRow>
-                                                                                                        <TableCell>{task.taskName}</TableCell>
+                                                                                                    <TableRow
+                                                                                                        sx={{
+                                                                                                            backgroundColor: task.deleteRequestPending ? '#fff3e0' : 'inherit',
+                                                                                                            transition: 'background-color 0.3s ease',
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <TableCell>
+                                                                                                            {task.taskName}
+                                                                                                            {task.deleteRequestPending && (
+                                                                                                                <Box component="span" sx={{
+                                                                                                                    ml: 1,
+                                                                                                                    px: 1,
+                                                                                                                    py: 0.25,
+                                                                                                                    fontSize: '0.65rem',
+                                                                                                                    fontWeight: 700,
+                                                                                                                    borderRadius: '4px',
+                                                                                                                    backgroundColor: '#e65100',
+                                                                                                                    color: '#fff',
+                                                                                                                    letterSpacing: '0.05em',
+                                                                                                                }}>
+                                                                                                                    ⏳ PENDING DELETION
+                                                                                                                </Box>
+                                                                                                            )}
+                                                                                                        </TableCell>
                                                                                                         <TableCell>{task.typeOfUnit}</TableCell>
                                                                                                         <TableCell>{task.ratePerUnit}</TableCell>
                                                                                                         <TableCell>
@@ -662,14 +766,42 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                         <TableCell>{task.balanceRemaining + task.beneficiaryContributionRemain}</TableCell>
                                                                                                         <TableCell>{task.yearOfSanction}</TableCell>
                                                                                                         <TableCell>
-                                                                                                            <Button
-                                                                                                                variant="outlined"
-                                                                                                                color="primary"
-                                                                                                                onClick={() => toggleTaskDetails(task.id)}
-
-                                                                                                            >
-                                                                                                                View
-                                                                                                            </Button>
+                                                                                                            <Box display="flex" gap={0.5} alignItems="center">
+                                                                                                                <Button
+                                                                                                                    variant="outlined"
+                                                                                                                    color="primary"
+                                                                                                                    size="small"
+                                                                                                                    onClick={() => toggleTaskDetails(task.id)}
+                                                                                                                >
+                                                                                                                    View
+                                                                                                                </Button>
+                                                                                                                {!isReject && !task.deleteRequestPending && (
+                                                                                                                    <IconButton
+                                                                                                                        size="small"
+                                                                                                                        title="Request Task Deletion"
+                                                                                                                        sx={{
+                                                                                                                            color: '#c62828',
+                                                                                                                            '&:hover': { backgroundColor: 'rgba(198,40,40,0.08)' }
+                                                                                                                        }}
+                                                                                                                        onClick={() => handleTaskDeleteRequest(task.id)}
+                                                                                                                    >
+                                                                                                                        <DeleteForeverIcon fontSize="small" />
+                                                                                                                    </IconButton>
+                                                                                                                )}
+                                                                                                                {!isReject && task.deleteRequestPending && (
+                                                                                                                    <IconButton
+                                                                                                                        size="small"
+                                                                                                                        title="Revert Delete Request"
+                                                                                                                        sx={{
+                                                                                                                            color: '#1565c0',
+                                                                                                                            '&:hover': { backgroundColor: 'rgba(21,101,192,0.08)' }
+                                                                                                                        }}
+                                                                                                                        onClick={() => handleTaskRevertRequest(task.id)}
+                                                                                                                    >
+                                                                                                                        <RestoreIcon fontSize="small" />
+                                                                                                                    </IconButton>
+                                                                                                                )}
+                                                                                                            </Box>
                                                                                                         </TableCell>
                                                                                                     </TableRow>
                                                                                                     <TableRow>
@@ -720,8 +852,17 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                             </TableHead>
                                                                                                                             <TableBody>
                                                                                                                                 {(task.taskUpdates || [])?.map((row, rowIndex) => (
-                                                                                                                                    <TableRow key={rowIndex}>
-                                                                                                                                        {editMode[`${task.id}-${rowIndex}`] ? (
+                                                                                                                                    <TableRow
+                                                                                                                                        key={rowIndex}
+                                                                                                                                        sx={task.deleteRequestPending ? {
+                                                                                                                                            opacity: 0.55,
+                                                                                                                                            backgroundColor: '#f5f5f5',
+                                                                                                                                            pointerEvents: 'none',
+                                                                                                                                            userSelect: 'none',
+                                                                                                                                        } : {}}
+                                                                                                                                    >
+                                                                                                                                        {/* When frozen, never show edit mode — always show read-only view */}
+                                                                                                                                        {(!task.deleteRequestPending && editMode[`${task.id}-${rowIndex}`]) ? (
                                                                                                                                             <>
                                                                                                                                                 <TableCell>
                                                                                                                                                     <TextField
@@ -1034,16 +1175,22 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                                                         />
                                                                                                                                                     </TableCell>
                                                                                                                                                 )}
-                                                                                                                                                <TableCell>
-                                                                                                                                                    <IconButton
-                                                                                                                                                        color={
-                                                                                                                                                            'success'
-                                                                                                                                                        }
-                                                                                                                                                        onClick={() => { newTask ? handleSaveRow(task.id, rowIndex, null) : handleSaveRow(task.id, rowIndex, row.id) }}
-                                                                                                                                                    >
-                                                                                                                                                        <SaveIcon />
-                                                                                                                                                    </IconButton>
-                                                                                                                                                </TableCell>
+<TableCell>
+                                                                                                                                                     <IconButton
+                                                                                                                                                         color={
+                                                                                                                                                             'success'
+                                                                                                                                                         }
+                                                                                                                                                         disabled={task.deleteRequestPending && !canBypass}
+                                                                                                                                                         onClick={() => { newTask ? handleSaveRow(task.id, rowIndex, null) : handleSaveRow(task.id, rowIndex, row.id) }}
+                                                                                                                                                     >
+                                                                                                                                                         <SaveIcon />
+                                                                                                                                                     </IconButton>
+                                                                                                                                                 {task.deleteRequestPending && !canBypass && (
+                                                                                                                                                     <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                                                                                                                                                         ⏳ Pending Deletion
+                                                                                                                                                     </Typography>
+                                                                                                                                                 )}
+                                                                                                                                                 </TableCell>
                                                                                                                                             </>) : (
                                                                                                                                             <>
                                                                                                                                                 <TableCell>{row.id}</TableCell>
@@ -1122,7 +1269,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                             </TableBody>
                                                                                                                         </Table>
                                                                                                                     </TableContainer>
-                                                                                                                    {!isReject &&
+                                                                                                                    {!isReject && !task.deleteRequestPending &&
                                                                                                                         <Button
                                                                                                                             variant="contained"
                                                                                                                             color="primary"
@@ -1130,6 +1277,7 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                                                                                                                         >
                                                                                                                             Add New Row
                                                                                                                         </Button>}
+
                                                                                                                 </div>
                                                                                                             </Collapse>
                                                                                                         </TableCell>
@@ -1324,6 +1472,77 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
                         </Button>
                         <Button variant="contained" color="secondary" onClick={handleCloseDeleteConfirmation}>
                             No
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+
+            {/* ─── Task Delete Request Confirmation ─────────────────────────────── */}
+            <Modal
+                open={showTaskDeleteConfirmation}
+                onClose={() => setShowTaskDeleteConfirmation(false)}
+                aria-labelledby="task-delete-modal"
+            >
+                <Box sx={{
+                    position: 'absolute', top: '50%', left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 440, bgcolor: 'background.paper',
+                    boxShadow: 24, p: 4, borderRadius: '12px',
+                }}>
+                    <Typography id="task-delete-modal" variant="h6" component="h2" sx={{ color: '#b71c1c', fontWeight: 700 }}>
+                        🗑️ Request Task Deletion
+                    </Typography>
+                    <Typography sx={{ mt: 2, color: '#555' }}>
+                        This will <strong>freeze</strong> the task and all its associated records in the PM view.
+                        The task will be <strong>permanently deleted</strong> only after Admin approval.
+                        <br /><br />
+                        You can undo this before Admin acts using the <strong>Revert</strong> button.
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+                        <Button
+                            variant="contained"
+                            sx={{ backgroundColor: '#c62828', '&:hover': { backgroundColor: '#b71c1c' } }}
+                            onClick={handleTaskDeleteConfirmSubmit}
+                        >
+                            Yes, Request Deletion
+                        </Button>
+                        <Button variant="outlined" onClick={() => setShowTaskDeleteConfirmation(false)}>
+                            Cancel
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+
+            {/* ─── Task Revert Confirmation ──────────────────────────────────────── */}
+            <Modal
+                open={showTaskRevertConfirmation}
+                onClose={() => setShowTaskRevertConfirmation(false)}
+                aria-labelledby="task-revert-modal"
+            >
+                <Box sx={{
+                    position: 'absolute', top: '50%', left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 440, bgcolor: 'background.paper',
+                    boxShadow: 24, p: 4, borderRadius: '12px',
+                }}>
+                    <Typography id="task-revert-modal" variant="h6" component="h2" sx={{ color: '#1565c0', fontWeight: 700 }}>
+                        ↩ Revert Delete Request
+                    </Typography>
+                    <Typography sx={{ mt: 2, color: '#555' }}>
+                        This will <strong>cancel the pending delete request</strong> for this task.
+                        The task will be restored to its <strong>active state</strong>, and you will
+                        be able to add achievement details again.
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleTaskRevertConfirmSubmit}
+                        >
+                            Yes, Revert
+                        </Button>
+                        <Button variant="outlined" onClick={() => setShowTaskRevertConfirmation(false)}>
+                            Cancel
                         </Button>
                     </Box>
                 </Box>

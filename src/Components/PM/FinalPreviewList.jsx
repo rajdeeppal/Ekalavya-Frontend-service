@@ -39,7 +39,7 @@ import { useAuth } from '../PrivateRoute';
 import { exportFinalPreviewDetails, rollbackTaskUpdateFromPreview, submitPreviewDetails } from '../DataCenter/apiService';
 
 const FinalReviewList = ({ beneficiaries, value, isReview, onRefresh }) => {
-    const { userId } = useAuth();
+    const { userId, userRole } = useAuth();
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
     const [editMode, setEditMode] = useState({});
@@ -49,6 +49,10 @@ const FinalReviewList = ({ beneficiaries, value, isReview, onRefresh }) => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
     const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+
+    // Roles that can bypass the deleteRequestPending restriction
+    const bypassRoles = ['CFO', 'VICE_CHAIRMAN', 'SECRETARY'];
+    const canBypass = bypassRoles.includes(userRole);
 
     const showSnackbar = (message, severity) => setSnackbar({ open: true, message, severity });
 
@@ -378,10 +382,16 @@ const FinalReviewList = ({ beneficiaries, value, isReview, onRefresh }) => {
                                                                                                                                                     color="warning"
                                                                                                                                                     size="small"
                                                                                                                                                     startIcon={<UndoIcon />}
+                                                                                                                                                    disabled={task.deleteRequestPending && !canBypass}
                                                                                                                                                     onClick={() => handleRollbackClick(row)}
                                                                                                                                                 >
                                                                                                                                                     Rollback
                                                                                                                                                 </Button>
+                                                                                                                                                {task.deleteRequestPending && !canBypass && (
+                                                                                                                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                                                                                                                                        ⏳ Pending Deletion - Actions Disabled
+                                                                                                                                                    </Typography>
+                                                                                                                                                )}
                                                                                                                                             </TableCell>
                                                                                                                                         )}
                                                                                                                                     </TableRow>

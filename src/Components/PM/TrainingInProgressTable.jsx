@@ -38,7 +38,7 @@ import { exportInProgressDetails } from '../DataCenter/apiService';
 import { useSnackbar } from 'notistack';
 
 const TrainingInProgressTable = ({ beneficiaries, value, setBeneficiaries, isReject, setIsSucess, showTraining }) => {
-    const { userId } = useAuth();
+    const { userId, userRole } = useAuth();
     const { enqueueSnackbar } = useSnackbar();
     const [open, setOpen] = useState({});
     const [taskDetailsOpen, setTaskDetailsOpen] = useState({});
@@ -57,6 +57,10 @@ const TrainingInProgressTable = ({ beneficiaries, value, setBeneficiaries, isRej
     const [isBulk, setIsBulk] = useState(false);
     const [payeeAccounts, setPayeeAccounts] = useState({});
     const [payeeAccountLoading, setPayeeAccountLoading] = useState({});
+
+    // Roles that can bypass the deleteRequestPending restriction
+    const bypassRoles = ['CFO', 'VICE_CHAIRMAN', 'SECRETARY'];
+    const canBypass = bypassRoles.includes(userRole);
 
     useEffect(() => {
         async function fetchDomain() {
@@ -1082,16 +1086,22 @@ const formatDateTime = (value) => {
                                                                                                                                                         />
                                                                                                                                                     </TableCell>
                                                                                                                                                 )}
-                                                                                                                                                <TableCell>
-                                                                                                                                                    <IconButton
-                                                                                                                                                        color={
-                                                                                                                                                            'success'
-                                                                                                                                                        }
-                                                                                                                                                        onClick={() => { newTask ? handleSaveRow(task.id, rowIndex, null) : handleSaveRow(task.id, rowIndex, row.id) }}
-                                                                                                                                                    >
-                                                                                                                                                        <SaveIcon />
-                                                                                                                                                    </IconButton>
-                                                                                                                                                </TableCell>
+<TableCell>
+                                                                                                                                                     <IconButton
+                                                                                                                                                         color={
+                                                                                                                                                             'success'
+                                                                                                                                                         }
+                                                                                                                                                         disabled={task.deleteRequestPending && !canBypass}
+                                                                                                                                                         onClick={() => { newTask ? handleSaveRow(task.id, rowIndex, null) : handleSaveRow(task.id, rowIndex, row.id) }}
+                                                                                                                                                     >
+                                                                                                                                                         <SaveIcon />
+                                                                                                                                                     </IconButton>
+                                                                                                                                                 {task.deleteRequestPending && !canBypass && (
+                                                                                                                                                     <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                                                                                                                                                         ⏳ Pending Deletion
+                                                                                                                                                     </Typography>
+                                                                                                                                                 )}
+                                                                                                                                                 </TableCell>
                                                                                                                                             </>) : (
                                                                                                                                             <>
                                                                                                                                                 <TableCell>{row.achievementUnit}</TableCell>

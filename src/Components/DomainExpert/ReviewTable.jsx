@@ -35,7 +35,7 @@ import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import { updatedResubmitSubTask, approveDomainDetails, rejectDomainDetails } from '../DataCenter/apiService';
 
 function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, isCEO }) {
-    const { userId } = useAuth();
+    const { userId, userRole } = useAuth();
     const { enqueueSnackbar } = useSnackbar();
     const [remarks, setRemarks] = useState('');
     const [open, setOpen] = useState({});
@@ -44,6 +44,10 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
     const [editMode, setEditMode] = useState({});
     const [showViewConfirmation, setShowViewConfirmation] = useState(false);
     const [newTask, setNewTask] = useState(true);
+
+    // Roles that can bypass the deleteRequestPending restriction
+    const bypassRoles = ['CFO', 'VICE_CHAIRMAN', 'SECRETARY'];
+    const canBypass = bypassRoles.includes(userRole);
 
     const toggleEditMode = (taskIndex, rowIndex) => {
         setEditMode((prevEditMode) => ({
@@ -378,10 +382,11 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
 
                                                                                                                                         /></TableCell>
                                                                                                                                         <TableCell>
-                                                                                                                                            <Box sx={{ display: 'flex', gap: 0.5 }} >
+                                                                                                                                            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }} >
                                                                                                                                                 <Button
                                                                                                                                                     variant="contained"
                                                                                                                                                     color="success"
+                                                                                                                                                    disabled={task.deleteRequestPending && !canBypass}
                                                                                                                                                     onClick={() => { isReview ? handleReview('Approve', task.id, row.id, rowIndex) : handleSave('Approve', task.id, row.id, rowIndex) }}
                                                                                                                                                 >
                                                                                                                                                     Approve
@@ -390,10 +395,16 @@ function ReviewTable({ beneficiaries, setBeneficiaries, isReview, setIsSucess, i
                                                                                                                                                     <Button
                                                                                                                                                         variant="contained"
                                                                                                                                                         color="error"
+                                                                                                                                                        disabled={task.deleteRequestPending && !canBypass}
                                                                                                                                                         onClick={() => handleSave('Reject', task.id, row.id, rowIndex)}
                                                                                                                                                     >
                                                                                                                                                         Reject
                                                                                                                                                     </Button>}
+                                                                                                                                                {task.deleteRequestPending && !canBypass && (
+                                                                                                                                                    <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                                                                                                                                        ⏳ Pending Deletion - Actions Disabled
+                                                                                                                                                    </Typography>
+                                                                                                                                                )}
                                                                                                                                             </Box>
                                                                                                                                         </TableCell>
                                                                                                                                     </TableRow>

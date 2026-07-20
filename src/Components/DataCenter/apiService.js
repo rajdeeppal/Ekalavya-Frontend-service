@@ -1436,3 +1436,116 @@ export const submitPreviewDetails = async (beneficiaryData) => {
     throw error;
   }
 };
+
+// ─── Task Deletion Workflow ───────────────────────────────────────────────────
+
+/**
+ * PM requests deletion of a task (and all its task updates).
+ * Freezes the task in the PM UI and creates a pending request for Admin review.
+ */
+export const requestTaskDeletion = async (taskId, empId) => {
+  try {
+    const response = await axios.post(
+      `${BENEFICIARY_BASE_URL}/task/${taskId}/request-delete`,
+      null,
+      {
+        params: { empId },
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error requesting task deletion:", error);
+    throw error;
+  }
+};
+
+/**
+ * PM reverts a pending delete request before Admin acts on it.
+ * Restores the task to active status.
+ */
+export const revertTaskDeletion = async (taskId) => {
+  try {
+    const response = await axios.post(
+      `${BENEFICIARY_BASE_URL}/task/${taskId}/revert-delete`,
+      null,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error reverting task deletion:", error);
+    throw error;
+  }
+};
+
+/**
+ * Admin: Fetches all PENDING task delete requests with full task details.
+ */
+export const getPendingTaskDeleteRequests = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/task/delete-requests`, {
+      headers: getAuthorizationHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pending task delete requests:", error);
+    throw error;
+  }
+};
+
+/**
+ * Admin: Fetches the count of PENDING task delete requests (for badge).
+ */
+export const getPendingTaskDeleteRequestCount = async () => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/task/delete-requests/count`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pending task delete request count:", error);
+    return 0;
+  }
+};
+
+/**
+ * Admin: Approves a task delete request — permanently deletes task + all task updates.
+ */
+export const approveTaskDeletion = async (requestId, adminRemarks = "") => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/task/delete-requests/${requestId}/approve`,
+      null,
+      {
+        params: { adminRemarks },
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error approving task deletion:", error);
+    throw error;
+  }
+};
+
+/**
+ * Admin: Rejects a task delete request — restores task to active.
+ */
+export const rejectTaskDeletion = async (requestId, adminRemarks = "") => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/task/delete-requests/${requestId}/reject`,
+      null,
+      {
+        params: { adminRemarks },
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting task deletion:", error);
+    throw error;
+  }
+};
+
