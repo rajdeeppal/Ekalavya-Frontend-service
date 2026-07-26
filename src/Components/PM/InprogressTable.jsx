@@ -461,11 +461,13 @@ const InprogressTable = ({ beneficiaries, value, setBeneficiaries, isReject, set
         }
         // If passbookDocFromPayee exists, backend will fetch it using the useExistingPassbook flag
         
-        // Handle other documents - only send newly uploaded files
+        // Send retained existing doc IDs so backend knows which ones to keep (and delete the rest)
         if (changedData.otherDocs && changedData.otherDocs.length > 0) {
             changedData.otherDocs.forEach((doc) => {
                 if (doc.file) {
-                    formData.append(`otherDocs`, doc.file);
+                    formData.append('otherDocs', doc.file);
+                } else if (doc.id) {
+                    formData.append('retainedDocIds', doc.id);
                 }
             });
         }
