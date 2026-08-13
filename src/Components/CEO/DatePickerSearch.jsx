@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid, Typography } from '@mui/material';
+import { TextField, Button, Grid, Typography, IconButton, Tooltip } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
-const DatePickerSearch = ({ onSearch, setIsVoucher, isVoucher, isTrue }) => {
+const DatePickerSearch = ({ onSearch, setIsVoucher, isVoucher, isTrue, onDownloadReport }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [voucherId, setVoucherId] = useState('');
@@ -27,6 +28,17 @@ const DatePickerSearch = ({ onSearch, setIsVoucher, isVoucher, isTrue }) => {
     setVoucherId('');
     setStartDate(null);
     setEndDate(null);
+    if (setIsVoucher) setIsVoucher(false);
+  };
+
+  const handleVoucherIdChange = (e) => {
+    const val = e.target.value;
+    setVoucherId(val);
+    if (val) {
+      setIsVoucher(true);
+    } else {
+      setIsVoucher(false);
+    }
   };
 
   return (
@@ -61,10 +73,27 @@ const DatePickerSearch = ({ onSearch, setIsVoucher, isVoucher, isTrue }) => {
               <TextField
                 label="Voucher ID"
                 value={voucherId}
-                onChange={(e) => { setVoucherId(e.target.value); setIsVoucher(true) }}
+                onChange={handleVoucherIdChange}
                 size="small"
               />
             </Grid>
+
+            {/* Download Report button — visible only when Voucher ID has text */}
+            {onDownloadReport && voucherId.trim() && (
+              <Grid item>
+                <Tooltip title="Download Voucher Report">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<FileDownloadIcon />}
+                    onClick={() => onDownloadReport(voucherId.trim())}
+                    size="small"
+                  >
+                    Download Associated JobIds
+                  </Button>
+                </Tooltip>
+              </Grid>
+            )}
           </>
         }
 
@@ -73,7 +102,6 @@ const DatePickerSearch = ({ onSearch, setIsVoucher, isVoucher, isTrue }) => {
             variant="contained"
             color="primary"
             onClick={handleSearch}
- 
           >
             Search
           </Button>
@@ -94,3 +122,4 @@ const DatePickerSearch = ({ onSearch, setIsVoucher, isVoucher, isTrue }) => {
 };
 
 export default DatePickerSearch;
+

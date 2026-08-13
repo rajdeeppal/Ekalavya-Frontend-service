@@ -10,7 +10,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import VoucherPortal from './VoucherPortal';
 import DeleteJobPortal from './DeleteJobPortal';
 import DeleteTaskRequests from './DeleteTaskRequests';
-import { getPendingTaskDeleteRequestCount } from '../DataCenter/apiService';
+import ProjectTerminationRequests from './ProjectTerminationRequests';
+import BroadcastCompose from './BroadcastCompose';
+import NotificationBell from '../Common/NotificationBell';
+import { jwtDecode } from 'jwt-decode';
+import { getPendingTaskDeleteRequestCount, getPendingTerminationCount } from '../DataCenter/apiService';
 
 const AdminDashboard = () => {
   const [activeComponent, setActiveComponent] = useState('PendingRequests');
@@ -18,10 +22,18 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [pendingCount, setPendingCount] = useState(0);
   const [deleteTaskCount, setDeleteTaskCount] = useState(0);
+  const [terminationCount, setTerminationCount] = useState(0);
+
+  const adminEmpId = (() => {
+    try { return jwtDecode(localStorage.getItem('jwtToken')).empId; } catch { return null; }
+  })();
 
   useEffect(() => {
     getPendingTaskDeleteRequestCount()
       .then((count) => setDeleteTaskCount(Number(count) || 0))
+      .catch(() => {});
+    getPendingTerminationCount()
+      .then((count) => setTerminationCount(Number(count) || 0))
       .catch(() => {});
   }, []);
 
@@ -58,6 +70,10 @@ const AdminDashboard = () => {
         return <DeleteJobPortal />;
       case 'DeleteTaskRequests':
         return <DeleteTaskRequests onCountChange={(count) => setDeleteTaskCount(count)} />;
+      case 'ProjectTerminationRequests':
+        return <ProjectTerminationRequests onCountChange={(count) => setTerminationCount(count)} />;
+      case 'BroadcastCompose':
+        return <BroadcastCompose />;
       default:
         return <PendingRequests />;
     }
@@ -70,6 +86,7 @@ const AdminDashboard = () => {
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
             Admin Dashboard
           </Typography>
+          {adminEmpId && <NotificationBell empId={adminEmpId} />}
 
           <Button
             sx={{
@@ -157,6 +174,30 @@ const AdminDashboard = () => {
             <Badge badgeContent={deleteTaskCount} color="error">
               Task Delete Requests
             </Badge>
+          </Button>
+
+          <Button
+            sx={{
+              fontWeight: activeComponent === 'ProjectTerminationRequests' ? 'bold' : 'normal',
+              color: activeComponent === 'ProjectTerminationRequests' ? '#8ce0f5' : 'inherit',
+              borderBottom: activeComponent === 'ProjectTerminationRequests' ? '2px solid #8ce0f5' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('ProjectTerminationRequests')}
+          >
+            <Badge badgeContent={terminationCount} color="warning">
+              Project Completion
+            </Badge>
+          </Button>
+
+          <Button
+            sx={{
+              fontWeight: activeComponent === 'BroadcastCompose' ? 'bold' : 'normal',
+              color: activeComponent === 'BroadcastCompose' ? '#8ce0f5' : 'inherit',
+              borderBottom: activeComponent === 'BroadcastCompose' ? '2px solid #8ce0f5' : 'none',
+            }}
+            onClick={() => handleComponentSwitch('BroadcastCompose')}
+          >
+            📢 Broadcast
           </Button>
 
           <IconButton

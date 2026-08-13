@@ -1396,6 +1396,22 @@ export const revertVoucher = async (employeeId, voucherId, remarks) => {
   }
 };
 
+export const emailVoucherReport = async (voucherId, userId) => {
+  try {
+    const response = await axios.get(
+      `https://projects.ekalavya.net/api/cfo/voucher/report/email/${voucherId}`,
+      {
+        params: { userId },
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error sending voucher report email:', error);
+    throw error;
+  }
+};
+
 export const getVoucherJobIds = async (voucherId) => {
   try {
     const response = await axios.get(
@@ -1549,3 +1565,125 @@ export const rejectTaskDeletion = async (requestId, adminRemarks = "") => {
   }
 };
 
+
+// ─── Broadcast / Notification APIs ───────────────────────────────────────────
+
+export const getBroadcastsForUser = async (empId) => {
+  try {
+    const response = await axios.get(
+      `https://projects.ekalavya.net/api/broadcasts/user/${empId}`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching broadcasts:', error);
+    return [];
+  }
+};
+
+export const getBroadcastUnreadCount = async (empId) => {
+  try {
+    const response = await axios.get(
+      `https://projects.ekalavya.net/api/broadcasts/user/${empId}/unread-count`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching unread count:', error);
+    return 0;
+  }
+};
+
+export const markBroadcastRead = async (broadcastId, empId) => {
+  try {
+    await axios.post(
+      `https://projects.ekalavya.net/api/broadcasts/${broadcastId}/read/${empId}`,
+      null,
+      { headers: getAuthorizationHeader() }
+    );
+  } catch (error) {
+    console.error('Error marking broadcast read:', error);
+  }
+};
+
+export const markAllBroadcastsRead = async (empId) => {
+  try {
+    await axios.post(
+      `https://projects.ekalavya.net/api/broadcasts/user/${empId}/mark-all-read`,
+      null,
+      { headers: getAuthorizationHeader() }
+    );
+  } catch (error) {
+    console.error('Error marking all broadcasts read:', error);
+  }
+};
+
+export const createBroadcast = async (payload) => {
+  try {
+    const response = await axios.post(
+      `https://projects.ekalavya.net/api/broadcasts`,
+      payload,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating broadcast:', error);
+    throw error;
+  }
+};
+
+// ─── Project Termination Approval APIs ───────────────────────────────────────
+
+export const getPendingTerminationRequests = async () => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/project/termination-requests`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching termination requests:', error);
+    throw error;
+  }
+};
+
+export const getPendingTerminationCount = async () => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/project/termination-requests/count`,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching termination count:', error);
+    return 0;
+  }
+};
+
+export const approveTerminationRequest = async (requestId, adminEmpId, remarks = '') => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/project/termination-requests/${requestId}/approve?adminEmpId=${adminEmpId}&remarks=${encodeURIComponent(remarks)}`,
+      null,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error approving termination request:', error);
+    throw error;
+  }
+};
+
+export const rejectTerminationRequest = async (requestId, remarks = '') => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/project/termination-requests/${requestId}/reject?remarks=${encodeURIComponent(remarks)}`,
+      null,
+      { headers: getAuthorizationHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error rejecting termination request:', error);
+    throw error;
+  }
+};

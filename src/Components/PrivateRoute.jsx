@@ -7,6 +7,7 @@ const defaultAuthContext = {
   isTokenExpired: false,
   token: null,
   userId: null,
+  empId: null,
   userRole: null,
   hasAccess: () => false,
 };
@@ -70,11 +71,14 @@ export const PrivateRoute = ({ children, requiredRoles }) => {
     if (shouldRedirect) return <Navigate to="/" replace />;
   }
 
-  const userId = jwtDecode(token).sub; // Decode the token after ensuring it's not null or expired
+  const decoded = jwtDecode(token);
+  const userId = decoded.sub;
+  const empId = decoded.sub ? Number(decoded.sub) : null;
 
   const value = {
     token,
     userId,
+    empId,
     userRole,
     hasAccess,
     isTokenExpired,

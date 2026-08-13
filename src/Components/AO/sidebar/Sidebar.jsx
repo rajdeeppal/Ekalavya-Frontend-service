@@ -12,11 +12,12 @@ import logo from '../../images/logo.png';
 import { getAOPendingCounts } from '../../DataCenter/apiService';
 import Badge from "@mui/material/Badge";
 import { useAuth } from '../../PrivateRoute';
+import NotificationBell from "../../Common/NotificationBell";
 
 const Sidebar = ({ isSuccess }) => {
   const [pendingCount, setPendingCount] = useState('');
   const navigate = useNavigate();
-  const { userId } = useAuth();
+  const { userId, empId } = useAuth();
   useEffect(() => {
     async function fetchProjects() {
       const data = await getAOPendingCounts(userId);
@@ -41,6 +42,7 @@ const Sidebar = ({ isSuccess }) => {
         <NavLink to="/" style={{ textDecoration: "none" }}>
           <span><img src={logo} alt="Logo" className="logo" /></span>
         </NavLink>
+        <NotificationBell empId={empId} />
       </div>
       <hr />
       <div className="center">

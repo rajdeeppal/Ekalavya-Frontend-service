@@ -28,9 +28,10 @@ import {
     Edit as EditIcon,
     Save as SaveIcon,
     Reviews,
+    FileDownload as FileDownloadIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../PrivateRoute';
-import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails, rejectVCPaymentDetails, approveVCPaymentDetails, getPayeeAccountByAccountNumber, updatePayeeAccount } from '../DataCenter/apiService';
+import { generatedVoucherDetails, getRestrictedComponents, exportCEOPaymentDetails, rejectVCPaymentDetails, approveVCPaymentDetails, getPayeeAccountByAccountNumber, updatePayeeAccount, emailVoucherReport } from '../DataCenter/apiService';
 import AOPaymentTable from '../AO/AOPaymentTable';
 import DownloadIcon from '@mui/icons-material/Download';
 import Avatar from '@mui/material/Avatar';
@@ -471,6 +472,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
 
                                     <TableCell style={{ fontWeight: 'bold' }}>Voucher</TableCell>
                                     <TableCell style={{ fontWeight: 'bold' }}>Comments</TableCell>
+                                    <TableCell style={{ fontWeight: 'bold' }}>Download Associated JobIds</TableCell>
                                 </>
                             }
                             <TableCell style={{ fontWeight: 'bold' }}>Actions</TableCell>
@@ -537,6 +539,23 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                                                         <RemoveRedEyeOutlinedIcon />
                                                     </IconButton>
                                                 )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <IconButton
+                                                    color="primary"
+                                                    disabled={!beneficiary.voucherId}
+                                                    title={beneficiary.voucherId ? 'Download Voucher Report' : 'No voucher available'}
+                                                    onClick={async () => {
+                                                        try {
+                                                            const msg = await emailVoucherReport(beneficiary.voucherId, userId);
+                                                            showSuccess(msg || 'Voucher report sent successfully');
+                                                        } catch (err) {
+                                                            showError(err?.response?.data?.message || err?.message || 'Failed to send voucher report');
+                                                        }
+                                                    }}
+                                                >
+                                                    <FileDownloadIcon />
+                                                </IconButton>
                                             </TableCell>
                                         </>
                                     )}

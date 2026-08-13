@@ -19,10 +19,11 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { useAuth } from '../../PrivateRoute';
 import { getPendingCounts } from '../../DataCenter/apiService';
 import Badge from "@mui/material/Badge";
+import NotificationBell from "../../Common/NotificationBell";
 
 const Sidebar = ({ isSuccess }) => {
   const navigate = useNavigate();
-  const { userId } = useAuth();
+  const { userId, empId } = useAuth();
   const location = useLocation();
   const [pendingCount, setPendingCount] = useState({});
   const [openMenu, setOpenMenu] = useState({
@@ -104,6 +105,7 @@ const Sidebar = ({ isSuccess }) => {
         <NavLink to="/" style={{ textDecoration: "none" }}>
           <span><img src={logo} alt="Logo" className="logo" /></span>
         </NavLink>
+        <NotificationBell empId={empId} />
       </div>
       <hr />
       <div className="center">

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal, Typography, Box } from '@mui/material';
 import Sidebar from '../AO/sidebar/Sidebar';
 import DatePickerSearch from '../CEO/DatePickerSearch';
-import { getSuccessPaymentDetails, getVoucherDetails } from '../DataCenter/apiService';
+import { getSuccessPaymentDetails, getVoucherDetails, emailVoucherReport } from '../DataCenter/apiService';
 import { useAuth } from '../PrivateRoute';
+import { useNotification } from '../Common/useNotification';
 import PaymentTable from '../CEO/PaymentTable';
 import AOPaymentTable from '../AO/AOPaymentTable';
 
 function AOPaymentSuccess() {
     const { userId } = useAuth();
+    const { showSuccess, showError } = useNotification();
     const [showTable, setShowTable] = useState(false);
     const [isReview, setIsReview] = useState(true);
     const [isSuccess, setIsSucess] = useState(false);
@@ -58,6 +60,15 @@ function AOPaymentSuccess() {
         setShowViewPaymentConfirmation(false);
     };
 
+    const handleDownloadReport = async (voucherId) => {
+        try {
+            const msg = await emailVoucherReport(voucherId, userId);
+            showSuccess(msg || 'Voucher report sent successfully');
+        } catch (err) {
+            showError(err?.response?.data?.message || err?.message || 'Failed to send voucher report');
+        }
+    };
+
     return (
         <Box sx={{ display: 'flex' }} style={{ backgroundColor: "#F0F5F9" }}>
             <Sidebar isSuccess={isSuccess} />
@@ -72,7 +83,7 @@ function AOPaymentSuccess() {
             >
 
                 <Box sx={{ borderRadius: 2, boxShadow: 1, backgroundColor: 'background.paper' }}>
-                    <DatePickerSearch onSearch={handleSearch} setIsVoucher={setIsVoucher} isVoucher={isVoucher} isTrue='true' />
+                    <DatePickerSearch onSearch={handleSearch} setIsVoucher={setIsVoucher} isVoucher={isVoucher} isTrue='true' onDownloadReport={handleDownloadReport} />
                 </Box>
 
                 {showTable && <Box sx={{ borderRadius: 2, boxShadow: 2, backgroundColor: 'background.paper', pb: 3, mt: 3 }}>
