@@ -126,12 +126,27 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
 
 
 
-    const validateForm = () => {
-        // Check if all fields are filled
+    const validateForm = (tasks, beneficiary) => {
         let formErrors = {};
         if (!formValues.bankName) formErrors.bankName = 'Bank name is required';
         if (!formValues.iFSCNo) formErrors.iFSCNo = 'IFSC No is required';
         if (!formValues.branchName) formErrors.branchName = 'Branch name is required';
+
+        if (!formValues.isFullPayment) {
+            const partial = parseFloat(formValues.partialPayment || 0);
+            if (!partial || partial <= 0) {
+                formErrors.partialPayment = 'Partial payment amount is required';
+            } else {
+                const totalAmount = tasks ? Object.values(tasks).reduce((pSum, componentGroup) =>
+                    pSum + Object.values(componentGroup).reduce((cSum, activityGroup) =>
+                        cSum + Object.values(activityGroup).reduce((aSum, taskGroup) =>
+                            aSum + Object.values(taskGroup).reduce((tSum, task) =>
+                                tSum + task.totalAmount, 0), 0), 0), 0) : 0;
+                if (partial >= totalAmount) {
+                    formErrors.partialPayment = `Partial payment must be less than total amount (\u20b9${totalAmount}). Use "Is Full Payment" instead.`;
+                }
+            }
+        }
 
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
@@ -140,7 +155,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
     const handleGenerateVoucher = async (beneficiaryKey) => {
         const beneficiary = beneficiaries.find((beneficiary) => getBeneficiaryKey(beneficiary) === beneficiaryKey);
 
-        if (!validateForm()) return;
+        if (!validateForm(tasks, beneficiary)) return;
 
         if (!beneficiary) {
             showError(`Beneficiary not found for the selected payment.`);
@@ -936,7 +951,7 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
                             margin="normal"
                             required
                             error={!!errors.partialPayment}
-                            helperText={errors.partialPayment}
+                            helperText={errors.partialPayment || 'Must be less than total amount'}
                         />
                     )}
 
