@@ -1396,6 +1396,23 @@ export const revertVoucher = async (employeeId, voucherId, remarks) => {
   }
 };
 
+export const flagVoucherAmountDispute = async (employeeId, voucherId, correctAmount, justification) => {
+  try {
+    const response = await axios.post(
+      `https://projects.ekalavya.net/api/cfo/voucher/flag-amount/${employeeId}/${voucherId}`,
+      null,
+      {
+        params: { correctAmount, justification },
+        headers: getAuthorizationHeader(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error flagging amount dispute:', error);
+    throw error;
+  }
+};
+
 export const emailVoucherReport = async (voucherId, userId) => {
   try {
     const response = await axios.get(
