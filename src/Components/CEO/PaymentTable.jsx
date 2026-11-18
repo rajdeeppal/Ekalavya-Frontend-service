@@ -159,8 +159,6 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
     const handleGenerateVoucher = async (beneficiaryKey) => {
         const beneficiary = beneficiaries.find((beneficiary) => getBeneficiaryKey(beneficiary) === beneficiaryKey);
 
-        if (!validateForm(tasks, beneficiary)) return;
-
         if (!beneficiary) {
             showError(`Beneficiary not found for the selected payment.`);
             return;
@@ -245,6 +243,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
         }, 0);
 
         console.log(totalAmount)
+        if (!validateForm(tasks, beneficiary)) return;
+
         const voucherData = {
             payeeName: beneficiary.payeeName,
             accountNumber: beneficiary.accountNumber,
@@ -257,7 +257,8 @@ function PaymentTable({ beneficiaries, setBeneficiaries, isReview, date, setIsSu
             branchName: formValues.branchName,
             passbookDocs: beneficiary.passbookDocs,
             otherDocs: beneficiary.otherDocs,
-            saveDetails: formValues.saveDetails
+            saveDetails: formValues.saveDetails,
+            employeeId: userId
         };
 
         console.log(totalAmount)
